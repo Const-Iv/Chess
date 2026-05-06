@@ -138,3 +138,9 @@
 - Principle: preliminary action / mediator / separation by stage.
 - Changes: final task QA repeated the same trigger after verification; the selected solution remains the same: Codex performs read-only self-check before owner approval, while deterministic scripts keep ambiguous rules out of automatic imports.
 - Guard: final `npm run qa:agent` and `npm run task:qa:agent` passed; no additional code path was introduced after the TRIZ decision.
+
+## 2026-05-06T10:34:09.645Z 20260506-102928-f734
+
+- Branch: `codex/20260506-102928-f734-restore-assist-product-sources`
+- Reasons: historical_recurrence
+- Status: trigger recorded
