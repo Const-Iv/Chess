@@ -2,6 +2,7 @@
 
 import { readFile, readdir, writeFile } from "node:fs/promises";
 import path from "node:path";
+import { pathToFileURL } from "node:url";
 
 import { findGitRoot, listRepoFiles, parseArgs } from "./lib/runtime.mjs";
 
@@ -115,6 +116,6 @@ async function main() {
   console.log(`repo-lint: ok (${files.filter(isLintable).length} files checked)`);
 }
 
-if (import.meta.url === `file://${process.argv[1]}`) {
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
   await main();
 }

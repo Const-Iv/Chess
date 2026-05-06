@@ -2,6 +2,7 @@
 
 import { readFile, readdir, writeFile } from "node:fs/promises";
 import path from "node:path";
+import { pathToFileURL } from "node:url";
 
 import { detectChangedZones, readTaskEvents } from "./lib/conveyor-utils.mjs";
 import {
@@ -132,6 +133,6 @@ async function main() {
   console.log(JSON.stringify({ taskId: state.taskId, reasons }, null, 2));
 }
 
-if (import.meta.url === `file://${process.argv[1]}`) {
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
   await main();
 }
