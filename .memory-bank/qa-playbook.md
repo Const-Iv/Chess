@@ -1,5 +1,13 @@
 # QA Playbook
 
+## Current Project QA Context
+
+- Проект находится на этапе discovery / проверки гипотезы.
+- Для документальных и governance-правок минимум проверки: `npm run lint`.
+- Для завершения bootstrap после canonical transfer: `npm run qa:agent`.
+- Product-specific runtime QA появится только после подтверждения гипотезы и отдельного approval по stack/runtime choices.
+- Capability decisions на текущем этапе не применимы, поэтому security-sensitive capability QA пока не требуется.
+
 ## Agent QA Gate (Mandatory)
 
 Primary deterministic gate:
