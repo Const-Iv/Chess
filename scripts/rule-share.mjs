@@ -4,6 +4,7 @@ import { createHash } from "node:crypto";
 import { existsSync } from "node:fs";
 import { mkdir, readFile, readdir, realpath, writeFile } from "node:fs/promises";
 import path from "node:path";
+import { pathToFileURL } from "node:url";
 
 import { findGitRoot, formatIso, getCodexHome, isGitDirty, parseArgs, runCommand, slugify } from "./lib/runtime.mjs";
 
@@ -1121,6 +1122,6 @@ async function main() {
   usage();
 }
 
-if (import.meta.url === `file://${process.argv[1]}`) {
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
   await main();
 }
