@@ -162,3 +162,15 @@
 ### Status
 
 - In progress.
+
+## 2026-05-08T11:57:00.106Z - Rule-share baseline import
+
+- Starter source: /Users/constantine.ivshin/!AI/new-project-starter
+- Starter HEAD: 44421e069af01ccd9be5db07816ffb0a7b44d54c
+- Approved project: Assist
+- Imported reusable rules: starter.agent.contract-challenge, starter.conveyor.dirty-source-blocker-report, starter.agent.default-goal-loop, starter.qa.ui-browser-oracle, starter.project-intake.integration-review-path
+- Registered already-present rules: starter.conveyor.task-slug-readable
+- Skipped product-specific areas: product charter wording, adapters, profiles, local rules, credentials, runtime state and private notes.
+- Changed canonical files: .cursorrules, .memory-bank/code-rules.md, .memory-bank/index.md, .memory-bank/product-charter.md, .memory-bank/project-context.md, .memory-bank/qa-playbook.md, .memory-bank/starter-rule-registry.json, AGENTS.md, CLAUDE.md, CODEX_MEMORY.md, README.md, plans/_project_intake_template.md, skills/starter-project-bootstrap/SKILL.md
+- Deterministic QA result: PASS `npm run lint`; PASS targeted rule import guard (registry id and exact rule text found for every imported rule); PASS `npm run task:qa:agent`.
+- TRIZ decision: TRIZ_APPLIED recorded in Docs/triz-usage-log.md for cross_module_conflict, historical_recurrence.

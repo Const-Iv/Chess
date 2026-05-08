@@ -156,3 +156,19 @@
 - Branch: `codex/20260508-095622-21ac-starter-rule-sync-import`
 - Reasons: historical_recurrence
 - Status: trigger recorded
+
+## 2026-05-08T11:59:12.768Z 20260508-114808-92af
+
+- Branch: `codex/20260508-114808-92af-share-starter-rules-with-assist`
+- Reasons: cross_module_conflict, historical_recurrence
+- Status: trigger recorded
+
+## 2026-05-08T12:00:39.969Z 20260508-114808-92af — TRIZ_APPLIED
+
+- Branch: `codex/20260508-114808-92af-share-starter-rules-with-assist`
+- Reasons: cross_module_conflict, historical_recurrence
+- Противоречие: нужно быстро разнести reusable starter governance в несколько downstream-проектов, но нельзя превращать это в bulk-copy, затирать product charter wording или импортировать manual-review rules.
+- ИКР: каждый проект получает только утверждённые missing rules в своём managed task worktree; product-specific документы и runtime state сохраняются, а manual-review/blocked rules остаются вне автоматического импорта.
+- Подходы: segmentation / separation by project and rule status; preliminary action через owner-approved target list и dry-run task seed; standard interface через downstream `task:start`, registry dedupe и deterministic QA.
+- Что устранено: риск повторить ошибку слепого выбора проектов и риск governance drift, где правило появляется только в одном mirror-файле или дублируется вместо registry-aware импорта.
+- Guard: `npm run lint`, targeted rule import guard и `npm run task:qa:agent` прошли; excluded/dirty projects не изменялись.
