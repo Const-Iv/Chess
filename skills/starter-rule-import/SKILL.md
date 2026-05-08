@@ -26,7 +26,7 @@ If no report exists, stop and run `$starter-rule-report` first.
    - `Кандидаты на импорт`
    - `Требует ручной проверки`
 3. Collapse duplicates by source project and rule topic. One reusable starter rule should produce one owner question, even if several candidate ids support it.
-4. Ask owner decisions sequentially. Each question must show:
+4. Ask owner decisions sequentially and make every question self-contained. Each question must follow the Owner Question Standard below and show:
    - `Проект: <source project>`
    - `Суть: <plain-language rule topic>`
    - `**Точный текст для starter:** <proposed exact text>`
@@ -45,6 +45,34 @@ If no report exists, stop and run `$starter-rule-report` first.
    - `Что переносим с правкой`
    - `Что не переносим`
    - `Что осталось заблокировано`
+
+## Owner Question Standard
+
+Use this standard whenever the owner reviews rule candidates in Plan mode. The question must let the owner decide without rereading the whole report or decoding internal ids.
+
+Before asking, do a self-check and state:
+- `Статус сейчас:` whether the rule is missing, already present but unregistered, partially covered, or source-specific.
+- `Проект-источник:` where the lesson came from.
+- `Суть:` what behavior changes in plain language.
+- `Что меняется в starter:` exact canonical surface, registry-only change, Project Intake template change, or no import.
+- `**Точный текст для starter:**` the portable text, rewritten away from source-project details.
+- `**Моё предложение:**` the charter-safe recommendation and why.
+- `Traceability:` candidate/source ids after the human decision content.
+
+Successful patterns to repeat:
+- Explain existing coverage before the choice: `правило уже есть, упущение только registry` or `правила ещё нет в starter`.
+- Group duplicates into one decision when they support the same reusable starter rule.
+- For source-specific lessons, preserve the invariant and remove local wording, project names, local commands, channels, private notes, and raw logs.
+- When adapting workflow choices, make them explicit owner/team decisions, not new starter defaults.
+- If the owner says the question is unclear, stop that sequence, restate the candidate using this full standard, and continue only after the owner can see the exact proposed rule and effect.
+
+Anti-patterns to avoid:
+- Do not ask terse technical choices such as `registry-only / править текст / пропустить` without explaining the actual rule and current starter gap.
+- Do not lead with internal ids, report numbers, registry mechanics, or candidate labels before the human meaning.
+- Do not ask the owner to approve a rule without exact starter text and a recommendation.
+- Do not bundle unrelated decisions into one question.
+- Do not import source-specific wording such as a solo-owner PR policy as if it were portable starter text.
+- Do not treat `Требует ручной проверки` as owner homework when Codex can inspect the source itself.
 
 ## Import Preparation
 
