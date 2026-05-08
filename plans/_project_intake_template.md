@@ -319,3 +319,7 @@ Runtime-specific rules:
 
 Комментарии / blockers:
 -
+
+## Shared Starter Baseline Rules
+
+- `starter.project-intake.integration-review-path`: Integration / review path в Project Intake фиксирует, как изменения попадают в основной проект: managed task conveyor, Pull Request review или hybrid. Pull Request review является явным owner/team choice для risky, broad, external-review или team-review работы и не должен обходить deterministic QA, source-of-truth governance, task finish и merge gates.

@@ -78,3 +78,7 @@
 - `starter-rule-import` — основной Codex entrypoint для утреннего согласования: он ведёт owner'а по `Кандидаты на импорт` и `Требует ручной проверки`, задаёт self-contained questions со статусом правила, source project, сутью, exact starter text, recommendation и traceability, затем после explicit approval готовит approval JSON и preliminary check без изменений. Каждый approved reusable rule добавляется или обновляется в `.memory-bank/starter-rule-registry.json`.
 - `starter-rule-share` — основной Codex entrypoint для outbound sharing уже обновлённого starter baseline в выбранные active downstream проекты; `runtime/rule-share/config.json` хранит локальный allowlist/ignorelist и optional standing approval для guarded one-run mode, не коммитится.
 - Reusable starter skills публикуются в `$CODEX_HOME/skills` через symlink-based `skills:link`; после `git pull` существующие ссылки подхватывают обновления сразу, а для новых или переименованных skills нужно повторно запустить `skills:link`.
+
+## Shared Starter Baseline Rules
+
+- `starter.project-intake.integration-review-path`: Integration / review path в Project Intake фиксирует, как изменения попадают в основной проект: managed task conveyor, Pull Request review или hybrid. Pull Request review является явным owner/team choice для risky, broad, external-review или team-review работы и не должен обходить deterministic QA, source-of-truth governance, task finish и merge gates.
