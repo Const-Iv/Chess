@@ -52,6 +52,19 @@ Dependency preflight обязателен перед запуском gate:
 - Если relevant tests нет, явно фиксировать gap и компенсировать ближайшей более широкой deterministic check.
 - `qa:agent` остаётся обязательным final gate.
 
+## Default Goal Loop QA
+
+- Для executable tasks ассистент должен вывести ожидаемый результат из запроса пользователя и вести цикл `goal -> change -> check -> fix -> re-check`, пока результат не проверен или не достигнут явный stop condition.
+- Stop conditions: существенная продуктовая неоднозначность, риск destructive/data/prod/secret/main-worktree action, отсутствие permission/credential, конфликт, требующий выбора владельца, исчерпанный retryable QA chunk, baseline/infra blocker вне scope задачи или настоящий продуктовый tradeoff с несколькими валидными вариантами.
+- Если loop останавливается до готового результата, evidence должно показать текущий state, первый blocker, уже выполненные проверки и ближайший safe next step.
+
+## UI Browser Oracle
+
+- Для user-visible UI behavior change или UI bugfix до реализации нужно определить browser oracle: точный пользовательский сценарий, ожидаемый видимый результат, релевантные данные/состояния, признаки сбоя и console/runtime status.
+- Перед завершением UI-задачи нужно проверить реальный интерфейс доступным browser-инструментом; code review, typecheck, unit tests, HTTP reachability и `qa:agent` без browser evidence недостаточны, если интерфейс можно запустить.
+- Если browser verification падает и агент может это воспроизвести, он диагностирует, исправляет, повторяет deterministic checks и снова прогоняет browser oracle, а не просит владельца искать UI-ошибки вручную.
+- Если browser не стартует, сначала выполнить recovery; если recovery не помог, task остаётся blocked с конкретной причиной вместо статуса done.
+
 ## Echo-testing Gate For Unknown Root Technology
 
 - Echo-test обязателен до feature/refactor/behavior-change реализации, если продукт или capability зависит от неизвестной корневой технологии, интеграции, provider, runtime, agent surface, bot/channel, worker или внешнего API.
@@ -96,6 +109,7 @@ Eval обязателен для изменений, которые влияют
 - rule-sync owner reports;
 - rule-share owner reports;
 - conversational commands;
+- default goal loop и UI browser oracle;
 - TRIZ trigger/decision behavior;
 - другой AI/agent response quality.
 
@@ -118,6 +132,7 @@ Acceptance criteria проверяют пользовательский резу
 - Записывать точные команды и PASS/FAIL.
 - Для bugfixes фиксировать defect class, invariant и shared seam.
 - Для AI/agent behavior changes записывать eval cases, expected behavior, actual behavior и pass/fail.
+- Для UI behavior changes записывать browser oracle, инструмент проверки, URL/base URL, expected visible result, actual visible result и console/runtime status.
 - Для rule-sync/rule-share imports считать QA/TRIZ logs evidence, а не готовым rule text: итоговое правило должно быть переписано как portable invariant и сохранять source traceability.
 - Для performance и state-safety fixes фиксировать, что user data и public behavior contracts сохранены; read-only/internal automatic updates не должны считаться user changes без user interaction или real entity changes.
 - Если defect class связан с потерей пользовательского состояния, evidence должно включать root-cause summary и reusable regression guard или явно зафиксированный exception.

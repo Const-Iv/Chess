@@ -125,6 +125,15 @@ Echo-testing / root capability check:
 - Подтвердил:
 - Дата:
 
+Integration / review path:
+- Primary integration path: [ ] Managed task conveyor [ ] Pull Request review [ ] Hybrid
+- When Pull Request review is required:
+- When local managed conveyor is enough:
+- Required gates before merge/release:
+- Статус согласования: [ ] Ожидает owner approval [ ] Согласовано [ ] Заблокировано
+- Подтвердил:
+- Дата:
+
 QA / release choices:
 - Primary deterministic gate:
 - Smoke / e2e scope:

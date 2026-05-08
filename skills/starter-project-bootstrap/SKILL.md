@@ -85,10 +85,11 @@ Stop instead of auto-starting when the repo is dirty, the task conveyor is unava
 8. For capability decisions, first ask whether each block is applicable. If applicable, record owner-approved invariants before implementation in that area.
 9. If the project is still validating a hypothesis, do not treat architecture, technologies, launch method, commercial model, ownership zones, or major product capabilities as approved until they are explicitly agreed in Project Intake, product charter, or roadmap.
 10. If the project depends on an unknown root technology, integration, provider, runtime, agent surface, bot/channel, worker, or external API, require isolated echo-test evidence or a recorded blocker before feature/refactor/behavior-change work in that area.
-11. If the project needs actions after publishing, such as restarting local agents or services, capture the owner-approved method in Project Intake; do not turn local commands or environment settings into starter core behavior.
-12. After owner approval, transfer answers into canonical sources.
-13. Run baseline QA and report evidence.
-14. Only after QA passes, say the downstream project is ready for feature/refactor/behavior-change tasks.
+11. Capture the owner-approved integration/review path in Project Intake: managed task conveyor, Pull Request review, or hybrid; Pull Request review must not bypass deterministic QA, source-of-truth governance, or finish/merge gates.
+12. If the project needs actions after publishing, such as restarting local agents or services, capture the owner-approved method in Project Intake; do not turn local commands or environment settings into starter core behavior.
+13. After owner approval, transfer answers into canonical sources.
+14. Run baseline QA and report evidence.
+15. Only after QA passes, say the downstream project is ready for feature/refactor/behavior-change tasks.
 
 ## Project Intake Order
 
@@ -107,10 +108,11 @@ Collect and approve in this order:
 11. Core / adapters / profiles boundary
 12. Stack / runtime choices
 13. Echo-testing / root capability check, only if unknown root technology exists
-14. QA / release choices
-15. Agent / eval choices
-16. Memory / rules ownership
-17. Capability decisions, only if applicable:
+14. Integration / review path
+15. QA / release choices
+16. Agent / eval choices
+17. Memory / rules ownership
+18. Capability decisions, only if applicable:
     - auth / user identity
     - payments / billing
     - credits / limits
