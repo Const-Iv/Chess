@@ -150,3 +150,9 @@
 - Branch: `codex/20260504-084634-8208-bootstrap-downstream-`
 - Reasons: historical_recurrence
 - Status: trigger recorded
+
+## 2026-05-08T11:16:59.866Z 20260508-095622-21ac
+
+- Branch: `codex/20260508-095622-21ac-starter-rule-sync-import`
+- Reasons: historical_recurrence
+- Status: trigger recorded
