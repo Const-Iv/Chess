@@ -2,17 +2,6 @@
 
 Журнал срабатываний TRIZ-триггеров и применённых решений.
 
-## `<YYYY-MM-DD HH:MM:SS>` — TRIZ_TRIGGER
-
-- Reason: `<qa_repeat_stage|qa_chunk_exhausted|cross_module_conflict|historical_recurrence>`
-- Details: `<json or concise structured summary>`
-
-## `<YYYY-MM-DD HH:MM:SS>` — TRIZ_APPLIED
-
-- Principle: `<chosen principle or structural move>`
-- Changes: `<what changed>`
-- Guard: `<what reusable guard was added>`
-
 ## 2026-04-22T12:52:38.438Z 20260422-123751-07b0
 
 - Branch: `codex/20260422-123751-07b0-agent-const-plan-template-sync`
@@ -172,3 +161,32 @@
 - Подходы: segmentation / separation by project and rule status; preliminary action через owner-approved target list и dry-run task seed; standard interface через downstream `task:start`, registry dedupe и deterministic QA.
 - Что устранено: риск повторить ошибку слепого выбора проектов и риск governance drift, где правило появляется только в одном mirror-файле или дублируется вместо registry-aware импорта.
 - Guard: `npm run lint`, targeted rule import guard и `npm run task:qa:agent` прошли; excluded/dirty projects не изменялись.
+
+## 2026-05-08T12:07:50.903Z 20260508-120257-87d1
+
+- Branch: `codex/20260508-120257-87d1-require-rule-share-project-selection-first`
+- Reasons: cross_module_conflict, historical_recurrence
+- Status: trigger recorded
+
+## 2026-05-08T12:08:30.000Z 20260508-120257-87d1 — TRIZ_APPLIED
+
+- Branch: `codex/20260508-120257-87d1-require-rule-share-project-selection-first`
+- Reasons: cross_module_conflict, historical_recurrence
+- Противоречие: нужно сохранить быстрый guarded one-run для outbound sharing, но нельзя снова допустить перенос правил в проекты без явного текущего выбора владельца.
+- ИКР: выбор проектов становится отдельным первым owner-facing gate; deterministic scan/apply-plan/task-start остаются прежними execution layers и запускаются только после exact confirmation.
+- Подходы: separation by stage, preliminary action, standard interface. Выбор проектов отделён от scan/report и approval JSON, а отсутствие UI-окна переводит flow в stop-and-ask вместо silent fallback.
+- Что устранено: риск молчаливой трактовки “all ready projects”, повторного использования старого approval JSON и запуска downstream task worktrees без подтверждённого include/exclude set.
+- Guard: `skills/starter-rule-share/SKILL.md`, canonical governance, registry rule and plan Eval spec updated; `npm run task:qa:agent` passed.
+
+## 2026-05-08T12:08:53.797Z 20260508-120257-87d1
+
+- Branch: `codex/20260508-120257-87d1-require-rule-share-project-selection-first`
+- Reasons: cross_module_conflict, historical_recurrence
+- Status: trigger recorded
+
+## 2026-05-08T12:09:10.000Z 20260508-120257-87d1 — TRIZ_APPLIED
+
+- Branch: `codex/20260508-120257-87d1-require-rule-share-project-selection-first`
+- Reasons: cross_module_conflict, historical_recurrence
+- Status: final task QA repeated the same trigger after the TRIZ decision above; no additional solution was introduced.
+- Guard: the selected solution remains the project selection gate before rule-share execution, and final `npm run task:qa:agent` passed.
