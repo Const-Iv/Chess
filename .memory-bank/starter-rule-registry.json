@@ -524,6 +524,29 @@
       "sharePolicy": "required"
     },
     {
+      "id": "starter.rule-share.project-selection-first",
+      "title": "Rule-share starts with owner-confirmed project selection",
+      "text": "При запуске `starter-rule-share` первым owner-facing шагом должен быть выбор проектов для текущего переноса: Codex показывает полный обнаруженный список кандидатов, явно отмечает include/exclude/blocked/source-only рекомендации, получает подтверждение владельца по exact project set и только после этого запускает `rule-share:scan`, `rule-share:apply-plan`, downstream `task:start` или guarded one-run. Если окно выбора недоступно, Codex задаёт вопрос в чате и останавливается; нельзя молча трактовать “all ready projects”, прошлый approval JSON или standing approval как подтверждение текущего интерактивного запуска.",
+      "targetFiles": [
+        "AGENTS.md",
+        ".memory-bank/code-rules.md",
+        ".memory-bank/project-context.md",
+        "CODEX_MEMORY.md",
+        "README.md",
+        "skills/starter-rule-share/SKILL.md"
+      ],
+      "requiredFragments": [
+        "первым owner-facing шагом должен быть выбор проектов",
+        "полный обнаруженный список кандидатов",
+        "нельзя молча трактовать “all ready projects”"
+      ],
+      "source": {
+        "type": "existing-governance",
+        "note": "Owner-requested guard after an incorrect rule-share run selected projects without confirmation."
+      },
+      "sharePolicy": "required"
+    },
+    {
       "id": "starter.skills.generated-trees-not-core",
       "title": "Generated skill trees are not starter core",
       "text": "Generated skill trees (`.agents/skills`, `.claude/skills`, `.cursor/skills`) считаются profile/tool output; starter импортирует только reusable source policy или repo-owned skills under `skills/`, а не bulk generated trees.",

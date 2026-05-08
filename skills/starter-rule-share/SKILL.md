@@ -12,12 +12,18 @@ Charter fit: outbound sharing supports the mission and JTBD by letting active do
 ## Workflow
 
 1. Read `.memory-bank/product-charter.md`, `AGENTS.md`, `.memory-bank/index.md`, and `.memory-bank/code-rules.md`.
-2. Confirm the starter import is actually ready:
+2. Project selection gate is the first owner-facing step and must run before `rule-share:scan`, `rule-share:report`, `rule-share:apply-plan`, downstream `task:start`, or one-run execution:
+   - present the complete discovered candidate list from `runtime/rule-share/config.json` roots/allowlist and any owner-named root such as `/Users/.../!AI`;
+   - show each project with a plain recommendation: include, exclude, blocked because dirty, blocked because not starter-based, or source project only;
+   - ask the owner to approve the exact include/exclude set for the current run;
+   - use an available choice window when the environment supports it; if it is unavailable, ask in chat and stop until the owner answers;
+   - never infer that “all ready projects” are approved, and never treat a previous approval JSON or standing approval as current-run confirmation in an interactive session.
+3. Confirm the starter import is actually ready:
    - starter working tree is clean;
    - the rule-sync import task passed deterministic QA;
    - the rules being shared are reusable starter baseline rules, not product-specific source-project details.
    - `.memory-bank/starter-rule-registry.json` contains the approved reusable rules that should be checked downstream.
-3. Ensure local target-project config exists in ignored `runtime/rule-share/config.json`:
+4. Ensure local target-project config exists in ignored `runtime/rule-share/config.json` and reflects the owner-approved project set for this run:
    ```json
    {
      "roots": ["/path/to/project-root-folder"],
@@ -27,10 +33,10 @@ Charter fit: outbound sharing supports the mission and JTBD by letting active do
    }
    ```
    Keep this file uncommitted. It may contain personal local paths.
-4. Run or inspect the latest rule-share scan:
+5. Run or inspect the latest rule-share scan only after the project selection gate is satisfied:
    - `npm run rule-share:scan`
    - `npm run rule-share:report -- --latest`
-5. Present the owner report in this order:
+6. Present the owner report in this order:
    - `Предложения к проектам`
    - `Готово к обновлению`
    - `Актуально`
@@ -43,8 +49,8 @@ Charter fit: outbound sharing supports the mission and JTBD by letting active do
    - `Будет добавлено`: exact missing rule text that can be imported automatically.
    - `Требует ручной проверки`: similar or manual-review rules that must not be auto-imported.
    For `Требует ручной проверки`, do not hand the search work to the owner. Codex must first inspect the target project read-only when possible, then report a concrete recommendation: already covered, add as written, add with adaptation, skip, or blocked. Owner action is only to approve that recommendation or clear a real blocker such as dirty tree / missing starter signals.
-6. Ask the owner to approve the target project list before apply-plan. Use project ids only as traceability after the project names and recommended actions are clear.
-7. After explicit approval, write an ignored approval JSON such as `runtime/rule-share/approvals/<date>-approval.json`:
+7. Reconfirm the final target project list before apply-plan if the scan/report changed any status from the owner-approved set. Use project ids only as traceability after the project names and recommended actions are clear.
+8. After explicit approval, write an ignored approval JSON such as `runtime/rule-share/approvals/<date>-approval.json`:
    ```json
    {
      "approvedProjects": ["rsh-project-id"],
@@ -53,9 +59,9 @@ Charter fit: outbound sharing supports the mission and JTBD by letting active do
      }
    }
    ```
-8. Prepare outbound tasks with:
+9. Prepare outbound tasks with:
    - `npm run rule-share:apply-plan -- --approval <path> --dry-run`
-9. For each returned project task seed:
+10. For each returned project task seed:
    - run the target project's managed `task:start` from that project's root;
    - apply the appropriate update inside the target task worktree;
    - run the target project's deterministic QA;
@@ -63,7 +69,7 @@ Charter fit: outbound sharing supports the mission and JTBD by letting active do
 
 ## One-Run Mode
 
-Use one-run mode only when the owner explicitly asks for automatic sharing in the current request, or when ignored local config contains standing approval for the selected projects. One-run mode reduces chat turns; it does not bypass safety gates.
+Use one-run mode only when the owner explicitly asks for automatic sharing in the current request, or when ignored local config contains standing approval for the selected projects. One-run mode reduces chat turns; it does not bypass safety gates or the project selection gate.
 
 Allowed standing approval shape in `runtime/rule-share/config.json`:
 
@@ -80,20 +86,21 @@ Allowed standing approval shape in `runtime/rule-share/config.json`:
 
 When one-run mode is active:
 
-1. Run `npm run rule-share:scan` and `npm run rule-share:report -- --latest`.
-2. Select only `ready` projects that are both in the allowlist and explicitly approved by the current request or `autoShare.approvedProjects`.
-3. Skip `manual_review`, `blocked`, dirty, archived, paused, or unclear projects and report the reason.
-4. Write ignored approval JSON for the selected ready projects.
-5. Run `npm run rule-share:apply-plan -- --approval <path> --dry-run`.
-6. For each returned task seed, run the target project's managed `task:start`.
-7. In each target task worktree, apply only reusable baseline updates:
+1. Run the project selection gate first. If the current request or `autoShare.approvedProjects` names projects, treat them only as the proposed selection, show the include/exclude set, and require confirmation in interactive sessions before continuing.
+2. Run `npm run rule-share:scan` and `npm run rule-share:report -- --latest`.
+3. Select only `ready` projects that are both in the allowlist and explicitly approved by the confirmed current-run selection.
+4. Skip `manual_review`, `blocked`, dirty, archived, paused, or unclear projects and report the reason.
+5. Write ignored approval JSON for the selected ready projects.
+6. Run `npm run rule-share:apply-plan -- --approval <path> --dry-run`.
+7. For each returned task seed, run the target project's managed `task:start`.
+8. In each target task worktree, apply only reusable baseline updates:
    - for `update_starter_reference`, update `vendor/new-project-starter` to the approved starter HEAD and check shared skills;
    - for `prepare_rule_import`, import only the `missingRules` from the task seed; preserve downstream product charter wording, adapters, profiles and local rules.
    - if a rule is `presentUnregistered`, do not duplicate its text; only register it as applied if the downstream project maintains a rule registry and this is part of the approved task.
    - for copied-baseline imports, sync the reusable rule across downstream canonical and mirror surfaces when relevant: `AGENTS.md`, `.memory-bank/*`, `CODEX_MEMORY.md`, `README.md`, `.cursorrules`, and `CLAUDE.md`.
    - record downstream evidence in `Docs/qa-implementation-log.md` and `Docs/triz-usage-log.md` when TRIZ triggers. Evidence must include starter source, starter HEAD, approved project, imported reusable rules, skipped product-specific areas, changed canonical files, deterministic QA result and any TRIZ decision.
-8. Run the target project's deterministic QA and record evidence in the target plan or response.
-9. Stop before finish/merge/publish unless the owner explicitly requested that stage and the target project has PASS QA plus its normal cleanup/publish approvals.
+9. Run the target project's deterministic QA and record evidence in the target plan or response.
+10. Stop before finish/merge/publish unless the owner explicitly requested that stage and the target project has PASS QA plus its normal cleanup/publish approvals.
 
 If any target becomes ambiguous during import, stop that target and continue only with other ready targets. The final response must list `updated`, `skipped`, `blocked`, QA status, and the target worktree paths.
 
@@ -177,6 +184,7 @@ Never turn manual review into direct copy. After the missing signals are fixed a
 ## Safety Rules
 
 - Never share to projects outside `runtime/rule-share/config.json` allowlist.
+- Never start `rule-share:scan`, `rule-share:apply-plan`, downstream `task:start`, or one-run execution before the current-run project selection gate is satisfied.
 - Never apply outbound changes directly from starter into downstream source files.
 - Never edit dirty downstream projects; ask for cleanup/commit/stash in that project first.
 - Never overwrite downstream product charter or product-specific instructions.
