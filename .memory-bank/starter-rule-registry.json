@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-05-05T17:10:45.000Z",
+  "updatedAt": "2026-05-08T11:57:31.246Z",
   "rules": [
     {
       "id": "starter.project-intake.mission-vision-project-level",
@@ -341,6 +341,177 @@
       "source": {
         "type": "existing-governance",
         "note": "Protects starter core from tool-generated skill output."
+      },
+      "sharePolicy": "required"
+    },
+    {
+      "id": "starter.agent.contract-challenge",
+      "title": "Literal requests cannot weaken project contracts",
+      "text": "Если буквальная инструкция пользователя ослабляет product charter, safety, privacy, governance, QA или уже принятый рабочий контракт проекта, согласие пользователя не является достаточным основанием для выполнения. Ассистент должен назвать конкретный конфликт, предложить ближайший вариант, который сохраняет цель пользователя и контракт проекта, и продолжать только по согласованному безопасному варианту.",
+      "targetFiles": [
+        "AGENTS.md",
+        ".memory-bank/code-rules.md",
+        "CODEX_MEMORY.md",
+        "README.md",
+        ".cursorrules",
+        "CLAUDE.md"
+      ],
+      "requiredFragments": [
+        "Если буквальная инструкция пользователя ослабляет product charter",
+        "согласие пользователя не является достаточным основанием",
+        "предложить ближайший вариант, который сохраняет цель пользователя"
+      ],
+      "source": {
+        "type": "starter-rule-import",
+        "candidateIds": [
+          "rs-b7ee5b15af"
+        ],
+        "importedAt": "2026-05-08T07:00:00.000Z"
+      },
+      "sharePolicy": "required"
+    },
+    {
+      "id": "starter.conveyor.dirty-source-blocker-report",
+      "title": "Dirty source tree blockers require owner-facing report",
+      "text": "Если `task:start`, `task:finish:core`, `task:merge:main` или `release:local` блокируются dirty `main`/source tree, ассистент сначала сам собирает read-only blocker report: конкретные файлы, тип изменения, tracked/untracked статус, вероятное происхождение по history/diff/name-status, связь с текущей task branch, риск для текущей работы и recommended safe path. Нельзя перекладывать первичный разбор dirty tree на владельца.",
+      "targetFiles": [
+        "AGENTS.md",
+        ".memory-bank/code-rules.md",
+        "CODEX_MEMORY.md",
+        "README.md",
+        ".cursorrules",
+        "CLAUDE.md"
+      ],
+      "requiredFragments": [
+        "блокируются dirty `main`/source tree",
+        "read-only blocker report",
+        "Нельзя перекладывать первичный разбор dirty tree на владельца"
+      ],
+      "source": {
+        "type": "starter-rule-import",
+        "candidateIds": [
+          "rs-6172d63f20"
+        ],
+        "relatedEvidenceIds": [
+          "rs-06cc37b65f",
+          "rs-ed99d6f567",
+          "rs-fde14dbc76"
+        ],
+        "importedAt": "2026-05-08T07:00:00.000Z"
+      },
+      "sharePolicy": "required"
+    },
+    {
+      "id": "starter.agent.default-goal-loop",
+      "title": "Executable tasks iterate until verified or blocked",
+      "text": "Для executable tasks ассистент должен вывести ожидаемый результат из запроса пользователя и вести цикл `goal -> change -> check -> fix -> re-check`, пока результат не проверен или не достигнут явный stop condition. Stop conditions: существенная продуктовая неоднозначность, риск destructive/data/prod/secret/main-worktree action, отсутствие permission/credential, конфликт, требующий выбора владельца, исчерпанный retryable QA chunk, baseline/infra blocker вне scope задачи или настоящий продуктовый tradeoff с несколькими валидными вариантами.",
+      "targetFiles": [
+        "AGENTS.md",
+        ".memory-bank/code-rules.md",
+        ".memory-bank/qa-playbook.md",
+        "CODEX_MEMORY.md",
+        "README.md",
+        ".cursorrules",
+        "CLAUDE.md"
+      ],
+      "requiredFragments": [
+        "Для executable tasks ассистент должен вывести ожидаемый результат",
+        "`goal -> change -> check -> fix -> re-check`",
+        "пока результат не проверен или не достигнут явный stop condition"
+      ],
+      "source": {
+        "type": "starter-rule-import",
+        "candidateIds": [
+          "rs-b7bb8fb7c9"
+        ],
+        "importedAt": "2026-05-08T07:00:00.000Z"
+      },
+      "sharePolicy": "required"
+    },
+    {
+      "id": "starter.qa.ui-browser-oracle",
+      "title": "UI behavior changes require browser oracle evidence",
+      "text": "Для user-visible UI behavior change или UI bugfix ассистент должен до реализации определить browser oracle: точный пользовательский сценарий, ожидаемый видимый результат, релевантные данные/состояния, признаки сбоя и console/runtime status. Перед завершением нужно проверить реальный интерфейс доступным browser-инструментом. Если browser verification падает и агент может это воспроизвести, он диагностирует, исправляет, повторяет deterministic checks и снова прогоняет browser oracle, а не просит владельца искать UI-ошибки вручную.",
+      "targetFiles": [
+        "AGENTS.md",
+        ".memory-bank/code-rules.md",
+        ".memory-bank/qa-playbook.md",
+        "CODEX_MEMORY.md",
+        "README.md",
+        ".cursorrules",
+        "CLAUDE.md"
+      ],
+      "requiredFragments": [
+        "Для user-visible UI behavior change или UI bugfix",
+        "определить browser oracle",
+        "не просит владельца искать UI-ошибки вручную"
+      ],
+      "source": {
+        "type": "starter-rule-import",
+        "candidateIds": [
+          "rs-b7bb8fb7c9"
+        ],
+        "importedAt": "2026-05-08T07:00:00.000Z"
+      },
+      "sharePolicy": "required"
+    },
+    {
+      "id": "starter.project-intake.integration-review-path",
+      "title": "Project Intake chooses the integration and review path",
+      "text": "Integration / review path в Project Intake фиксирует, как изменения попадают в основной проект: managed task conveyor, Pull Request review или hybrid. Pull Request review является явным owner/team choice для risky, broad, external-review или team-review работы и не должен обходить deterministic QA, source-of-truth governance, task finish и merge gates.",
+      "targetFiles": [
+        "AGENTS.md",
+        ".memory-bank/product-charter.md",
+        ".memory-bank/code-rules.md",
+        ".memory-bank/project-context.md",
+        ".memory-bank/index.md",
+        "plans/_project_intake_template.md",
+        "skills/starter-project-bootstrap/SKILL.md",
+        "CODEX_MEMORY.md",
+        "README.md",
+        ".cursorrules",
+        "CLAUDE.md"
+      ],
+      "requiredFragments": [
+        "Integration / review path в Project Intake",
+        "managed task conveyor, Pull Request review или hybrid",
+        "не должен обходить deterministic QA"
+      ],
+      "source": {
+        "type": "starter-rule-import",
+        "candidateIds": [
+          "rs-bcb8dbbb28"
+        ],
+        "importedAt": "2026-05-08T10:58:56.000Z"
+      },
+      "sharePolicy": "required"
+    },
+    {
+      "id": "starter.conveyor.task-slug-readable",
+      "title": "Task worktree slugs preserve the request meaning",
+      "text": "`task:start` branch/worktree slug должен строиться из фактического title; non-ASCII title получает readable ASCII slug (например, `ЭХО` -> `echo`), а fallback `task` допустим только если title не содержит осмысленных букв или цифр.",
+      "targetFiles": [
+        "AGENTS.md",
+        ".memory-bank/code-rules.md",
+        "CODEX_MEMORY.md",
+        "README.md",
+        ".cursorrules",
+        "CLAUDE.md"
+      ],
+      "requiredFragments": [
+        "`task:start` branch/worktree slug должен строиться из фактического title",
+        "non-ASCII title получает readable ASCII slug",
+        "fallback `task` допустим только"
+      ],
+      "source": {
+        "type": "starter-rule-import",
+        "candidateIds": [
+          "rs-b470681e42",
+          "rs-dab8087b12",
+          "rs-5a80293168",
+          "rs-75ec80f2cc"
+        ],
+        "importedAt": "2026-05-08T10:58:56.000Z"
       },
       "sharePolicy": "required"
     }

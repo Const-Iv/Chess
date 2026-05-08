@@ -115,3 +115,7 @@
 - Если запрос пользователя конфликтует с этим charter, ассистент должен остановиться, коротко объяснить конфликт и предложить ближайший безопасный вариант, который сохраняет миссию и цель проекта.
 - Product charter нельзя обходить через локальный patch, mirror-файл, временный exception или ad-hoc script. Если charter требует изменения, сначала обновить этот файл и синхронизировать обязательные правила в `AGENTS.md`, `.memory-bank/*` и `CODEX_MEMORY.md`.
 - Raw transcript нельзя редактировать или пересказывать как источник: `Docs/product-discovery/2026-04-03-assistant-selection-transcript.raw` хранит verbatim-фрагмент встречи.
+
+## Shared Starter Baseline Rules
+
+- `starter.project-intake.integration-review-path`: Integration / review path в Project Intake фиксирует, как изменения попадают в основной проект: managed task conveyor, Pull Request review или hybrid. Pull Request review является явным owner/team choice для risky, broad, external-review или team-review работы и не должен обходить deterministic QA, source-of-truth governance, task finish и merge gates.
