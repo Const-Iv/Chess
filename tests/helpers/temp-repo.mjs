@@ -77,7 +77,7 @@ export async function createTempStarterRepo(options = {}) {
 /**
  * @param {string} repoRoot
  * @param {string[]} args
- * @param {{env?: NodeJS.ProcessEnv, allowFailure?: boolean}} [options]
+ * @param {{env?: Record<string, string | undefined>, allowFailure?: boolean}} [options]
  * @returns {import("../../scripts/lib/runtime.mjs").CommandResult}
  */
 export function runStarterScript(repoRoot, args, options = {}) {

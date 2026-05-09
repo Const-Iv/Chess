@@ -1,13 +1,15 @@
 {
-  "name": "new-project-starter",
+  "name": "chess-openings-trainer",
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "description": "Executable Node/npm baseline for Codex worktree conveyor, deterministic QA, and governance-first project bootstrap.",
+  "description": "Local chess openings trainer with legal-move echo tests and verified opening-map seeds.",
   "scripts": {
     "lint": "node scripts/repo-lint.mjs",
     "lint:fix": "node scripts/repo-lint.mjs --fix",
     "lint:fix:changed": "node scripts/lint-fix-changed.mjs",
+    "echo:chess-opening": "node scripts/echo-chess-opening.mjs",
+    "dev": "next dev",
     "skills:link": "node scripts/skills-manage.mjs link",
     "skills:status": "node scripts/skills-manage.mjs status",
     "skills:unlink": "node scripts/skills-manage.mjs unlink",
@@ -19,7 +21,7 @@
     "rule-share:apply-plan": "node scripts/rule-share.mjs apply-plan",
     "typecheck": "node ./node_modules/typescript/bin/tsc --noEmit",
     "test": "node --test tests/unit/*.test.mjs tests/integration/*.test.mjs",
-    "build": "node scripts/build-starter.mjs",
+    "build": "next build && node scripts/build-starter.mjs",
     "qa:agent": "node scripts/deterministic-feedback-loop.mjs",
     "qa:smoke:pr": "node --test tests/e2e/pr-smoke.test.mjs",
     "qa:e2e:nightly": "node --test tests/e2e/*.test.mjs",
@@ -39,9 +41,20 @@
   },
   "devDependencies": {
     "@types/node": "^22.15.3",
+    "@types/react": "19.2.14",
+    "@types/react-dom": "19.2.3",
     "typescript": "^5.8.3"
   },
   "engines": {
     "node": ">=20"
+  },
+  "dependencies": {
+    "chess.js": "1.4.0",
+    "next": "16.2.6",
+    "react": "19.2.6",
+    "react-dom": "19.2.6"
+  },
+  "overrides": {
+    "postcss": "8.5.14"
   }
 }
