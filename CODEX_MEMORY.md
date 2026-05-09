@@ -71,6 +71,7 @@
 - Approved reusable starter rules должны фиксироваться в `.memory-bank/starter-rule-registry.json`; без stable id и exact text `starter-rule-share` не может надёжно отличить уже применённое правило от missing rule.
 - Outbound rule sharing переносит в copied-baseline проекты только `missingRules`; `presentUnregisteredRules` нельзя дублировать как новый текст, а partial/manual-review matches требуют owner review.
 - Outbound rule sharing переносит в copied-baseline проекты только `missingRules`; `presentUnregisteredRules` нельзя дублировать как новый текст, а partial/manual-review matches сначала требуют Codex read-only self-check с конкретной рекомендацией для владельца.
+- Большая база дебютов, import adapter and full UI behavior remain blocked until each expansion has source/manual verification and deterministic QA.
 
 ## Project Notes
 
@@ -94,3 +95,11 @@
 - Ночной `starter-rule-report` и исходящий `starter-rule-share` не должны отдавать владельцу read-only поиск по проектам: если Codex может проверить source/target files сам, он делает self-check и пишет итог `уже покрыто / добавить как написано / добавить с адаптацией / не добавлять`; владелец согласует решение или снимает настоящий blocker.
 - Rule-share report не должен перекладывать read-only проверку partial/blocked rules на владельца; для `blockedRules` в ready-проекте Codex сначала проверяет target files сам и пишет конкретную рекомендацию.
 - При каждом интерактивном запуске `starter-rule-share` первый owner-facing шаг — выбор проектов для текущего переноса: показать полный обнаруженный список кандидатов, отметить include/exclude/blocked/source-only рекомендации, получить exact confirmation, и только затем запускать scan/apply-plan/downstream task worktrees. Если UI-окно выбора недоступно, остановиться и спросить в чате; “all ready projects”, прошлый approval JSON и standing approval не считаются текущим подтверждением.
+- 2026-05-09: Project Intake согласован owner'ом для "Тренажера шахматных дебютов".
+- 2026-05-09: Skills were adopted to point at this Chess worktree; previous conflicting skill symlinks were backed up under `$CODEX_HOME/skills-backups/2026-05-09T12-43-37-375Z`.
+- 2026-05-09: Approved runtime direction is local Next.js / React MVP with `npm`; exact package versions and chess tooling require official docs check at implementation time.
+- 2026-05-09: Approved echo-test: legal move parsing for `1. e4 e5 2. Nf3 Nc6 3. Bb5` plus manually verified opening-map for Spanish / Ruy Lopez.
+- 2026-05-09: Echo-test PASS via `npm run echo:chess-opening`; `chess.js@1.4.0` legally applied the line and manually verified map returned Ruy Lopez / Spanish Opening / Spanish Game with `a6`, `Nf6`, `d6` continuations.
+- 2026-05-09: First MVP UI slice implemented for Ruy Lopez: local Next.js screen shows board state, move hints, verified variation names, opening principle, position goal, middlegame plan and legal continuations; browser smoke requires no console errors.
+- 2026-05-09: Opening board perspective is fixed by the side being studied, not by whose turn it is; current Ruy Lopez continuation screen studies black responses, so black pieces stay at the bottom while stepping through both sides' moves.
+- 2026-05-09: Move-by-move learning UI should keep the current move explanation directly under the board with previous/next arrows; full move lists are secondary because they distract from the beginner explanation.
