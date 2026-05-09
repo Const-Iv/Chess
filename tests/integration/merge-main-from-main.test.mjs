@@ -1,7 +1,7 @@
 // @ts-check
 
 import assert from "node:assert/strict";
-import { appendFile, readFile } from "node:fs/promises";
+import { appendFile, mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import test from "node:test";
 
@@ -38,6 +38,10 @@ test("task:merge:main can merge a committed task branch when started from main",
     state.commitSha = getHeadSha(startPayload.worktreePath);
     await saveTaskState(fixture.repoRoot, state);
 
+    const archivePath = path.join(fixture.repoRoot, "Docs/archive/merge-main-test.md.gz");
+    await mkdir(path.dirname(archivePath), { recursive: true });
+    await writeFile(archivePath, "archive placeholder\n", "utf8");
+
     const merged = runStarterScript(
       fixture.repoRoot,
       ["scripts/worktree-merge-main.mjs", "--branch", startPayload.branch],
@@ -50,6 +54,8 @@ test("task:merge:main can merge a committed task branch when started from main",
 
     const refreshed = await loadTaskStateByBranch(fixture.repoRoot, startPayload.branch);
     assert.equal(refreshed?.publishStatus, "local-only");
+    const archiveStatus = runCommand(fixture.repoRoot, "git", ["status", "--short", "--", "Docs/archive/merge-main-test.md.gz"]);
+    assert.equal(archiveStatus.stdout.trim(), "");
 
     const events = await readNdjson(getHistoryPath(fixture.repoRoot));
     assert.ok(events.some((event) => event.type === "MERGE_MAIN" && event.branch === startPayload.branch));

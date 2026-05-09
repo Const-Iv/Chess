@@ -189,13 +189,27 @@ async function normalizeLegacyTaskHistory(mainWorktreePath, repoRoot) {
  * @param {import("./lib/runtime.mjs").TaskState} state
  * @returns {Promise<void>}
  */
-async function maybeAutoCommitTrackedChanges(mainWorktreePath, state) {
+async function maybeAutoCommitPublishChanges(mainWorktreePath, state) {
   const trackedChanged = await getTrackedChangedFiles(mainWorktreePath);
-  if (trackedChanged.length === 0) {
+  const archiveStatus = runCommand(mainWorktreePath, "git", ["status", "--porcelain=v1", "--", "Docs/archive"], {
+    allowFailure: true
+  }).stdout;
+  const untrackedArchives = archiveStatus
+    .split(/\r?\n/)
+    .map((line) => line.trim())
+    .filter((line) => line.startsWith("?? "))
+    .map((line) => line.slice(3))
+    .filter((filePath) => filePath.startsWith("Docs/archive/") && filePath.endsWith(".md.gz"));
+  if (trackedChanged.length === 0 && untrackedArchives.length === 0) {
     return;
   }
 
-  runCommand(mainWorktreePath, "git", ["add", "-u"]);
+  if (trackedChanged.length > 0) {
+    runCommand(mainWorktreePath, "git", ["add", "-u"]);
+  }
+  if (untrackedArchives.length > 0) {
+    runCommand(mainWorktreePath, "git", ["add", "--", ...untrackedArchives]);
+  }
   const staged = runCommand(mainWorktreePath, "git", ["diff", "--cached", "--quiet"], { allowFailure: true });
   if (staged.status === 0) {
     return;
@@ -278,7 +292,7 @@ async function main() {
     const artifactDir = path.join(getPipelinePaths(repoRoot).artifactsDir, state.taskId);
     await syncOperationalDocs(mainWorktreePath, artifactDir).catch(() => []);
     runCommand(mainWorktreePath, "node", ["scripts/worktree-history.mjs", "sync"]);
-    await maybeAutoCommitTrackedChanges(mainWorktreePath, state);
+    await maybeAutoCommitPublishChanges(mainWorktreePath, state);
 
     if (hasRemote(mainWorktreePath)) {
       runCommand(mainWorktreePath, "git", ["push", "origin", "main"]);

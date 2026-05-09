@@ -195,3 +195,19 @@
 - Branch: `codex/20260509-172330-ce2e-prilozhenie`
 - Reasons: cross_module_conflict
 - Status: trigger recorded
+
+## 2026-05-09T20:38:53.772Z 20260509-172330-ce2e
+
+- Branch: `codex/20260509-172330-ce2e-prilozhenie`
+- Reasons: cross_module_conflict
+- Status: trigger recorded
+
+## 2026-05-09T20:39:15.000Z 20260509-172330-ce2e — TRIZ_APPLIED
+
+- Branch: `codex/20260509-172330-ce2e-prilozhenie`
+- Reasons: cross_module_conflict
+- Противоречие: нужно быстро использовать Vercel preview/production для личного доступа к тренажеру, но нельзя ослабить production gate, оставить `main` грязным после publish-stage sync или случайно опубликовать секреты, личные данные и неподтвержденный шахматный контент.
+- ИКР: branch push дает только preview для просмотра, production обновляется из GitHub `main` после managed task/merge flow, а publish-stage сам подхватывает security gate and generated operational archives before push.
+- Подходы: separation by stage; preliminary action; standard interface. Preview отделен от production, `qa:security` встроен в canonical `task:merge:main`, generated `Docs/archive/*.md.gz` попадает в publish-stage auto-commit.
+- Что устранено: риск governance-only правила без исполнения в скрипте, риск обхода `qa:security` перед Vercel production update, риск считать preview заменой task QA and риск оставить `main` грязным generated archive после publish-stage sync.
+- Guard: targeted `merge-main-from-main` integration test passed; repeated `npm run task:qa:agent` passed before final finish/merge retry.
