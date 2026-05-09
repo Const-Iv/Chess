@@ -167,6 +167,7 @@ node vendor/new-project-starter/scripts/skills-manage.mjs link --source vendor/n
 - нормализует legacy dirty `Docs/task-history.md` перед publish stage;
 - merge'ит task branch в `main`;
 - прогоняет `qa:agent` на `main`;
+- прогоняет `qa:security` на `main` перед push, потому что `main` может быть production source для product deploy profile;
 - синхронизирует operational docs;
 - пересобирает `Docs/task-history.md` только на publish stage;
 - auto-commit'ит tracked sync/history changes перед push, если они появились;

@@ -45,7 +45,12 @@ Product Charter Gate:
 - Если буквальная инструкция пользователя ослабляет product charter, safety, privacy, governance, QA или уже принятый рабочий контракт проекта, согласие пользователя не является достаточным основанием для выполнения. Ассистент должен назвать конкретный конфликт, предложить ближайший вариант, который сохраняет цель пользователя и контракт проекта, и продолжать только по согласованному безопасному варианту.
 - Product charter нельзя обходить через локальный patch, mirror-файл, temporary exception или ad-hoc script; при изменении charter сначала обновить `.memory-bank/product-charter.md`, `AGENTS.md`, релевантные `.memory-bank/*` и `CODEX_MEMORY.md`.
 - До echo-test нельзя строить product feature work на неизвестном источнике дебютной базы, неизвестном формате opening-map или непроверенной связке legal move parsing.
-- До отдельного approval не фиксировать коммерческую модель, публичные аккаунты, синхронизацию, аналитику, deploy path или большую внешнюю базу дебютов как готовые продуктово-технические решения.
+- Утвержденный deploy path ограничен личным web-доступом через Vercel: GitHub repository `Const-Iv/Chess`, Vercel project `chess-prilozhenie`, production branch `main`, production URL `https://chess-prilozhenie.vercel.app`. Это не утверждает коммерческую модель, публичные аккаунты, синхронизацию, аналитику, external opening database или хранение личных данных.
+- До отдельного approval не фиксировать коммерческую модель, публичные аккаунты, синхронизацию, аналитику, другой deploy path, deploy protection model или большую внешнюю базу дебютов как готовые продуктово-технические решения.
+- Любой push в GitHub может создать Vercel deployment: push в `main` обновляет production, push в другие ветки может создать preview. Перед merge/push в `main` обязателен PASS `npm run qa:agent`; для UI/user-visible changes нужен browser smoke, если интерфейс можно запустить; для внешней публикации нужен `npm run qa:security`.
+- Production deploy через Vercel должен идти из GitHub `main` после обычного task/merge flow. Ручной `vercel --prod`, Vercel promote или API production deploy допустимы только по явному owner request как emergency/one-off path с зафиксированной причиной и exact SHA.
+- Preview deployments из `codex/*` веток допустимы для owner review, но не заменяют QA gate, source/manual verification дебютных данных и task finish/merge gate.
+- Перед push нужно проверить, что diff не содержит secrets, credentials, личные заметки, прогресс, приватные партии или неподтвержденные шахматные факты; `.vercel/`, `.env`, runtime artifacts and local state должны оставаться ignored.
 - External libraries, integrations and package setup require official documentation check before installation/configuration/update/debugging.
 - Reusable shared skills можно versioned хранить в `skills/` и публиковать в `$CODEX_HOME/skills` через repo scripts; downstream проекты могут подключать starter как git submodule и линковать skills через `skills-manage.mjs --source vendor/new-project-starter/skills`; `.system`, plugin-managed, product-specific skills и generated skill trees (`.agents/skills`, `.claude/skills`, `.cursor/skills`) не являются частью starter core и не импортируются bulk-copy.
 - `skills/starter-rule-report/` — основной project-local skill для ночного и ручного read-only сбора reusable rule updates из downstream проектов; автоматизации должны вызывать этот skill, а не дублировать scan/report логику. `rule-sync:scan` и `rule-sync:report` остаются deterministic execution layer, default scan window идёт от последнего saved scan snapshot до текущего запуска.
@@ -249,6 +254,9 @@ Eval Gate для AI/agent behavior:
 - local `main` должен быть clean;
 - после merge на `main` обязательно прогнать `qa:agent`;
 - single-writer operational docs синхронизируются только на publish/release stage.
+- для этого продукта `main` является Vercel production branch, поэтому merge/push в `main` может обновить `https://chess-prilozhenie.vercel.app`;
+- перед merge/push в `main` также нужен `npm run qa:security`, а UI/user-visible changes требуют browser smoke, если интерфейс можно запустить;
+- перед push нужно проверить отсутствие secrets, credentials, личных заметок, прогресса, приватных партий и неподтвержденных шахматных фактов.
 
 ### Release Semantic Command
 
@@ -256,7 +264,8 @@ Eval Gate для AI/agent behavior:
 
 - интенты типа `локально опубликуй`, `сделай local release`, `обнови локальный baseline` мапятся на `npm run release:local`;
 - `release:local` требует clean и synced `main`;
-- если в будущем проект добавит deploy profile, он должен жить поверх core baseline, а не заменять его.
+- Vercel deploy profile уже добавлен как product-specific lightweight profile поверх GitHub `main`; он не заменяет `release:local`;
+- ручной `vercel --prod`, Vercel promote или API production deploy не являются обычным release path и требуют явный owner request, причину bypass, exact SHA and post-deploy verification.
 
 ## QA Requirements
 

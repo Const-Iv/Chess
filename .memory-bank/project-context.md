@@ -7,6 +7,7 @@
 - Проект проверяет личную гипотезу: поможет ли компактный интерактивный тренажер лучше понимать и помнить основные шахматные дебюты.
 - Canonical transfer выполнен, baseline QA прошел, корневой chess echo-test прошел.
 - Feature/refactor/behavior-change implementation можно начинать в следующей managed task, не расширяя шахматные данные за пределы проверенного source/manual-verification contract.
+- GitHub repository `Const-Iv/Chess` подключен к Vercel project `chess-prilozhenie`; production branch `main`, production URL `https://chess-prilozhenie.vercel.app`.
 
 ## Канонические источники
 
@@ -31,6 +32,8 @@
 - Package manager: `npm`.
 - Build command: `npm run build`.
 - Основной integration path: managed task conveyor.
+- Lightweight deploy path: GitHub `main` -> Vercel production for personal web access; branch pushes may create Vercel previews.
+- Перед push/merge в `main` обязателен PASS `npm run qa:agent`; для UI/user-visible изменений нужен browser smoke, если интерфейс можно запустить; для внешней публикации нужен `npm run qa:security`.
 - Первый релиз ориентирован на owner как шахматиста-любителя.
 - Нужны подсказки для каждого хода, варианты развития, названия вариантов, дебютные правила, принципы и цели.
 - Нужна учебная цель: понимать и помнить минимум 80% типовых случаев от выбранного дебюта до миттельшпиля.
@@ -43,7 +46,8 @@
 - Источник шахматных данных и licensing model.
 - Формат opening-map.
 - Конкретные версии Next.js / React и chess tooling.
-- Дизайн, deploy path, публичные аккаунты, синхронизация прогресса, аналитика и коммерческая модель.
+- Дизайн, публичные аккаунты, синхронизация прогресса, аналитика и коммерческая модель.
+- Защита доступа к Vercel production/preview, если появятся личные заметки, прогресс, приватные партии или другие user data.
 
 ## Echo-test evidence
 
@@ -59,6 +63,10 @@ Evidence path: `Docs/echo-tests/chess-opening-root-capability.md`.
 
 - Работа ведется в managed worktree и ветке `codex/*`.
 - `main` защищен от прямых изменений без явного разрешения owner'а.
+- `main` является Vercel production branch; попадание изменений в GitHub `main` может обновить production URL.
+- Ручной `vercel --prod`, Vercel promote или API production deploy не использовать как обычный release path; только по явному owner request с причиной и SHA.
+- Перед push проверять, что diff не содержит secrets, credentials, личные заметки, прогресс, приватные партии или неподтвержденные шахматные факты.
+- `.vercel/`, `.env`, runtime artifacts and local state должны оставаться ignored.
 - Для code-changing work обязателен `npm run qa:agent`.
 - После появления UI нужен browser smoke: выбор дебюта, ввод линии, показ подсказки, названия варианта, принципа, цели позиции и следующих ходов.
 - Repo-managed skills подключаются через `npm run skills:link`; `--adopt` требует отдельного owner approval.

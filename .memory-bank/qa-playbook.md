@@ -6,6 +6,7 @@
 - Baseline deterministic gate: `npm run qa:agent`.
 - Product-specific runtime QA появляется после echo-test and UI implementation.
 - Root echo-test for legal move parsing + manually verified Ruy Lopez opening-map passed on 2026-05-09.
+- GitHub `main` подключен к Vercel production; push в другие ветки может создать Vercel preview deployment.
 
 ## Agent QA Gate (Mandatory)
 
@@ -25,6 +26,19 @@ Dependency preflight обязателен перед запуском gate:
 - если требуемые runtime files в `node_modules/*` отсутствуют, запускать `npm ci`;
 - продолжать QA сразу после успешного recovery;
 - fail only when recovery did not restore required files.
+
+## GitHub / Vercel Deployment QA
+
+Перед merge/push в `main`, который может обновить Vercel production URL, нужно:
+- PASS `npm run qa:agent`;
+- PASS `npm run qa:security`;
+- для UI/user-visible changes - browser smoke, если интерфейс можно запустить;
+- для chess content changes - source/manual verification note and deterministic content QA;
+- проверить diff на отсутствие secrets, credentials, личных заметок, прогресса, приватных партий and unverified chess facts.
+
+Preview deployment из `codex/*` ветки допустим для owner review, но не считается substitute for deterministic QA or task finish/merge gates.
+
+Ручной `vercel --prod`, Vercel promote или API production deploy требует явный owner request, exact SHA, причину bypass and post-deploy verification.
 
 ## Echo-test Gate
 
@@ -121,3 +135,4 @@ For the inherited starter baseline these remain process-level checks until produ
 - Для UI behavior changes записывать browser oracle, URL/base URL, expected visible result, actual visible result и console/runtime status.
 - Для chess content changes записывать known line, expected opening name, source/manual verification, actual output and pass/fail.
 - Для echo-test фиксировать root capability, minimal scenario, actual observed result, limitations and decision.
+- Для Vercel production update фиксировать source branch/SHA, deployment URL, QA/security status and whether deployment came from GitHub `main` or explicit one-off owner-approved path.
