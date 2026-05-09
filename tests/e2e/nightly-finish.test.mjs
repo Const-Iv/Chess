@@ -19,7 +19,7 @@ import { createTempStarterRepo, runStarterScript } from "../helpers/temp-repo.mj
 
 /**
  * @param {ReturnType<typeof createTempStarterRepo> extends Promise<infer T> ? T : never} fixture
- * @returns {NodeJS.ProcessEnv}
+ * @returns {Record<string, string>}
  */
 function buildEnv(fixture) {
   return {
@@ -30,7 +30,7 @@ function buildEnv(fixture) {
 
 /**
  * @param {string} repoRoot
- * @param {NodeJS.ProcessEnv} env
+ * @param {Record<string, string>} env
  * @param {string} title
  * @returns {{taskId: string, branch: string, worktreePath: string, openedChat: boolean}}
  */
@@ -52,7 +52,7 @@ async function appendReadmeLine(worktreePath, line) {
 
 /**
  * @param {string} worktreePath
- * @param {NodeJS.ProcessEnv} env
+ * @param {Record<string, string>} env
  * @returns {void}
  */
 function runQaCheckpoint(worktreePath, env) {

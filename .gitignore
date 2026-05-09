@@ -2,6 +2,11 @@ node_modules/
 coverage/
 runtime/
 tmp/
+.next/
+out/
+.playwright-cli/
+output/
+*.tsbuildinfo
 playwright-report/
 .env
 .DS_Store

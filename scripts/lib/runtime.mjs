@@ -206,7 +206,7 @@ const CYRILLIC_TO_LATIN = new Map([
  * @param {string} cwd
  * @param {string} command
  * @param {string[]} args
- * @param {{allowFailure?: boolean, env?: NodeJS.ProcessEnv}} [options]
+ * @param {{allowFailure?: boolean, env?: Record<string, string | undefined>}} [options]
  * @returns {CommandResult}
  */
 export function runCommand(cwd, command, args, options = {}) {
@@ -593,7 +593,18 @@ export function parseArgs(argv) {
 export async function listRepoFiles(repoRoot) {
   /** @type {string[]} */
   const files = [];
-  const ignored = new Set([".git", "node_modules", "tmp", "runtime", "coverage", "playwright-report"]);
+  const ignored = new Set([
+    ".git",
+    "node_modules",
+    "tmp",
+    "runtime",
+    "coverage",
+    "playwright-report",
+    ".playwright-cli",
+    ".next",
+    "out",
+    "output"
+  ]);
 
   /**
    * @param {string} currentDir
