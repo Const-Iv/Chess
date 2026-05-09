@@ -1,50 +1,23 @@
-# Школа ассистентов
+# Starter Kit нового проекта
 
-Проект подбора и обучения проверенных ассистентов для владельцев бизнеса, CEO и клиентов Business Booster.
+Этот репозиторий — канонический исполняемый Node/npm baseline для старта новых проектов под Codex/worktree conveyor:
 
-## Что Зафиксировано
+- `codex/*` managed worktrees;
+- conversational branch-chat;
+- deterministic QA;
+- eval gate for AI/agent behavior changes;
+- safe Project Intake до feature work;
+- reusable starter skills;
+- shared memory-bank governance;
+- local-first `release:local`.
 
-- Product Charter утверждён owner'ом 2026-05-04.
-- Project Intake утверждён owner'ом 2026-05-04.
-- Roadmap запуска утверждён owner'ом 2026-05-04.
-- Raw transcript сохранён без изменений.
+Миссия starter: помогать командам, которые запускают новый проект или репозиторий, с первого дня получать понятную и воспроизводимую операционную основу через переносимый starter baseline.
 
-## Канонические Источники
+Целевая аудитория starter: команды, которые начинают новый проект или репозиторий, технические и продуктовые лиды, инженеры и agent-operators, а также downstream maintainers, которые подключают starter как baseline.
 
-- `.memory-bank/product-charter.md` — миссия, видение, цель, целевая аудитория, `JTBD`, ограничения, сценарии и критерии успеха.
-- `.memory-bank/project-context.md` — текущее состояние проекта, утверждённые и отложенные решения.
-- `.memory-bank/architecture-map.md` — статус архитектуры и границы решений до подтверждения гипотезы.
-- `.memory-bank/code-rules.md` — правила работы ассистента и процесса.
-- `.memory-bank/qa-playbook.md` — правила проверок.
-- `plans/2026-05-04-1147-project-intake.md` — approved intake.
-- `Docs/product-discovery/2026-04-03-assistant-selection-transcript.raw` — verbatim source.
-- `Docs/product-discovery/2026-04-03-assistant-selection-product-charter-draft.md` — discovery draft.
-- `Docs/product-discovery/2026-04-03-assistant-selection-roadmap.md` — approved roadmap.
+JTBD: когда начинается новый проект, получить готовую и переносимую основу, чтобы команда сразу работала по ясным правилам, проверяла изменения воспроизводимо и не собирала governance, task flow и QA заново.
 
-## Продуктовая Суть
-
-Миссия: помогать владельцам бизнеса и CEO освобождать время для развития компании через подбор и обучение проверенных ассистентов.
-
-Цель: создать направление, которое даёт владельцам подготовленных помощников для разгрузки времени и внедрения изменений, а кандидатам — путь от обучения и проверки к стажировке и работе с предпринимателями.
-
-Граница продукта: Школа ассистентов — отдельное направление. При этом оно может быть встроено как в трек основной программы Business Booster, так и в отдельные составляющие платформы Business Booster.
-
-## Текущий Этап
-
-Проект находится на этапе проверки гипотезы.
-
-Первый шаг roadmap: быстро проверить спрос через две очереди — владельцев / CEO и будущих ассистентов, отдельно посмотреть действующих клиентов Business Booster, провести кастдевы на тарифах с сопровождением и десятках, а затем перейти к сборке продуктовой модели только при хорошем отклике.
-
-## Что Пока Не Утверждено
-
-- Runtime / stack.
-- Product implementation architecture.
-- QA / release path для будущей реализации.
-- Коммерческая модель.
-- Agent / eval ownership.
-- Memory / rules ownership после подтверждения гипотезы.
-
-Capability decisions на этапе проверки гипотезы помечены как неприменимые.
+Любое изменение starter нужно сверять с этой ролью: оно должно быть полезно как переносимый baseline для новых проектов. Продуктовую специфику добавляйте поверх starter через Project Intake, adapters/profiles и downstream canonical sources, а не в core governance.
 
 ## Что внутри
 

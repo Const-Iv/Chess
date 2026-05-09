@@ -1,61 +1,56 @@
-# Architecture Map: школа ассистентов
+# Architecture Map
 
 ## Текущий Статус
 
-Продуктовая архитектура не утверждается на этапе проверки гипотезы.
+`new-project-starter` — runnable local-first process baseline для новых репозиториев. Он содержит правила, scripts, shared skills, memory-bank governance и deterministic QA для безопасного старта downstream-проектов.
 
-Сейчас проект существует как discovery/intake пакет:
-- verbatim transcript;
-- approved product charter;
-- approved roadmap;
-- approved intake;
-- inherited starter process baseline for worktrees, QA and operational docs.
+Core starter не содержит продуктовый UI/API runtime и не фиксирует продуктовые решения конкретного downstream-проекта. Product-specific capabilities добавляются поверх starter через Project Intake, adapters/profiles и отдельные owner-approved decisions.
 
-## Product Runtime
+## Runtime Baseline
 
-Runtime, stack, package manager, test framework, build command, preview/deploy path and service layout отложены до подтверждения гипотезы.
-
-До отдельного owner approval нельзя фиксировать:
-- frontend stack;
-- backend/runtime stack;
-- identity provider;
-- payments provider;
-- analytics provider;
-- database/queue/worker model;
-- API shape;
-- production deploy path.
+- Runtime: Node.js CLI scripts.
+- Process layer: managed git worktrees, task state, runtime history, operational docs.
+- QA layer: lint, typecheck, tests, build, smoke/nightly process scenarios, security, coverage and perf gates.
+- Knowledge layer: `AGENTS.md`, `.memory-bank/*`, `CODEX_MEMORY.md`, mirrors and reusable skills.
+- Sharing layer: `starter-rule-report`, `starter-rule-import`, `starter-rule-sync` and `starter-rule-share`.
 
 ## Current Information Flow
 
-1. Raw transcript хранится без изменений в `Docs/product-discovery/2026-04-03-assistant-selection-transcript.raw`.
-2. Product Charter фиксирует смысл, аудиторию, `JTBD`, ограничения, сценарии и критерии успеха.
-3. Roadmap фиксирует последовательность проверки спроса и развития направления.
-4. Intake фиксирует owner approval и применимость capability/runtime decisions.
-5. После подтверждения гипотезы отдельная задача должна зафиксировать product architecture, runtime and QA/release decisions.
+1. `.memory-bank/product-charter.md` фиксирует миссию, видение, цель, аудиторию и `JTBD` самого starter.
+2. `plans/_project_intake_template.md` задаёт обязательный intake для нового downstream-проекта.
+3. `starter-project-bootstrap` ведёт owner'а от copied/submodule baseline к approved Project Intake, canonical transfer и baseline QA.
+4. `task:*` scripts ведут isolated implementation work через managed worktrees and deterministic QA.
+5. `rule-sync:*` and `rule-share:*` scripts остаются approval-safe execution layer для reusable governance updates.
+6. Downstream product/runtime decisions живут в downstream canonical sources, а не в starter core.
 
 ## Risk Hotspots
 
-- Смешать Школу ассистентов с другими идеями встречи.
-- Начать строить runtime до подтверждения спроса.
-- Зафиксировать коммерческую модель раньше, чем будет проверен отклик.
-- Подменить raw transcript пересказом.
-- Предложить владельцу неподготовленного ассистента без отбора, проверки и стажировки.
-- Заменить человека AI-ассистентом в задачах, где нужна ответственность, сложная коммуникация или чувствительный контекст без контроля владельца.
+- Случайно заменить starter charter продуктовой спецификой downstream-проекта.
+- Зафиксировать конкретный stack, provider, locale, payment/auth choice, deploy path, worker model или post-publish command как starter default.
+- Ослабить deterministic QA, safe task flow, source-of-truth governance или main-branch protection.
+- Перенести raw QA/TRIZ logs, task snippets или source-project details как готовые reusable rules.
+- Bulk-copy generated or plugin-managed skill trees вместо repo-owned reusable skills.
+- Перезаписать downstream product charter во время outbound rule sharing.
 
 ## Change Impact Checklist
 
-Когда меняется product charter:
+Когда меняется product charter starter:
 - обновить `.memory-bank/product-charter.md`;
-- проверить синхронизацию с `AGENTS.md`, `CODEX_MEMORY.md`, `README.md` and discovery docs;
-- сохранить raw transcript без изменений.
+- синхронизировать `AGENTS.md`, `.memory-bank/project-context.md`, `CODEX_MEMORY.md`, `README.md` and mirrors where applicable;
+- убедиться, что charter остаётся про portable starter baseline, а не про downstream-продукт.
 
-Когда меняется roadmap:
-- сверить изменение с raw transcript или owner clarification;
-- обновить traceability;
-- не переносить roadmap item в обязательную функциональность без отдельного approval.
+Когда меняются Project Intake или bootstrap rules:
+- обновить `plans/_project_intake_template.md`;
+- обновить `skills/starter-project-bootstrap/SKILL.md`;
+- проверить `AGENTS.md`, `.memory-bank/code-rules.md`, `.memory-bank/qa-playbook.md`, README and mirrors.
 
-Когда подтверждается гипотеза и начинается реализация:
-- обновить этот файл с выбранной архитектурой;
-- заполнить runtime-specific decisions в intake или новом plan file;
-- обновить `.memory-bank/qa-playbook.md` with product-specific QA;
+Когда меняются rule-sync/rule-share contracts:
+- обновить соответствующий skill;
+- обновить scripts/tests/reference docs in the same task;
+- обновить `.memory-bank/starter-rule-registry.json`, если меняются exact reusable rules;
 - прогнать deterministic QA.
+
+Когда downstream-проекту нужен runtime:
+- зафиксировать product-specific choices в downstream Project Intake / product charter / architecture map;
+- при неизвестной root technology выполнить isolated echo-test или записать blocker;
+- не переносить provider-specific setup обратно в starter core как mandatory default.
