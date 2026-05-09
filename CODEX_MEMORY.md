@@ -72,6 +72,7 @@
 - Outbound rule sharing переносит в copied-baseline проекты только `missingRules`; `presentUnregisteredRules` нельзя дублировать как новый текст, а partial/manual-review matches требуют owner review.
 - Outbound rule sharing переносит в copied-baseline проекты только `missingRules`; `presentUnregisteredRules` нельзя дублировать как новый текст, а partial/manual-review matches сначала требуют Codex read-only self-check с конкретной рекомендацией для владельца.
 - Большая база дебютов, import adapter and full UI behavior remain blocked until each expansion has source/manual verification and deterministic QA.
+- Vercel deploy profile approved only as lightweight personal web access via GitHub `main`; auth, sync, analytics, personal data storage and deploy protection model remain separate approvals.
 
 ## Project Notes
 
@@ -103,3 +104,4 @@
 - 2026-05-09: First MVP UI slice implemented for Ruy Lopez: local Next.js screen shows board state, move hints, verified variation names, opening principle, position goal, middlegame plan and legal continuations; browser smoke requires no console errors.
 - 2026-05-09: Opening board perspective is fixed by the side being studied, not by whose turn it is; current Ruy Lopez continuation screen studies black responses, so black pieces stay at the bottom while stepping through both sides' moves.
 - 2026-05-09: Move-by-move learning UI should keep the current move explanation directly under the board with previous/next arrows; full move lists are secondary because they distract from the beginner explanation.
+- 2026-05-09: Vercel/GitHub deploy rule approved: `Const-Iv/Chess` -> Vercel `chess-prilozhenie`, production branch `main`, production URL `https://chess-prilozhenie.vercel.app`; branch pushes may create preview deployments, but production updates must go through GitHub `main` after QA/security gates.

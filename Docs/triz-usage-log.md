@@ -2,30 +2,6 @@
 
 Журнал срабатываний TRIZ-триггеров и применённых решений.
 
-## 2026-04-22T12:52:38.438Z 20260422-123751-07b0
-
-- Branch: `codex/20260422-123751-07b0-agent-const-plan-template-sync`
-- Reasons: historical_recurrence
-- Status: trigger recorded
-
-## 2026-04-23T12:19:01.968Z 20260423-105805-90fc
-
-- Branch: `codex/20260423-105805-90fc-finish-cleanup-contract`
-- Reasons: cross_module_conflict, historical_recurrence
-- Status: trigger recorded
-
-## 2026-04-23T12:28:18.299Z 20260423-105805-90fc
-
-- Branch: `codex/20260423-105805-90fc-finish-cleanup-contract`
-- Reasons: cross_module_conflict, historical_recurrence
-- Status: trigger recorded
-
-## 2026-04-24T09:22:26.456Z 20260424-091736-6c73
-
-- Branch: `codex/20260424-091736-6c73-submodule-shared-skills`
-- Reasons: cross_module_conflict
-- Status: trigger recorded
-
 ## 2026-04-24T09:22:54.300Z 20260424-091736-6c73 — TRIZ_APPLIED
 
 - Principle: separation in space / mediator
@@ -190,3 +166,32 @@
 - Reasons: cross_module_conflict, historical_recurrence
 - Status: final task QA repeated the same trigger after the TRIZ decision above; no additional solution was introduced.
 - Guard: the selected solution remains the project selection gate before rule-share execution, and final `npm run task:qa:agent` passed.
+
+## 2026-05-09T20:33:40.922Z 20260509-172330-ce2e
+
+- Branch: `codex/20260509-172330-ce2e-prilozhenie`
+- Reasons: cross_module_conflict
+- Status: trigger recorded
+
+## 2026-05-09T20:33:59.000Z 20260509-172330-ce2e — TRIZ_APPLIED
+
+- Branch: `codex/20260509-172330-ce2e-prilozhenie`
+- Reasons: cross_module_conflict
+- Противоречие: нужно быстро использовать Vercel preview/production для личного доступа к тренажеру, но нельзя ослабить production gate и случайно опубликовать секреты, личные данные или неподтвержденный шахматный контент.
+- ИКР: branch push может дать preview для просмотра, а production обновляется только из GitHub `main` после managed task/merge flow, deterministic QA and security gate.
+- Подходы: separation by stage; preliminary action; standard interface. Preview отделен от production, security gate перенесен в canonical `task:merge:main`, а ручной `vercel --prod` оставлен только как explicit owner-approved one-off path.
+- Что устранено: риск governance-only правила без исполнения в скрипте, риск обхода `qa:security` перед Vercel production update and риск считать preview заменой task QA.
+- Guard: targeted `merge-main-from-main` integration test passed; `npm run task:qa:agent` passed before final finish/merge.
+
+## 2026-05-09T20:34:30.000Z 20260509-172330-ce2e — TRIZ_APPLIED
+
+- Branch: `codex/20260509-172330-ce2e-prilozhenie`
+- Reasons: cross_module_conflict
+- Status: final task QA repeated the same trigger after the TRIZ decision above; no additional solution was introduced.
+- Guard: selected solution remains stage-separated preview/production with `qa:security` inside `task:merge:main`; repeated `npm run task:qa:agent` passed.
+
+## 2026-05-09T20:34:52.538Z 20260509-172330-ce2e
+
+- Branch: `codex/20260509-172330-ce2e-prilozhenie`
+- Reasons: cross_module_conflict
+- Status: trigger recorded
