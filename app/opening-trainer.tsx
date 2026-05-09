@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 
 type StudySide = "white" | "black";
+type BlackPieceStyle = "original" | "inverted-white";
 
 type BoardPiece = Readonly<{
   symbol: string;
@@ -97,6 +98,14 @@ type BoardArrow = Readonly<{
   y2: number;
 }> | null;
 
+const BLACK_PIECE_STYLES: readonly Readonly<{
+  key: BlackPieceStyle;
+  label: string;
+}>[] = Object.freeze([
+  Object.freeze({ key: "original", label: "Как было" }),
+  Object.freeze({ key: "inverted-white", label: "Инверсия белых" })
+]);
+
 function formatMove(step: MoveStep) {
   const separator = step.actor === "black" ? "..." : ".";
   return `${step.moveNumber}${separator} ${step.san}`;
@@ -133,6 +142,7 @@ function getMoveArrow(step: MoveStep): BoardArrow {
 
 export default function OpeningTrainer({ lessons }: Readonly<{ lessons: readonly RuyLopezLesson[] }>) {
   const [selectedOpeningKey, setSelectedOpeningKey] = useState(lessons[0]?.opening.key ?? "");
+  const [blackPieceStyle, setBlackPieceStyle] = useState<BlackPieceStyle>("original");
   const lesson = lessons.find((candidate) => candidate.opening.key === selectedOpeningKey) ?? lessons[0]!;
   const firstContinuation = lesson.opening.continuations[0];
   const firstBadMove = lesson.opening.badMoves[0];
@@ -210,8 +220,26 @@ export default function OpeningTrainer({ lessons }: Readonly<{ lessons: readonly
             <span>{lesson.opening.turnLabel}</span>
           </div>
 
+          <div className="piece-style-switcher" aria-label="Вид черных фигур">
+            {BLACK_PIECE_STYLES.map((style) => (
+              <button
+                aria-label={style.label}
+                aria-pressed={style.key === blackPieceStyle}
+                className={`black-pieces-${style.key}`}
+                key={style.key}
+                onClick={() => setBlackPieceStyle(style.key)}
+                title={style.label}
+                type="button"
+              >
+                <span aria-hidden="true" className="piece piece-black piece-style-sample">
+                  ♚
+                </span>
+              </button>
+            ))}
+          </div>
+
           <div
-            className={`board perspective-${lesson.opening.studySide}`}
+            className={`board perspective-${lesson.opening.studySide} black-pieces-${blackPieceStyle}`}
             aria-label={`Позиция после ${formatMove(activeStep)}`}
           >
             <div className="board-grid">
@@ -234,7 +262,13 @@ export default function OpeningTrainer({ lessons }: Readonly<{ lessons: readonly
                   {square.piece ? (
                     <span
                       aria-label={`${square.piece.color === "white" ? "белая" : "черная"} ${square.piece.name} ${square.square}`}
-                      className={`piece piece-${square.piece.color}`}
+                      className={[
+                        "piece",
+                        `piece-${square.piece.color}`,
+                        square.piece.name === "пешка" ? "piece-pawn" : ""
+                      ]
+                        .filter(Boolean)
+                        .join(" ")}
                     >
                       {square.piece.symbol}
                     </span>
