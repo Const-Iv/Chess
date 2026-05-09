@@ -170,7 +170,7 @@ node vendor/new-project-starter/scripts/skills-manage.mjs link --source vendor/n
 - прогоняет `qa:security` на `main` перед push, потому что `main` может быть production source для product deploy profile;
 - синхронизирует operational docs;
 - пересобирает `Docs/task-history.md` только на publish stage;
-- auto-commit'ит tracked sync/history changes перед push, если они появились;
+- auto-commit'ит tracked sync/history changes и generated `Docs/archive/*.md.gz` перед push, если они появились;
 - пушит `main`, если remote существует.
 
 ### `task:history`

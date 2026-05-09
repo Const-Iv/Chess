@@ -64,7 +64,8 @@ QA evidence:
   - PASS `npm run task:qa:agent`.
   - PASS manual `rg`: Vercel/GitHub push rules are present in product charter, AGENTS, memory files, README and intake.
   - PASS `.gitignore`: `.vercel/` ignored once; duplicate `.vercel` entry removed.
-  - Added deterministic merge guard: `scripts/worktree-merge-main.mjs` runs `scripts/security-gate.mjs` before pushing `main`; integration test checks `SECURITY_GATE` history event.
+- Added deterministic merge guard: `scripts/worktree-merge-main.mjs` runs `scripts/security-gate.mjs` before pushing `main`; integration test checks `SECURITY_GATE` history event.
+- Added publish-stage cleanup guard: generated `Docs/archive/*.md.gz` files are auto-committed with other publish-stage docs so `main` does not remain dirty after Vercel-affecting push.
 
 TRIZ contribution:
 - Trigger: `cross_module_conflict`.
