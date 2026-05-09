@@ -59,11 +59,18 @@
 - типовые планы, идеи фигур, пешечные структуры и частые ошибки;
 - границу перехода от дебюта к понятному миттельшпилю.
 
+Утвержденный легкий deploy-контур для личного использования:
+- GitHub repository `Const-Iv/Chess` подключен к Vercel project `chess-prilozhenie`.
+- Production branch: `main`.
+- Production URL: `https://chess-prilozhenie.vercel.app`.
+- Vercel используется только как простой web-доступ к личному тренажеру с проверенным учебным контентом; это не утверждает публичные аккаунты, синхронизацию прогресса, аналитику, коммерческую модель, внешнюю базу дебютов или хранение личных данных.
+
 Вне первого scope без отдельного approval:
 - онлайн-мультиплеер;
 - полноценная игра против компьютера;
 - коммерческая модель;
 - публичные аккаунты и социальные функции;
+- публикация личных заметок, прогресса, приватных партий, секретов или credentials в GitHub/Vercel;
 - большая внешняя база дебютов без echo-test и проверки источника.
 
 ## Сценарии использования
@@ -110,6 +117,17 @@
 - Если запрос пользователя конфликтует с этим charter, ассистент должен остановиться, коротко объяснить конфликт и предложить ближайший безопасный вариант, который сохраняет цель проекта.
 - Product charter нельзя обходить через локальный patch, mirror-файл, временный exception или ad-hoc script. Если charter требует изменения, сначала обновить этот файл и синхронизировать обязательные правила в `AGENTS.md`, `.memory-bank/*` и `CODEX_MEMORY.md`.
 - Для изменений, влияющих на AI/agent behavior, рекомендации, Plan mode, Product Charter gate, Project Intake Gate или качество ответов, acceptance criteria недостаточно: задача должна иметь Eval spec с описанием хорошего ответа, провала, критичных edge cases, regression examples, способа сравнения версий и minimum pass threshold.
+
+## GitHub / Vercel Commit And Push Gate
+
+- Любой push в GitHub может создать Vercel deployment: push в `main` обновляет production URL, push в другие ветки может создать preview URL.
+- `main` остается защищенной production branch: не пушить и не merge'ить в `main` без PASS `npm run qa:agent`; для UI/user-visible изменений нужен browser smoke, если интерфейс можно запустить; для внешней публикации нужен `npm run qa:security`.
+- Production deploy через Vercel должен идти из GitHub `main` после обычного task/merge flow. Ручной `vercel --prod`, Vercel promote или API production deploy допустимы только по явному owner request как emergency/one-off path с зафиксированной причиной и SHA.
+- Preview deployments из `codex/*` веток допустимы для проверки owner'ом, но они не заменяют QA gate, source/manual verification дебютных данных и task finish/merge gate.
+- Коммит должен сохранять принятый формат `Ver. <version> <type> <description> | <qa-result>`; если QA не прошел, такой коммит нельзя пушить как production-ready изменение.
+- Перед push нужно проверить, что diff не содержит secrets, credentials, личные заметки, прогресс, приватные партии или неподтвержденные шахматные факты, которые будут доступны через GitHub/Vercel.
+- `.vercel/`, `.env`, runtime artifacts and local state должны оставаться ignored и не попадать в git.
+- Vercel/GitHub deploy path не заменяет `release:local` как core baseline release command; это product-specific lightweight deploy profile поверх managed task conveyor.
 
 ## Shared Starter Baseline Rules
 

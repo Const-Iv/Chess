@@ -53,6 +53,7 @@ test("task:merge:main can merge a committed task branch when started from main",
 
     const events = await readNdjson(getHistoryPath(fixture.repoRoot));
     assert.ok(events.some((event) => event.type === "MERGE_MAIN" && event.branch === startPayload.branch));
+    assert.ok(events.some((event) => event.type === "SECURITY_GATE" && event.branch === startPayload.branch));
     assert.ok(events.some((event) => event.type === "PUSH_MAIN" && event.branch === startPayload.branch));
   } finally {
     await fixture.cleanup();

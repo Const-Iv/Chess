@@ -6,9 +6,10 @@
 
 Утверждено:
 - локальное web-приложение на Next.js / React;
+- lightweight Vercel deploy для личного web-доступа через GitHub `main`;
 - `npm` как package manager;
 - managed task conveyor как основной integration path;
-- local-first MVP без аккаунтов, платежей, аналитики, API и фоновых jobs;
+- local-first MVP без аккаунтов, платежей, аналитики, API, фоновых jobs и хранения личного прогресса в Vercel;
 - root echo-test passed for legal move parsing + manually verified Ruy Lopez opening-map.
 
 ## Product Runtime
@@ -16,6 +17,15 @@
 Первый runtime: Next.js / React on Node.js.
 
 Точные версии Next.js / React и шахматных библиотек выбираются в implementation-задаче после проверки официальной документации.
+
+## Deploy Profile
+
+- Vercel project: `chess-prilozhenie`.
+- Git source: `Const-Iv/Chess`.
+- Production branch: `main`.
+- Production URL: `https://chess-prilozhenie.vercel.app`.
+- GitHub `main` is the production source; branch pushes may create preview deployments.
+- Deploy profile is product-specific and sits on top of the managed task conveyor; it does not replace `release:local`.
 
 ## Current Information Flow
 
@@ -39,7 +49,8 @@
 - Подключить большую внешнюю базу без licensing/source check.
 - Расширить UI/product feature work за пределы echo-tested legal move parsing + manually verified opening-map.
 - Потерять личный прогресс или заметки, если эта capability появится позже.
-- Добавить аккаунты, sync, аналитику, API или deploy path без отдельного capability approval.
+- Добавить аккаунты, sync, аналитику, API, private data storage или deploy protection model без отдельного capability approval.
+- Обновить Vercel production через direct/manual deploy, обходя GitHub `main`, task conveyor and QA gates.
 
 ## Change Impact Checklist
 
@@ -56,3 +67,9 @@
 - обновить QA playbook with browser smoke;
 - проверить реальный интерфейс browser-инструментом;
 - убедиться, что text does not overflow and board/help panels remain usable on desktop and mobile.
+
+Когда меняется GitHub/Vercel deploy path:
+- сверить актуальную official Vercel documentation;
+- обновить `.memory-bank/product-charter.md`, `.memory-bank/project-context.md`, `.memory-bank/code-rules.md`, `.memory-bank/qa-playbook.md`, `AGENTS.md`, `CODEX_MEMORY.md` и `README.md`;
+- проверить, что `.vercel/`, `.env`, runtime artifacts and local state ignored;
+- зафиксировать, какие push/merge действия могут создать preview или production deployment.

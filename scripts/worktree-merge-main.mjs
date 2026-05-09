@@ -263,6 +263,17 @@ async function main() {
 
     await ensureDependencies(mainWorktreePath);
     runCommand(mainWorktreePath, "node", ["scripts/deterministic-feedback-loop.mjs"]);
+    runCommand(mainWorktreePath, "node", ["scripts/security-gate.mjs"]);
+    await appendHistoryEvent(repoRoot, {
+      at: formatIso(),
+      type: "SECURITY_GATE",
+      taskId: state.taskId,
+      branch: state.branch,
+      payload: {
+        mainWorktreePath,
+        status: "passed"
+      }
+    });
 
     const artifactDir = path.join(getPipelinePaths(repoRoot).artifactsDir, state.taskId);
     await syncOperationalDocs(mainWorktreePath, artifactDir).catch(() => []);

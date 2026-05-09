@@ -7,6 +7,8 @@
 - Project Intake согласован owner'ом 2026-05-09.
 - Product Charter согласован owner'ом 2026-05-09.
 - Первый runtime direction: локальное Next.js / React web-приложение.
+- Lightweight deploy: GitHub `Const-Iv/Chess` -> Vercel project `chess-prilozhenie`, production branch `main`.
+- Production URL: `https://chess-prilozhenie.vercel.app`.
 - Основной work path: managed task conveyor.
 - Root echo-test passed: legal move parsing + manually verified Ruy Lopez opening-map.
 
@@ -35,7 +37,8 @@
 - Источник шахматных данных и licensing model.
 - Формат opening-map.
 - Конкретные версии Next.js / React и chess tooling.
-- Дизайн, публичный deploy, аккаунты, синхронизация, аналитика and commercial model.
+- Дизайн, публичные аккаунты, синхронизация, аналитика and commercial model.
+- Защита доступа к Vercel, если появятся личные заметки, прогресс, приватные партии или другие user data.
 
 ## Echo-test evidence
 
@@ -87,6 +90,10 @@ npm run skills:link -- --adopt
 - Нельзя превращать приложение в справочник ходов без объяснения принципов, целей позиции и планов.
 - Нельзя выдавать AI-generated или неподтвержденные названия вариантов как факт.
 - Личный прогресс и заметки, если появятся, нельзя терять при обновлениях.
+- GitHub `main` является Vercel production branch; перед merge/push в `main` нужен PASS `npm run qa:agent`, `npm run qa:security`, а для UI changes - browser smoke, если интерфейс можно запустить.
+- Push в рабочую ветку может создать Vercel preview; preview URL не заменяет QA, task finish/merge gate и source/manual verification шахматного контента.
+- Ручной `vercel --prod`, Vercel promote или API production deploy использовать только по явному owner request с причиной и exact SHA.
+- Перед push проверять, что diff не содержит secrets, credentials, личные заметки, прогресс, приватные партии или неподтвержденные шахматные факты; `.vercel/`, `.env`, runtime artifacts and local state должны оставаться ignored.
 - UI changes требуют browser smoke, если интерфейс можно запустить.
 - External libraries, integrations and package setup require official documentation check before installation/configuration/update/debugging.
 

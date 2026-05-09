@@ -3,6 +3,7 @@ coverage/
 runtime/
 tmp/
 .next/
+.vercel/
 out/
 .playwright-cli/
 output/

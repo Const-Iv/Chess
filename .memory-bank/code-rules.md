@@ -17,6 +17,7 @@
 - Для AI/agent behavior changes обязателен `Eval spec`: хороший ответ, провал, критичные edge cases, regression examples/golden prompts, comparison method и minimum pass threshold.
 - Capability decisions в Project Intake заполняются only-if-applicable и не должны превращать starter core в provider-specific или stack-specific baseline. Auth, payments, credits, analytics/consent, i18n, async jobs, API documentation, service layout и runtime-specific rules выбираются downstream owner'ом через adapters/profiles.
 - Integration / review path в Project Intake фиксирует, как изменения попадают в основной проект: managed task conveyor, Pull Request review или hybrid. Pull Request review является явным owner/team choice для risky, broad, external-review или team-review работы и не должен обходить deterministic QA, source-of-truth governance, task finish и merge gates.
+- GitHub/Vercel deploy path для этого продукта: GitHub `main` является Vercel production branch, а push в другие ветки может создать preview deployment. Любой push/merge, который может попасть в Vercel, не должен обходить Product Charter gate, managed task conveyor, deterministic QA and source/manual verification of chess content.
 - Security-sensitive capability decisions должны фиксировать portable invariants до implementation: token/session storage и revocation для auth; webhook verification и idempotency для payments; audit trail, precision, pre-execution checks and race protection for credits/limits; consent and failure isolation for analytics; completeness checks for i18n; retry/cancellation/idempotency for async jobs; documentation source of truth for APIs.
 - Нельзя импортировать в starter core как mandatory defaults: конкретный frontend stack, конкретный identity provider, конкретные payment providers, fixed locales, Python-only decorators, database queue или single-worker model. Такие решения допустимы только как downstream adapter/profile choice с owner approval.
 - Если конкретному проекту нужны действия после публикации, например перезапуск локальных агентов или сервисов, способ выполнения нужно согласовать в Project Intake этого проекта. Starter не зашивает продуктовые агенты, локальные команды и настройки конкретной среды в общую основу.
@@ -107,6 +108,10 @@
 - Если `HEAD == qaLastPassSha`, finish-flow должен переиспользовать checkpoint, а не повторять full task QA.
 - `task:finish:core` не имеет права завершать commit/merge/release path при failed task QA.
 - Если clean task branch уже содержится в `main` и task commit ещё не записан, finish-flow должен пропустить publish stage, поставить `publishStatus=skipped_already_merged` и всё равно записать итоговый cleanup status.
+- Для этого продукта `main` одновременно является Vercel production branch: перед merge/push в `main` обязателен PASS `npm run qa:agent`; для UI/user-visible изменений нужен browser smoke, если интерфейс можно запустить; для внешней публикации нужен `npm run qa:security`.
+- Ручной `vercel --prod`, Vercel promote или API production deploy запрещен как обычный release path; допустим только по явному owner request как emergency/one-off path с записанной причиной и exact SHA.
+- Preview deployments из `codex/*` веток можно использовать для owner review, но preview URL не заменяет QA gate, task finish/merge gate and content source/manual verification.
+- Перед push нужно проверить, что diff не содержит secrets, credentials, личные заметки, прогресс, приватные партии или неподтвержденные шахматные факты; `.vercel/`, `.env`, runtime artifacts and local state должны оставаться ignored.
 - Cleanup gate должен задаваться в виде фиксированного numbered choice: `1. Удалить`, `2. Оставить`; пользовательские ответы `1`/`2` маппятся на delete/keep без необходимости писать слова.
 - Delete cleanup может получить `cleanupStatus=passed` только после проверки exact `state.worktreePath`, отсутствия этого пути в `git worktree list`, удаления managed task root `$CODEX_HOME/worktrees/<taskId>/` и отсутствия task-scoped leftovers. Похожие worktrees других `taskId` или проектов не считаются cleanup текущей задачи и требуют отдельного fixed choice.
 - Shared operational docs и generated `Docs/task-history.md` — single-writer; task branch обновления проходят только через capture, а sync/rebuild происходят на publish/release stage.
@@ -144,7 +149,7 @@
 - `starter-project-bootstrap` является reusable repo-owned skill для guided downstream bootstrap; он не заменяет Project Intake, а делает его обязательный разговорный вход воспроизводимым.
 - Outbound rule sharing не должен перезаписывать downstream product charter, adapters, profiles или локальные правила; если проект не starter-based, dirty, archived или без managed task flow, он остаётся manual review / blocked.
 - Build/test/release scripts не должны зависеть от наличия продуктового UI/backend кода.
-- Любой optional deploy profile обязан дополнять core baseline, а не ломать `release:local`.
+- Любой optional deploy profile обязан дополнять core baseline, а не ломать `release:local`; для этого продукта Vercel deploy является таким optional profile поверх GitHub `main`.
 
 ## Shared Starter Baseline Rules
 

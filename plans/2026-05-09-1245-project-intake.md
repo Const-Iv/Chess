@@ -361,6 +361,14 @@ Required gates before merge/release:
 - Product-specific smoke/browser check after UI exists.
 - Echo-test evidence before feature work on unknown root capability.
 
+Vercel/GitHub deploy amendment:
+- GitHub repository `Const-Iv/Chess` connected to Vercel project `chess-prilozhenie`.
+- Production branch: `main`.
+- Production URL: `https://chess-prilozhenie.vercel.app`.
+- Push in `main` may update production; push in other branches may create preview deployment.
+- Vercel preview is only for owner review and does not replace QA, task finish/merge gates or source/manual verification.
+- Manual `vercel --prod`, Vercel promote or API production deploy requires explicit owner request, exact SHA and recorded reason.
+
 Статус согласования:
 - [ ] Ожидает owner approval
 - [x] Согласовано
@@ -384,10 +392,18 @@ Security gate:
 - Secret scan and dependency audit from starter baseline.
 
 Release path:
-- Локальный запуск для первого MVP; публичный deploy не утвержден.
+- Локальный запуск остается baseline.
+- Lightweight Vercel production deploy approved for personal web access from GitHub `main`.
 
 Preview / deploy adapter:
-- Не утвержден до первого работающего MVP.
+- Vercel preview deployments may be created from non-`main` GitHub branches for owner review.
+- Vercel deploy path does not approve auth, sync, analytics, commercial model, private data storage or public accounts.
+
+Required gates before production-affecting push/merge:
+- PASS `npm run qa:agent`.
+- PASS `npm run qa:security`.
+- Browser smoke for UI/user-visible changes when the interface can run.
+- Diff check for secrets, credentials, personal notes, progress, private games and unverified chess facts.
 
 Статус согласования:
 - [ ] Ожидает owner approval
