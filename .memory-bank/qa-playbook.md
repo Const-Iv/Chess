@@ -2,11 +2,11 @@
 
 ## Current Project QA Context
 
-- Проект находится на этапе discovery / проверки гипотезы.
+- `new-project-starter` — runnable process baseline, а не продуктовый UI/API runtime.
 - Для документальных и governance-правок минимум проверки: `npm run lint`.
-- Для завершения bootstrap после canonical transfer: `npm run qa:agent`.
-- Product-specific runtime QA появится только после подтверждения гипотезы и отдельного approval по stack/runtime choices.
-- Capability decisions на текущем этапе не применимы, поэтому security-sensitive capability QA пока не требуется.
+- Для code-changing, process-changing и bootstrap-transfer задач final gate: `npm run qa:agent`.
+- Product-specific runtime QA живёт в downstream-проектах после approved Project Intake и не становится starter core default.
+- Capability-specific QA применяется только к downstream capability blocks, которые owner явно признал applicable.
 
 ## Agent QA Gate (Mandatory)
 
