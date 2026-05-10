@@ -2,18 +2,6 @@
 
 Журнал срабатываний TRIZ-триггеров и применённых решений.
 
-## 2026-04-24T09:22:54.300Z 20260424-091736-6c73 — TRIZ_APPLIED
-
-- Principle: separation in space / mediator
-- Changes: skills source ownership is separated from local Codex activation through `--source <skills-root>`, so downstream repos can pin starter as `vendor/new-project-starter` while `$CODEX_HOME/skills` keeps symlink activation.
-- Guard: `tests/unit/skills-manager.test.mjs` covers linking from a submodule source path.
-
-## 2026-04-29T08:41:36.205Z 20260429-083348-74bc
-
-- Branch: `codex/20260429-083348-74bc-agent-const`
-- Reasons: cross_module_conflict, historical_recurrence
-- Status: trigger recorded
-
 ## 2026-04-29T08:42:00.000Z 20260429-083348-74bc — TRIZ_APPLIED
 
 - Principle: separation in space / mediator
