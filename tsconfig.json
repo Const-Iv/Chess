@@ -33,6 +33,7 @@
     "scripts/**/*.mjs",
     "src/**/*.mjs",
     "tests/**/*.mjs",
+    "research/**/*.json",
     ".next/types/**/*.ts",
     ".next/dev/types/**/*.ts"
   ],

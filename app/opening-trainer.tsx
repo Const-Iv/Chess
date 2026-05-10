@@ -2,6 +2,8 @@
 
 import { useMemo, useState } from "react";
 
+import { buildOpeningLessons } from "../src/domain/chess/opening-database.mjs";
+
 type StudySide = "white" | "black";
 type BlackPieceStyle = "original" | "inverted-white";
 
@@ -459,7 +461,8 @@ function getInteractiveBadMoveCards(lesson: OpeningLesson) {
   );
 }
 
-export default function OpeningTrainer({ lessons }: Readonly<{ lessons: readonly OpeningLesson[] }>) {
+export default function OpeningTrainer() {
+  const lessons = useMemo(() => buildOpeningLessons() as readonly OpeningLesson[], []);
   const initialLesson = lessons.find((candidate) => candidate.opening.studySide === "white") ?? lessons[0];
   const [studySideFilter, setStudySideFilter] = useState<StudySide>(initialLesson?.opening.studySide ?? "white");
   const [query, setQuery] = useState("");
