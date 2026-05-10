@@ -1,8 +1,10 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { Chess } from "chess.js";
+import type { Move, Piece, Square } from "chess.js";
 
-import { buildOpeningLessons } from "../src/domain/chess/opening-database.mjs";
+import { buildDisplayBoard, buildOpeningLessons } from "../src/domain/chess/opening-database.mjs";
 
 type StudySide = "white" | "black";
 type BlackPieceStyle = "original" | "inverted-white";
@@ -82,6 +84,23 @@ type SelectedTarget = Readonly<{
   key: string;
 }>;
 
+type MoveAssessmentKind = "recommended" | "bad" | "neutral";
+
+type MoveAssessment = Readonly<{
+  kind: MoveAssessmentKind;
+  title: string;
+  label: string;
+  body: string;
+  plan: string;
+  targetKind?: "continuation" | "badMove";
+  targetKey?: string;
+}>;
+
+type MoveChoice = Readonly<{
+  move: Move;
+  assessment: MoveAssessment;
+}>;
+
 type OpeningGroup = Readonly<{
   family: string;
   lessons: readonly OpeningLesson[];
@@ -129,7 +148,22 @@ type BoardArrow = Readonly<{
   y1: number;
   x2: number;
   y2: number;
-}> | null;
+  kind: "move" | "tactic";
+}>;
+
+type TacticalWarning = Readonly<{
+  title: string;
+  body: string;
+  from: string;
+  to: string;
+}>;
+
+type MoveFeedback = Readonly<{
+  move: Move;
+  assessment: MoveAssessment;
+  board: readonly BoardSquare[];
+  tactic: TacticalWarning | null;
+}>;
 
 const BLACK_PIECE_STYLES: readonly Readonly<{
   key: BlackPieceStyle;
@@ -161,6 +195,24 @@ const PIECE_LABELS: Readonly<Record<string, string>> = Object.freeze({
   R: "ладья"
 });
 
+const PIECE_NAMES_BY_TYPE: Readonly<Record<string, string>> = Object.freeze({
+  b: "слон",
+  k: "король",
+  n: "конь",
+  p: "пешка",
+  q: "ферзь",
+  r: "ладья"
+});
+
+const PIECE_MOVE_HINTS: Readonly<Record<string, string>> = Object.freeze({
+  b: "Слон ходит по диагоналям, пока путь не перекрыт своей или чужой фигурой.",
+  k: "Король ходит на одну клетку и не может вставать под шах.",
+  n: "Конь прыгает буквой Г и может перепрыгивать через занятые клетки.",
+  p: "Пешка идет вперед, берет по диагонали и зависит от цвета фигуры и занятости клеток.",
+  q: "Ферзь ходит по вертикалям, горизонталям и диагоналям, пока путь свободен.",
+  r: "Ладья ходит по вертикалям и горизонталям, пока путь свободен."
+});
+
 const MOVE_NOTATION_PATTERN =
   /\.{3}(?:O-O-O|O-O|0-0-0|0-0|[KQRBN][a-h][1-8]-[a-h][1-8][+#]?|[KQRBN][a-h]?[1-8]?x?[a-h][1-8][+#]?|[a-h]x[a-h][1-8][+#]?|[a-h][1-8]-[a-h][1-8]|[a-h][1-8])|(?:O-O-O|O-O|0-0-0|0-0|[KQRBN][a-h][1-8]-[a-h][1-8][+#]?|[KQRBN][a-h]?[1-8]?x?[a-h][1-8][+#]?|[a-h]x[a-h][1-8][+#]?|[a-h][1-8]-[a-h][1-8])/g;
 
@@ -183,9 +235,14 @@ function getSquareCenter(board: readonly BoardSquare[], squareName: string) {
   };
 }
 
-function getMoveArrow(step: MoveStep): BoardArrow {
-  const from = getSquareCenter(step.board, step.from);
-  const to = getSquareCenter(step.board, step.to);
+function getBoardArrow(
+  board: readonly BoardSquare[],
+  fromSquare: string,
+  toSquare: string,
+  kind: "move" | "tactic" = "move"
+): BoardArrow | null {
+  const from = getSquareCenter(board, fromSquare);
+  const to = getSquareCenter(board, toSquare);
   if (!from || !to) {
     return null;
   }
@@ -194,7 +251,8 @@ function getMoveArrow(step: MoveStep): BoardArrow {
     x1: from.x,
     y1: from.y,
     x2: to.x,
-    y2: to.y
+    y2: to.y,
+    kind
   };
 }
 
@@ -250,6 +308,177 @@ function getStudySideStatus(studySide: StudySide) {
 
 function cleanNotationToken(token: string) {
   return token.replace(/\.\.\./, "").replace(/0/g, "O").replace(/[+#]$/, "");
+}
+
+function normalizeSanForCompare(san: string) {
+  return cleanNotationToken(san).replace(/[!?]+$/g, "");
+}
+
+function getMoveKey(move: Move) {
+  return `${move.from}-${move.to}-${move.san}`;
+}
+
+function getSideNameFromTurn(turn: "w" | "b") {
+  return turn === "w" ? "белых" : "черных";
+}
+
+function getPieceSideName(piece: Piece) {
+  return piece.color === "w" ? "белая" : "черная";
+}
+
+function getPieceName(piece: Piece | undefined) {
+  return piece ? PIECE_NAMES_BY_TYPE[piece.type] ?? "фигура" : "фигура";
+}
+
+function getAssessmentResultTitle(assessment: MoveAssessment) {
+  if (assessment.kind === "recommended") {
+    return "Правильно: ход совпадает с проверенной учебной подсказкой";
+  }
+
+  if (assessment.kind === "bad") {
+    return "Неправильно: это известная ошибка в этой карточке";
+  }
+
+  return "Ход легален, но тренер не подтверждает его как учебно хороший";
+}
+
+function buildChessAtPly(steps: readonly MoveStep[], positionPly: number) {
+  const chess = new Chess();
+  const safePly = Math.min(Math.max(positionPly, 0), steps.length);
+
+  for (let index = 0; index < safePly; index += 1) {
+    const step = steps[index];
+
+    if (step) {
+      chess.move(step.san, { strict: true });
+    }
+  }
+
+  return chess;
+}
+
+function getPositionLabel(activeStep: MoveStep | null) {
+  return activeStep ? `после ${formatMove(activeStep)}` : "на старте линии";
+}
+
+function getInitialPositionPly(lesson: OpeningLesson) {
+  if (lesson.opening.continuations.length > 0 || lesson.opening.badMoves.length > 0) {
+    return lesson.baseLine.steps.length;
+  }
+
+  return 0;
+}
+
+function getTacticalWarning(chess: Chess, move: Move): TacticalWarning | null {
+  const movedPiece = chess.get(move.to as Square);
+
+  if (!movedPiece) {
+    return null;
+  }
+
+  const opponentColor = movedPiece.color === "w" ? "b" : "w";
+  const attackers = chess.attackers(move.to as Square, opponentColor);
+  const attackerSquare = attackers[0];
+
+  if (!attackerSquare) {
+    return null;
+  }
+
+  const attacker = chess.get(attackerSquare);
+  const movedPieceName = getPieceName(movedPiece);
+  const attackerName = getPieceName(attacker);
+
+  return {
+    title: "Тактический сигнал",
+    body: `${movedPieceName} на ${move.to} сейчас под ударом: ${attackerName} с ${attackerSquare} атакует это поле. Это не всегда проигрыш, но ход нужно перепроверить.`,
+    from: attackerSquare,
+    to: move.to
+  };
+}
+
+function buildMoveFeedback(
+  chess: Chess,
+  lesson: OpeningLesson,
+  choice: MoveChoice
+): MoveFeedback {
+  const probe = new Chess(chess.fen());
+  const move = probe.move(choice.move.san, { strict: true });
+
+  return {
+    move,
+    assessment: choice.assessment,
+    board: buildDisplayBoard(probe, lesson.opening.studySide, {
+      from: move.from,
+      to: move.to
+    }) as readonly BoardSquare[],
+    tactic: choice.assessment.kind === "bad" || choice.assessment.kind === "neutral" ? getTacticalWarning(probe, move) : null
+  };
+}
+
+function matchesMove(move: Move, candidate: Readonly<{ san: string; from?: string; to?: string }>) {
+  const sanMatches = normalizeSanForCompare(move.san) === normalizeSanForCompare(candidate.san);
+  const fromMatches = !candidate.from || candidate.from === move.from;
+  const toMatches = !candidate.to || candidate.to === move.to;
+  return sanMatches && fromMatches && toMatches;
+}
+
+function assessLegalMove(
+  lesson: OpeningLesson,
+  move: Move,
+  nextLineStep: MoveStep | undefined,
+  selectedTargetKind: SelectedTarget["kind"],
+  isOpeningChoicePosition: boolean
+): MoveAssessment {
+  const knownBadMove = isOpeningChoicePosition
+    ? lesson.opening.badMoves.find((badMove) => matchesMove(move, badMove))
+    : undefined;
+
+  if (knownBadMove) {
+    return {
+      kind: "bad",
+      title: "Неудачный ход в этой позиции",
+      label: knownBadMove.label,
+      body: knownBadMove.whyBad,
+      plan: knownBadMove.betterPlan,
+      targetKind: "badMove",
+      targetKey: knownBadMove.key
+    };
+  }
+
+  const knownContinuation = isOpeningChoicePosition
+    ? lesson.opening.continuations.find((continuation) => matchesMove(move, continuation))
+    : undefined;
+
+  if (knownContinuation) {
+    return {
+      kind: "recommended",
+      title: "Хороший учебный ход",
+      label: knownContinuation.label,
+      body: knownContinuation.idea,
+      plan: knownContinuation.summary,
+      targetKind: "continuation",
+      targetKey: knownContinuation.key
+    };
+  }
+
+  if (nextLineStep && matchesMove(move, nextLineStep) && selectedTargetKind !== "badMove") {
+    return {
+      kind: "recommended",
+      title: "Ход выбранной учебной линии",
+      label: nextLineStep.title,
+      body: nextLineStep.explanation,
+      plan: nextLineStep.purpose
+    };
+  }
+
+  return {
+    kind: "neutral",
+    title: "Легальный ход без оценки в этой карточке",
+    label: "Можно по правилам шахмат",
+    body:
+      "Такой ход легален, но в текущей проверенной карточке он не отмечен как главное продолжение или типовая ошибка.",
+    plan: `Сверь ход с целью позиции: ${lesson.opening.positionGoal}`
+  };
 }
 
 function withMoveSidePrefix(meaning: string, isBlackMove: boolean) {
@@ -355,6 +584,151 @@ function InsightListItem({ text }: Readonly<{ text: string }>) {
       <span>{text}</span>
       <NotationHelp explanations={explanations} />
     </li>
+  );
+}
+
+function MoveCoach({
+  activeStep,
+  moveFeedback,
+  nextLineStep,
+  moveChoices,
+  onOpenMoveLine,
+  onResetMoveFeedback,
+  onSelectMove,
+  selectedMoveChoice,
+  selectedPiece,
+  selectedSquare,
+  sideToMove
+}: Readonly<{
+  activeStep: MoveStep | null;
+  moveFeedback: MoveFeedback | null;
+  nextLineStep: MoveStep | undefined;
+  moveChoices: readonly MoveChoice[];
+  onOpenMoveLine: (assessment: MoveAssessment) => void;
+  onResetMoveFeedback: () => void;
+  onSelectMove: (choice: MoveChoice) => void;
+  selectedMoveChoice: MoveChoice | null;
+  selectedPiece: Piece | undefined;
+  selectedSquare: string;
+  sideToMove: "w" | "b";
+}>) {
+  const isSelectedPieceOnTurn = selectedPiece?.color === sideToMove;
+  const pieceName = getPieceName(selectedPiece);
+  const canMoveSelectedPiece = isSelectedPieceOnTurn && moveChoices.length > 0;
+  const moveTargetList = moveChoices.map((choice) => choice.move.to).join(", ");
+
+  return (
+    <section className="move-coach" aria-labelledby="move-coach-title">
+      <div className="move-coach-head">
+        <div>
+          <p className="eyebrow">Инструктор выбора</p>
+          <h2 id="move-coach-title">{moveFeedback ? "Ход сделан" : `Ход ${getSideNameFromTurn(sideToMove)}`}</h2>
+          <span className="coach-subtitle">
+            {moveFeedback ? `${moveFeedback.move.san} показан на доске` : getPositionLabel(activeStep)}
+          </span>
+        </div>
+        <span
+          className={[
+            "coach-status",
+            !selectedPiece ? "status-wait" : canMoveSelectedPiece ? "status-can" : "status-cannot"
+          ]
+            .filter(Boolean)
+            .join(" ")}
+        >
+          {moveFeedback ? "ход сделан" : !selectedPiece ? "выбери фигуру" : canMoveSelectedPiece ? "можно ходить" : "нельзя ходить"}
+        </span>
+      </div>
+
+      {moveFeedback ? (
+        <article className={`move-assessment move-assessment-${moveFeedback.assessment.kind}`}>
+          <span>{moveFeedback.assessment.label}</span>
+          <h3>{`${moveFeedback.move.san}: ${getAssessmentResultTitle(moveFeedback.assessment)}`}</h3>
+          <p>{moveFeedback.assessment.body}</p>
+          <p>{moveFeedback.assessment.plan}</p>
+          {moveFeedback.tactic ? (
+            <div className="coach-tactic">
+              <strong>{moveFeedback.tactic.title}</strong>
+              <p>{moveFeedback.tactic.body}</p>
+            </div>
+          ) : null}
+          <button onClick={onResetMoveFeedback} type="button">
+            Продолжить разбор
+          </button>
+        </article>
+      ) : null}
+
+      {!selectedSquare && !moveFeedback ? (
+        <p>
+          Выбери фигуру стороны, которая сейчас ходит. На доске появятся точки на всех легальных клетках, а здесь
+          появится оценка выбранного хода.
+          {nextLineStep ? ` Следующий ход проверенной учебной линии: ${formatMove(nextLineStep)}.` : ""}
+        </p>
+      ) : null}
+
+      {selectedSquare && !selectedPiece && !moveFeedback ? (
+        <p>На {selectedSquare} нет фигуры. Выбери фигуру стороны, которая сейчас ходит.</p>
+      ) : null}
+
+      {selectedPiece && !moveFeedback ? (
+        <div className="coach-selection">
+          <h3>{`${getPieceSideName(selectedPiece)} ${pieceName} на ${selectedSquare}`}</h3>
+          <p>{PIECE_MOVE_HINTS[selectedPiece.type] ?? "Фигура ходит только по легальным для нее клеткам."}</p>
+
+          {selectedPiece.color !== sideToMove ? (
+            <p className="coach-warning">
+              Этой фигурой сейчас ходить нельзя: {getPositionLabel(activeStep)} ход у {getSideNameFromTurn(sideToMove)}.
+            </p>
+          ) : null}
+
+          {isSelectedPieceOnTurn && moveChoices.length === 0 ? (
+            <p className="coach-warning">
+              У этой фигуры нет легальных ходов. Причина обычно одна из трех: путь закрыт, клетка занята своей фигурой
+              или ход оставляет короля под шахом.
+            </p>
+          ) : null}
+
+          {canMoveSelectedPiece ? (
+            <>
+              <p>
+                <strong>Куда можно:</strong> {moveTargetList}.
+              </p>
+              <p className="coach-note">
+                Клетки без точки сейчас недоступны по правилам: там может стоять своя фигура, путь может быть закрыт
+                или ход может оставлять короля под шахом.
+              </p>
+              <div className="move-choice-list" aria-label="Легальные ходы выбранной фигурой">
+                {moveChoices.map((choice) => (
+                  <button
+                    aria-pressed={selectedMoveChoice ? getMoveKey(selectedMoveChoice.move) === getMoveKey(choice.move) : false}
+                    className={`move-choice move-choice-${choice.assessment.kind}`}
+                    key={getMoveKey(choice.move)}
+                    onClick={() => onSelectMove(choice)}
+                    type="button"
+                  >
+                    <strong>{choice.move.san}</strong>
+                    <span>{choice.move.to}</span>
+                  </button>
+                ))}
+              </div>
+            </>
+          ) : null}
+        </div>
+      ) : null}
+
+      {selectedMoveChoice ? (
+        <article className={`move-assessment move-assessment-${selectedMoveChoice.assessment.kind}`}>
+          <span>{selectedMoveChoice.assessment.label}</span>
+          <h3>{`${selectedMoveChoice.move.san}: ${selectedMoveChoice.assessment.title}`}</h3>
+          <p>{selectedMoveChoice.assessment.body}</p>
+          <p>{selectedMoveChoice.assessment.plan}</p>
+          {selectedMoveChoice.assessment.targetKind && selectedMoveChoice.assessment.targetKey ? (
+            <button onClick={() => onOpenMoveLine(selectedMoveChoice.assessment)} type="button">
+              Показать на доске
+            </button>
+          ) : null}
+        </article>
+      ) : null}
+    </section>
   );
 }
 
@@ -518,14 +892,16 @@ export default function OpeningTrainer() {
     lessons[0]!;
   const firstContinuation = lesson.opening.continuations[0];
   const firstBadMove = lesson.opening.badMoves[0];
-  const baseStepIndex = Math.max(lesson.baseLine.steps.length - 1, 0);
-  const firstContinuationStepIndex = lesson.baseLine.steps.length;
+  const firstContinuationPositionPly = lesson.baseLine.steps.length;
   const [selectedTarget, setSelectedTarget] = useState<SelectedTarget>({
     kind: firstContinuation ? "continuation" : firstBadMove ? "badMove" : "learning",
     key: firstContinuation?.key ?? firstBadMove?.key ?? ""
   });
-  const [stepIndex, setStepIndex] = useState(firstContinuationStepIndex);
+  const [positionPly, setPositionPly] = useState(getInitialPositionPly(lesson));
   const [selectedLearningCardKey, setSelectedLearningCardKey] = useState("");
+  const [selectedSquare, setSelectedSquare] = useState("");
+  const [selectedMoveKey, setSelectedMoveKey] = useState("");
+  const [moveFeedback, setMoveFeedback] = useState<MoveFeedback | null>(null);
 
   const selectedContinuation =
     selectedTarget.kind === "continuation"
@@ -538,49 +914,127 @@ export default function OpeningTrainer() {
   const fallbackLine = selectedTarget.kind === "learning" ? undefined : firstContinuation ?? firstBadMove;
   const selectedLine = selectedContinuation ?? selectedBadMove ?? fallbackLine;
   const selectedLineSteps = selectedLine?.steps ?? lesson.baseLine.steps;
-  const safeStepIndex = Math.min(Math.max(stepIndex, 0), Math.max(selectedLineSteps.length - 1, 0));
-  const activeStep = selectedLineSteps[safeStepIndex] ?? lesson.baseLine.steps[baseStepIndex];
-  const arrow = useMemo(() => getMoveArrow(activeStep), [activeStep]);
+  const safePositionPly = Math.min(Math.max(positionPly, 0), selectedLineSteps.length);
+  const activeStep = safePositionPly > 0 ? selectedLineSteps[safePositionPly - 1] ?? null : null;
+  const currentChess = useMemo(
+    () => buildChessAtPly(selectedLineSteps, safePositionPly),
+    [selectedLineSteps, safePositionPly]
+  );
+  const activeBoard = useMemo(
+    () =>
+      buildDisplayBoard(
+        currentChess,
+        lesson.opening.studySide,
+        activeStep ? { from: activeStep.from, to: activeStep.to } : null
+      ) as readonly BoardSquare[],
+    [activeStep, currentChess, lesson.opening.studySide]
+  );
+  const sideToMove = currentChess.turn() as "w" | "b";
+  const selectedPiece = selectedSquare ? currentChess.get(selectedSquare as Square) : undefined;
+  const isOpeningChoicePosition = safePositionPly === lesson.baseLine.steps.length;
+  const nextLineStep = selectedLineSteps[safePositionPly];
+  const allMoveChoices = useMemo(
+    () =>
+      currentChess.moves({ verbose: true }).map((move) => ({
+        move,
+        assessment: assessLegalMove(lesson, move, nextLineStep, selectedTarget.kind, isOpeningChoicePosition)
+      })),
+    [currentChess, isOpeningChoicePosition, lesson, nextLineStep, selectedTarget.kind]
+  );
+  const recommendedSourceSquares = useMemo(
+    () =>
+      new Set<string>(
+        allMoveChoices
+          .filter((choice) => choice.assessment.kind === "recommended")
+          .map((choice) => choice.move.from)
+      ),
+    [allMoveChoices]
+  );
+  const selectedLegalMoves = useMemo(() => {
+    if (!selectedSquare || selectedPiece?.color !== sideToMove) {
+      return [] as Move[];
+    }
+
+    return currentChess.moves({ square: selectedSquare as Square, verbose: true });
+  }, [currentChess, selectedPiece?.color, selectedSquare, sideToMove]);
+  const moveChoices = useMemo(
+    () =>
+      selectedLegalMoves.map((move) => ({
+        move,
+        assessment: assessLegalMove(lesson, move, nextLineStep, selectedTarget.kind, isOpeningChoicePosition)
+      })),
+    [isOpeningChoicePosition, lesson, nextLineStep, selectedLegalMoves, selectedTarget.kind]
+  );
+  const legalMoveByTarget = useMemo(
+    () => new Map<string, MoveChoice>(moveChoices.map((choice) => [choice.move.to, choice])),
+    [moveChoices]
+  );
+  const selectedMoveChoice = moveChoices.find((choice) => getMoveKey(choice.move) === selectedMoveKey) ?? null;
+  const displayedBoard = moveFeedback?.board ?? activeBoard;
+  const boardArrows = useMemo(() => {
+    if (moveFeedback) {
+      const moveArrow = getBoardArrow(moveFeedback.board, moveFeedback.move.from, moveFeedback.move.to, "move");
+      const tacticArrow = moveFeedback.tactic
+        ? getBoardArrow(moveFeedback.board, moveFeedback.tactic.from, moveFeedback.tactic.to, "tactic")
+        : null;
+      return [moveArrow, tacticArrow].filter((arrow): arrow is BoardArrow => Boolean(arrow));
+    }
+
+    const moveArrow = activeStep ? getBoardArrow(activeBoard, activeStep.from, activeStep.to, "move") : null;
+    return moveArrow ? [moveArrow] : [];
+  }, [activeBoard, activeStep, moveFeedback]);
   const interactiveContinuationCards = getInteractiveContinuationCards(lesson);
   const interactiveBadMoveCards = getInteractiveBadMoveCards(lesson);
   const selectedLearningCard = [...interactiveContinuationCards, ...interactiveBadMoveCards].find(
     (card) => card.key === selectedLearningCardKey
   );
 
-  function goToStep(nextStepIndex: number) {
+  useEffect(() => {
+    setSelectedSquare("");
+    setSelectedMoveKey("");
+  }, [lesson.opening.key, safePositionPly, selectedTarget.key, selectedTarget.kind]);
+
+  function goToPosition(nextPositionPly: number) {
     setSelectedLearningCardKey("");
-    setStepIndex(nextStepIndex);
+    setMoveFeedback(null);
+    setPositionPly(nextPositionPly);
   }
 
   function selectContinuation(continuation: OpeningContinuation) {
     setSelectedLearningCardKey("");
+    setMoveFeedback(null);
     setSelectedTarget({ kind: "continuation", key: continuation.key });
-    setStepIndex(Math.min(firstContinuationStepIndex, continuation.steps.length - 1));
+    setPositionPly(Math.min(firstContinuationPositionPly, continuation.steps.length));
   }
 
   function selectBadMove(badMove: BadMove) {
     setSelectedLearningCardKey("");
+    setMoveFeedback(null);
     setSelectedTarget({ kind: "badMove", key: badMove.key });
-    setStepIndex(Math.min(firstContinuationStepIndex, badMove.steps.length - 1));
+    setPositionPly(Math.min(firstContinuationPositionPly, badMove.steps.length));
   }
 
   function selectLearningCard(card: InteractiveLearningCard) {
+    setMoveFeedback(null);
     setSelectedTarget({ kind: "learning", key: card.key });
     setSelectedLearningCardKey(card.key);
-    setStepIndex(card.focusStepIndex);
+    setPositionPly(Math.min(card.focusStepIndex + 1, lesson.baseLine.steps.length));
   }
 
   function selectOpening(nextLesson: OpeningLesson) {
     const nextFirstContinuation = nextLesson.opening.continuations[0];
     const nextFirstBadMove = nextLesson.opening.badMoves[0];
     const nextLineSteps = nextFirstContinuation?.steps ?? nextFirstBadMove?.steps ?? nextLesson.baseLine.steps;
+    const nextInitialPositionPly =
+      nextFirstContinuation || nextFirstBadMove ? nextLesson.baseLine.steps.length : getInitialPositionPly(nextLesson);
     setSelectedOpeningKey(nextLesson.opening.key);
     setSelectedTarget({
       kind: nextFirstContinuation ? "continuation" : nextFirstBadMove ? "badMove" : "learning",
       key: nextFirstContinuation?.key ?? nextFirstBadMove?.key ?? ""
     });
     setSelectedLearningCardKey("");
-    setStepIndex(Math.min(nextLesson.baseLine.steps.length, Math.max(nextLineSteps.length - 1, 0)));
+    setMoveFeedback(null);
+    setPositionPly(Math.min(nextInitialPositionPly, nextLineSteps.length));
   }
 
   function selectStudySide(nextSide: StudySide) {
@@ -591,6 +1045,89 @@ export default function OpeningTrainer() {
 
     if (nextLesson) {
       selectOpening(nextLesson);
+    }
+  }
+
+  function selectBoardSquare(square: BoardSquare) {
+    if (moveFeedback) {
+      setMoveFeedback(null);
+      setSelectedSquare("");
+      setSelectedMoveKey("");
+      return;
+    }
+
+    const targetChoice = legalMoveByTarget.get(square.square);
+
+    if (selectedSquare && targetChoice) {
+      playMoveChoice(targetChoice);
+      return;
+    }
+
+    if (square.piece) {
+      setMoveFeedback(null);
+      setSelectedSquare(square.square);
+      setSelectedMoveKey("");
+      return;
+    }
+
+    setSelectedSquare("");
+    setSelectedMoveKey("");
+  }
+
+  function playMoveChoice(choice: MoveChoice) {
+    const feedback = buildMoveFeedback(currentChess, lesson, choice);
+    setMoveFeedback(feedback);
+    setSelectedSquare("");
+    setSelectedMoveKey(getMoveKey(choice.move));
+
+    if (choice.assessment.targetKind === "continuation") {
+      const continuation = lesson.opening.continuations.find((candidate) => candidate.key === choice.assessment.targetKey);
+
+      if (continuation) {
+        setSelectedLearningCardKey("");
+        setSelectedTarget({ kind: "continuation", key: continuation.key });
+        setPositionPly(Math.min(firstContinuationPositionPly + 1, continuation.steps.length));
+      }
+      return;
+    }
+
+    if (choice.assessment.targetKind === "badMove") {
+      const badMove = lesson.opening.badMoves.find((candidate) => candidate.key === choice.assessment.targetKey);
+
+      if (badMove) {
+        setSelectedLearningCardKey("");
+        setSelectedTarget({ kind: "badMove", key: badMove.key });
+        setPositionPly(Math.min(firstContinuationPositionPly + 1, badMove.steps.length));
+      }
+      return;
+    }
+
+    if (nextLineStep && matchesMove(choice.move, nextLineStep)) {
+      setPositionPly(Math.min(safePositionPly + 1, selectedLineSteps.length));
+    }
+  }
+
+  function openMoveLine(assessment: MoveAssessment) {
+    if (assessment.targetKind === "continuation") {
+      const continuation = lesson.opening.continuations.find((candidate) => candidate.key === assessment.targetKey);
+
+      if (continuation) {
+        setSelectedLearningCardKey("");
+        setMoveFeedback(null);
+        setSelectedTarget({ kind: "continuation", key: continuation.key });
+        setPositionPly(Math.min(firstContinuationPositionPly + 1, continuation.steps.length));
+      }
+    }
+
+    if (assessment.targetKind === "badMove") {
+      const badMove = lesson.opening.badMoves.find((candidate) => candidate.key === assessment.targetKey);
+
+      if (badMove) {
+        setSelectedLearningCardKey("");
+        setMoveFeedback(null);
+        setSelectedTarget({ kind: "badMove", key: badMove.key });
+        setPositionPly(Math.min(firstContinuationPositionPly + 1, badMove.steps.length));
+      }
     }
   }
 
@@ -669,7 +1206,7 @@ export default function OpeningTrainer() {
           <div className="board-toolbar" aria-label="Открытая тренировка">
             <span>{getStudySideStatus(lesson.opening.studySide)}</span>
             <strong>{lesson.opening.name}</strong>
-            <span>Выбери продолжение или ошибку справа</span>
+            <span>{`Ход ${getSideNameFromTurn(sideToMove)}: выбери фигуру`}</span>
           </div>
 
           <div className="piece-style-switcher" aria-label="Вид черных фигур">
@@ -692,63 +1229,99 @@ export default function OpeningTrainer() {
 
           <div
             className={`board perspective-${lesson.opening.studySide} black-pieces-${blackPieceStyle}`}
-            aria-label={`Позиция после ${formatMove(activeStep)}`}
+            aria-label={`Позиция ${getPositionLabel(activeStep)}`}
           >
             <div className="board-grid">
-              {activeStep.board.map((square) => (
-                <div
-                  className={[
-                    "square",
-                    square.shade,
-                    square.isMoveFrom ? "is-from" : "",
-                    square.isMoveTo ? "is-to" : ""
-                  ]
-                    .filter(Boolean)
-                    .join(" ")}
-                  data-square={square.square}
-                  key={square.square}
-                  title={square.square}
-                >
-                  {square.showRank ? <span className="coord coord-rank">{square.rank}</span> : null}
-                  {square.showFile ? <span className="coord coord-file">{square.file}</span> : null}
-                  {square.piece ? (
-                    <span
-                      aria-label={`${square.piece.color === "white" ? "белая" : "черная"} ${square.piece.name} ${square.square}`}
-                      className={[
-                        "piece",
-                        `piece-${square.piece.color}`,
-                        square.piece.name === "пешка" ? "piece-pawn" : ""
-                      ]
-                        .filter(Boolean)
-                        .join(" ")}
-                    >
-                      {square.piece.symbol}
-                    </span>
-                  ) : null}
-                </div>
-              ))}
+              {displayedBoard.map((square) => {
+                const targetChoice = moveFeedback ? undefined : legalMoveByTarget.get(square.square);
+                const isSelectedSquare = square.square === selectedSquare;
+                const isSelectedMoveTarget = selectedMoveChoice?.move.to === square.square;
+                const isRecommendedPiece = !moveFeedback && recommendedSourceSquares.has(square.square);
+                const squareLabel = square.piece
+                  ? `${square.piece.color === "white" ? "белая" : "черная"} ${square.piece.name} ${square.square}`
+                  : `Клетка ${square.square}`;
+
+                return (
+                  <button
+                    aria-label={
+                      targetChoice ? `${squareLabel}. Можно сходить ${targetChoice.move.san}` : squareLabel
+                    }
+                    aria-pressed={isSelectedSquare || isSelectedMoveTarget}
+                    className={[
+                      "square",
+                      square.shade,
+                      square.isMoveFrom ? "is-from" : "",
+                      square.isMoveTo ? "is-to" : "",
+                      isRecommendedPiece ? "is-recommended-piece" : "",
+                      isSelectedSquare ? "is-selected-piece" : "",
+                      targetChoice ? "is-legal-target" : "",
+                      targetChoice ? `target-${targetChoice.assessment.kind}` : "",
+                      isSelectedMoveTarget ? "is-selected-target" : ""
+                    ]
+                      .filter(Boolean)
+                      .join(" ")}
+                    data-square={square.square}
+                    key={square.square}
+                    onClick={() => selectBoardSquare(square)}
+                    title={targetChoice ? `${targetChoice.move.san}: ${targetChoice.assessment.label}` : square.square}
+                    type="button"
+                  >
+                    {square.showRank ? <span className="coord coord-rank">{square.rank}</span> : null}
+                    {square.showFile ? <span className="coord coord-file">{square.file}</span> : null}
+                    {targetChoice ? <span aria-hidden="true" className="legal-target-dot" /> : null}
+                    {square.piece ? (
+                      <span
+                        aria-hidden="true"
+                        className={[
+                          "piece",
+                          `piece-${square.piece.color}`,
+                          square.piece.name === "пешка" ? "piece-pawn" : ""
+                        ]
+                          .filter(Boolean)
+                          .join(" ")}
+                      >
+                        {square.piece.symbol}
+                      </span>
+                    ) : null}
+                  </button>
+                );
+              })}
             </div>
-            {arrow ? (
+            {boardArrows.length > 0 ? (
               <svg aria-hidden="true" className="move-arrow" viewBox="0 0 100 100">
                 <defs>
                   <marker
-                    id="arrow-head"
+                    id="arrow-head-move"
                     markerHeight="2.4"
                     markerWidth="2.4"
                     orient="auto-start-reverse"
                     refX="1.92"
                     refY="1.2"
                   >
-                    <path d="M0,0 L2.4,1.2 L0,2.4 Z" />
+                    <path className="arrow-head-move" d="M0,0 L2.4,1.2 L0,2.4 Z" />
+                  </marker>
+                  <marker
+                    id="arrow-head-tactic"
+                    markerHeight="2.4"
+                    markerWidth="2.4"
+                    orient="auto-start-reverse"
+                    refX="1.92"
+                    refY="1.2"
+                  >
+                    <path className="arrow-head-tactic" d="M0,0 L2.4,1.2 L0,2.4 Z" />
                   </marker>
                 </defs>
-                <line
-                  markerEnd="url(#arrow-head)"
-                  x1={arrow.x1}
-                  x2={arrow.x2}
-                  y1={arrow.y1}
-                  y2={arrow.y2}
-                />
+                {boardArrows.map((boardArrow, index) => (
+                  <line
+                    className={`arrow-line-${boardArrow.kind}`}
+                    key={`${boardArrow.kind}-${index}`}
+                    markerEnd={`url(#arrow-head-${boardArrow.kind})`}
+                    x1={boardArrow.x1}
+                    x2={boardArrow.x2}
+                    y1={boardArrow.y1}
+                    y2={boardArrow.y2}
+                  />
+                ))}
               </svg>
             ) : null}
           </div>
@@ -757,32 +1330,46 @@ export default function OpeningTrainer() {
             <button
               aria-label="Предыдущий ход"
               className="step-arrow"
-              disabled={safeStepIndex === 0}
-              onClick={() => goToStep(safeStepIndex - 1)}
+              disabled={safePositionPly === 0}
+              onClick={() => goToPosition(safePositionPly - 1)}
               type="button"
             >
               ←
             </button>
             <article className="board-step-card">
               <div>
-                <span>{formatMove(activeStep)}</span>
-                <strong>{`${safeStepIndex + 1} / ${selectedLineSteps.length}`}</strong>
+                <span>{activeStep ? formatMove(activeStep) : "Старт"}</span>
+                <strong>{`${safePositionPly} / ${selectedLineSteps.length}`}</strong>
               </div>
               <h2 id="board-explorer-title">
-                {selectedLearningCard ? `${selectedLearningCard.label}: ${selectedLearningCard.title}` : activeStep.title}
+                {selectedLearningCard
+                  ? `${selectedLearningCard.label}: ${selectedLearningCard.title}`
+                  : activeStep
+                    ? activeStep.title
+                    : "Начало учебной линии"}
               </h2>
-              {selectedLearningCard ? <InsightText text={selectedLearningCard.body} /> : <p>{activeStep.explanation}</p>}
+              {selectedLearningCard ? (
+                <InsightText text={selectedLearningCard.body} />
+              ) : (
+                <p>
+                  {activeStep
+                    ? activeStep.explanation
+                    : `Позиция перед первым ходом линии: ${lesson.input}. Выбери фигуру и сравни ход с проверенной подсказкой.`}
+                </p>
+              )}
               <p>
                 {selectedLearningCard
-                  ? `На доске показан связанный момент: ${formatMove(activeStep)}.`
-                  : activeStep.purpose}
+                  ? `На доске показан связанный момент: ${activeStep ? formatMove(activeStep) : "старт линии"}.`
+                  : nextLineStep
+                    ? `Следующий проверенный ход: ${formatMove(nextLineStep)}. ${nextLineStep.purpose}`
+                    : "Линия дошла до учебной табии; дальше ориентируйся на план до миттельшпиля."}
               </p>
             </article>
             <button
               aria-label="Следующий ход"
               className="step-arrow"
-              disabled={safeStepIndex === selectedLineSteps.length - 1}
-              onClick={() => goToStep(safeStepIndex + 1)}
+              disabled={safePositionPly === selectedLineSteps.length}
+              onClick={() => goToPosition(safePositionPly + 1)}
               type="button"
             >
               →
@@ -790,13 +1377,20 @@ export default function OpeningTrainer() {
           </section>
 
           <div className="move-dots" aria-label="Положение в варианте">
+            <button
+              aria-label="Перейти к старту линии"
+              aria-pressed={safePositionPly === 0}
+              className={safePositionPly === 0 ? "active" : ""}
+              onClick={() => goToPosition(0)}
+              type="button"
+            />
             {selectedLineSteps.map((step, index) => (
               <button
                 aria-label={`Перейти к ходу ${formatMove(step)}`}
-                aria-pressed={index === safeStepIndex}
-                className={index === safeStepIndex ? "active" : ""}
+                aria-pressed={index + 1 === safePositionPly}
+                className={index + 1 === safePositionPly ? "active" : ""}
                 key={`${step.ply}-${step.san}`}
-                onClick={() => goToStep(index)}
+                onClick={() => goToPosition(index + 1)}
                 type="button"
               />
             ))}
@@ -815,6 +1409,20 @@ export default function OpeningTrainer() {
             </div>
             <span className="status-pill">{lesson.status}</span>
           </div>
+
+          <MoveCoach
+            activeStep={activeStep}
+            moveFeedback={moveFeedback}
+            nextLineStep={nextLineStep}
+            moveChoices={moveChoices}
+            onOpenMoveLine={openMoveLine}
+            onResetMoveFeedback={() => setMoveFeedback(null)}
+            onSelectMove={playMoveChoice}
+            selectedMoveChoice={selectedMoveChoice}
+            selectedPiece={selectedPiece}
+            selectedSquare={selectedSquare}
+            sideToMove={sideToMove}
+          />
 
           <div className="insight-grid">
             <article>
