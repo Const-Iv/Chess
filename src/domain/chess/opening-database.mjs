@@ -6,11 +6,138 @@ import {
   loadOpeningResearchSource,
   loadOpeningResearchValidation
 } from "./opening-research-source.mjs";
+import {
+  THEORY_EVIDENCE_SOURCE_NOTE,
+  loadTheoryEvidenceSource
+} from "./theory-evidence-source.mjs";
 
 export const OPENING_SOURCE_NOTE =
-  "Учебная база собрана вручную по справочникам Chess.com Openings, ECO-классификации, Lichess Opening Explorer и идеям из классических учебников: Fundamental Chess Openings, The Ideas Behind the Chess Openings, Modern Chess Openings и Mastering the Chess Openings. Все SAN-линии проверяются chess.js.";
+  "Учебная база проверяется по открытым источникам: Lichess chess-openings для названий/ECO и Lichess Broadcast Database для реальных партий. Дополнительный библиографический слой фиксирует FCO, Mastering the Chess Openings, Chess Structures и ECO/Chess Informant как источники методологии; текст книг не копируется. Все SAN-линии проверяются chess.js.";
 
 export const IMPORTED_OPENING_SOURCE_NOTE = OPENING_RESEARCH_SOURCE_NOTE;
+export const POSITION_THEORY_SOURCE_NOTE = THEORY_EVIDENCE_SOURCE_NOTE;
+
+/**
+ * @typedef {"open-data"|"bibliographic"|"classification"} TheoryReferenceKind
+ *
+ * @typedef {Readonly<{
+ *   key: string;
+ *   title: string;
+ *   author: string;
+ *   publisher: string;
+ *   url: string;
+ *   kind: TheoryReferenceKind;
+ *   role: string;
+ *   usage: string;
+ * }>} TheoryReferenceSource
+ */
+
+/** @type {readonly TheoryReferenceSource[]} */
+export const THEORY_REFERENCE_SOURCES = Object.freeze([
+  Object.freeze({
+    key: "lichess-chess-openings",
+    title: "Lichess chess-openings",
+    author: "Lichess",
+    publisher: "lichess-org",
+    url: "https://github.com/lichess-org/chess-openings",
+    kind: "open-data",
+    role: "Названия дебютов, ECO и проверка известных PGN-префиксов.",
+    usage: "Используется как открытый источник совпадений; данные проходят локальную SAN-проверку chess.js."
+  }),
+  Object.freeze({
+    key: "lichess-broadcast-database",
+    title: "Lichess Broadcast/Open Database",
+    author: "Lichess",
+    publisher: "Lichess",
+    url: "https://database.lichess.org/",
+    kind: "open-data",
+    role: "Реальные партии и частоты ходов в позициях.",
+    usage: "Используется для практической проверки ходов и примеров партий с сохранением атрибуции."
+  }),
+  Object.freeze({
+    key: "fundamental-chess-openings",
+    title: "FCO: Fundamental Chess Openings",
+    author: "Paul van der Sterren",
+    publisher: "Gambit Publications / New In Chess",
+    url: "https://www.newinchess.com/fco-fundamental-chess-openings",
+    kind: "bibliographic",
+    role: "Базовая методология дебютов: идеи, планы сторон и характер основных открытий.",
+    usage: "Используется как bibliographic reference для проверки учебной рамки; текст не копируется."
+  }),
+  Object.freeze({
+    key: "mastering-the-chess-openings",
+    title: "Mastering the Chess Openings",
+    author: "John Watson",
+    publisher: "Gambit Publications",
+    url: "https://www.gambitbooks.com/booksbysubject.html",
+    kind: "bibliographic",
+    role: "Более глубокая методология дебютной борьбы, порядка ходов и типовых идей.",
+    usage: "Используется как bibliographic reference для методологии; конкретные рекомендации сверяются отдельно."
+  }),
+  Object.freeze({
+    key: "chess-structures",
+    title: "Chess Structures: A Grandmaster Guide",
+    author: "Mauricio Flores Rios",
+    publisher: "Quality Chess",
+    url: "https://www.newinchess.com/chess-structures-a-grandmaster-guide",
+    kind: "bibliographic",
+    role: "Типовые пешечные структуры, планы миттельшпиля, model games and pitfalls.",
+    usage: "Используется как bibliographic reference для планов перехода к миттельшпилю; текст не копируется."
+  }),
+  Object.freeze({
+    key: "eco-chess-informant",
+    title: "Encyclopaedia of Chess Openings / ECO",
+    author: "Chess Informant",
+    publisher: "Chess Informant",
+    url: "https://help.chessbase.com/CBase/16/Eng/eco_classification.htm",
+    kind: "classification",
+    role: "Стандартная классификация дебютов и ECO-диапазонов.",
+    usage: "Используется как справочный слой классификации; названия и ходы дополнительно сверяются с открытыми источниками."
+  })
+]);
+
+export const THEORY_REFERENCE_SOURCE_NOTE =
+  "Book references are bibliographic-only: they validate the teaching frame, but app copy is original and move facts still require open-data or manual verification.";
+
+/** @type {Readonly<Record<string, TheoryReferenceSource>>} */
+const THEORY_REFERENCE_BY_KEY = Object.freeze(
+  THEORY_REFERENCE_SOURCES.reduce(
+    /**
+     * @param {Record<string, TheoryReferenceSource>} acc
+     * @param {TheoryReferenceSource} source
+     */
+    (acc, source) => {
+      acc[source.key] = source;
+      return acc;
+    },
+    /** @type {Record<string, TheoryReferenceSource>} */ ({})
+  )
+);
+
+const CORE_THEORY_REFERENCE_KEYS = Object.freeze([
+  "lichess-chess-openings",
+  "lichess-broadcast-database",
+  "fundamental-chess-openings",
+  "mastering-the-chess-openings",
+  "chess-structures",
+  "eco-chess-informant"
+]);
+
+const RESEARCH_THEORY_REFERENCE_KEYS = Object.freeze([
+  "lichess-chess-openings",
+  "lichess-broadcast-database",
+  "fundamental-chess-openings",
+  "chess-structures",
+  "eco-chess-informant"
+]);
+
+/**
+ * @param {readonly string[]} keys
+ * @returns {readonly TheoryReferenceSource[]}
+ */
+function getTheoryReferences(keys) {
+  return Object.freeze(keys.map((key) => THEORY_REFERENCE_BY_KEY[key]).filter(Boolean));
+}
 
 export const RUY_LOPEZ_SAN_LINE = Object.freeze(["e4", "e5", "Nf3", "Nc6", "Bb5"]);
 export const RUY_LOPEZ_INPUT = "1. e4 e5 2. Nf3 Nc6 3. Bb5";
@@ -53,6 +180,8 @@ export const RUY_LOPEZ_STUDY_SIDE = "black";
  *   title: string;
  *   explanation: string;
  *   purpose: string;
+ *   fenBefore: string;
+ *   fenAfter: string;
  *   board: readonly BoardSquare[];
  * }>} MoveStep
  *
@@ -75,15 +204,32 @@ export const RUY_LOPEZ_STUDY_SIDE = "black";
  *   steps: readonly MoveStep[];
  * }>} OpeningContinuation
  *
+ * @typedef {"verified"|"candidate"|"rejected"} BadMoveReviewStatus
+ * @typedef {"manual-review"|"book"|"lichess-explorer"|"lichess-cloud-eval"|"lichess-puzzle"} BadMoveSourceKind
+ *
+ * @typedef {Readonly<{
+ *   status: BadMoveReviewStatus;
+ *   kind: BadMoveSourceKind;
+ *   title: string;
+ *   url?: string;
+ *   note: string;
+ * }>} BadMoveSource
+ *
  * @typedef {Readonly<{
  *   san: string;
  *   label: string;
  *   whyBad: string;
  *   betterPlan: string;
+ *   afterLineSan?: readonly string[];
+ *   source?: BadMoveSource;
  * }>} BadMoveSeed
  *
  * @typedef {Readonly<BadMoveSeed & {
  *   key: string;
+ *   anchorPly: number;
+ *   anchorFen: string;
+ *   anchorLineSan: readonly string[];
+ *   source: BadMoveSource;
  *   from: string;
  *   to: string;
  *   steps: readonly MoveStep[];
@@ -102,6 +248,8 @@ export const RUY_LOPEZ_STUDY_SIDE = "black";
  *   finalFen: string;
  *   lichessMatch: LichessOpeningMatch | null;
  * }>} OpeningSourceEvidence
+ *
+ * @typedef {import("./theory-evidence-source.mjs").PositionTheoryEvidence} PositionTheoryEvidence
  *
  * @typedef {Readonly<{
  *   ply: number;
@@ -173,6 +321,7 @@ export const RUY_LOPEZ_STUDY_SIDE = "black";
  *   avoid?: readonly string[];
  *   tags?: readonly string[];
  *   sourceEvidence?: OpeningSourceEvidence;
+ *   referenceSources?: readonly TheoryReferenceSource[];
  * }>} OpeningSeed
  *
  * @typedef {Readonly<Omit<OpeningSeed, "continuations"|"badMoves"|"moveGuides"> & {
@@ -180,6 +329,8 @@ export const RUY_LOPEZ_STUDY_SIDE = "black";
  *   fen: string;
  *   continuations: readonly OpeningContinuation[];
  *   badMoves: readonly BadMove[];
+ *   positionTheory: readonly PositionTheoryEvidence[];
+ *   referenceSources: readonly TheoryReferenceSource[];
  * }>} OpeningMapEntry
  *
  * @typedef {Readonly<{
@@ -195,6 +346,41 @@ export const RUY_LOPEZ_STUDY_SIDE = "black";
  *   opening: OpeningMapEntry;
  * }>} OpeningLesson
  */
+
+/**
+ * @param {string} note
+ * @returns {BadMoveSource}
+ */
+function verifiedCloudEvalSource(note) {
+  return Object.freeze({
+    status: "verified",
+    kind: "lichess-cloud-eval",
+    title: "Lichess cloud eval",
+    url: "https://lichess.org/api/cloud-eval",
+    note
+  });
+}
+
+const THEORY_EVIDENCE_SOURCE = loadTheoryEvidenceSource();
+const THEORY_BY_OPENING_KEY = THEORY_EVIDENCE_SOURCE.positions.reduce(
+  /**
+   * @param {Map<string, PositionTheoryEvidence[]>} grouped
+   * @param {PositionTheoryEvidence} position
+   */
+  (grouped, position) => {
+    grouped.set(position.openingKey, [...(grouped.get(position.openingKey) ?? []), position]);
+    return grouped;
+  },
+  new Map()
+);
+
+/**
+ * @param {string} openingKey
+ * @returns {readonly PositionTheoryEvidence[]}
+ */
+function getPositionTheory(openingKey) {
+  return Object.freeze([...(THEORY_BY_OPENING_KEY.get(openingKey) ?? [])]);
+}
 
 /** @type {readonly OpeningSeed[]} */
 export const OPENING_SEEDS = Object.freeze([
@@ -260,6 +446,20 @@ export const OPENING_SEEDS = Object.freeze([
         label: "Не решает проблему",
         whyBad: "Пешка h7 идет на h6, но она не нападает на слона b5 и не защищает пешку e5.",
         betterPlan: "Лучше сыграть a6, чтобы сразу спросить слона b5, или Nf6, чтобы напасть на пешку e4."
+      }),
+      Object.freeze({
+        san: "Qg5",
+        label: "Ферзь уходит в рейд без развития",
+        whyBad: "Ферзь d8 идет на g5, но черные оставляют короля в центре, не развивают коня g8 и дают белым темпы на ферзя.",
+        betterPlan: "Лучше сначала сыграть a6 или Nf6: оба хода решают задачу позиции и не выводят ферзя под атаки.",
+        source: verifiedCloudEvalSource("Lichess cloud eval: после 3...Qg5 позиция примерно на 704cp хуже для черных, чем после 3...a6.")
+      }),
+      Object.freeze({
+        san: "Qh4",
+        label: "Ранняя атака ферзем",
+        whyBad: "Ферзь d8 идет на h4 и делает вид, что атакует e4, но белые выигрывают темпы развитием и черные все еще не решили давление на e5.",
+        betterPlan: "Лучше выбрать нормальное развитие: a6, Nf6 или d6.",
+        source: verifiedCloudEvalSource("Lichess cloud eval: после 3...Qh4 позиция примерно на 689cp хуже для черных, чем после 3...a6.")
       })
     ])
   }),
@@ -311,6 +511,20 @@ export const OPENING_SEEDS = Object.freeze([
         label: "Ранняя жертва без причины",
         whyBad: "Слон c4 забирает пешку f7 слишком рано. Если атаки нет, белые просто отдают развитую фигуру.",
         betterPlan: "Лучше сначала рокировать, подготовить c3-d4 и только потом считать жертвы на f7."
+      }),
+      Object.freeze({
+        san: "Ng5",
+        label: "Нападение до подготовки",
+        whyBad: "Конь f3 идет на g5 и второй раз атакует f7, но центр еще не подготовлен, а черные получают простой ответ и темпы на коня.",
+        betterPlan: "Лучше сначала сыграть c3 или d3: тогда атака на f7 будет связана с центром и развитием.",
+        source: verifiedCloudEvalSource("Lichess cloud eval: после 4.Ng5 позиция примерно на 482cp хуже для белых, чем после 4.c3.")
+      }),
+      Object.freeze({
+        san: "Nxe5",
+        label: "Жадный удар по e5",
+        whyBad: "Конь f3 забирает пешку e5, но белые отводят развитую фигуру в тактику до рокировки и дают черным темпы на коня и центр.",
+        betterPlan: "Лучше подготовить d4 ходом c3 или спокойно укрепить e4 ходом d3.",
+        source: verifiedCloudEvalSource("Lichess cloud eval: после 4.Nxe5 позиция примерно на 265cp хуже для белых, чем после 4.c3.")
       })
     ])
   }),
@@ -362,6 +576,20 @@ export const OPENING_SEEDS = Object.freeze([
         label: "Ферзь рано выходит в атаку",
         whyBad: "Ферзь d1 идет на h5, но черные легко получают темп развитием и нападением на ферзя.",
         betterPlan: "Лучше сначала развить коня g1 на f3 или построить центр ходом c3."
+      }),
+      Object.freeze({
+        san: "h6",
+        label: "Крайний ход вместо борьбы за d4",
+        whyBad: "После 2.Nf3 ход ...h6 не мешает белым сыграть d4 и не развивает фигуры, которые должны поддерживать сицилианский центр.",
+        betterPlan: "Лучше сыграть d6, Nc6 или e6 и сразу подготовиться к d4.",
+        afterLineSan: Object.freeze(["e4", "c5", "Nf3"])
+      }),
+      Object.freeze({
+        san: "f6",
+        label: "Ослабляет короля и поле e6",
+        whyBad: "После 2.Nf3 ход ...f6 закрывает естественное поле коня g8 и ослабляет диагонали к королю, но не решает угрозу d4.",
+        betterPlan: "Лучше развить план Сицилианки через d6, Nc6 или e6.",
+        afterLineSan: Object.freeze(["e4", "c5", "Nf3"])
       })
     ])
   }),
@@ -413,6 +641,20 @@ export const OPENING_SEEDS = Object.freeze([
         label: "Оставляет центр под боем",
         whyBad: "Слон f1 идет на d3, но пешка d4 все еще под ударом пешки d5, и белые не решили проблему центра.",
         betterPlan: "Лучше защитить центр ходом Nc3 или Nd2, либо закрыть центр ходом e5."
+      }),
+      Object.freeze({
+        san: "h6",
+        label: "Не отвечает на Nc3",
+        whyBad: "После 3.Nc3 ход ...h6 не связывает коня, не давит на e4 и дает белым спокойно усилить центр.",
+        betterPlan: "Лучше сразу сыграть Bb4, Nf6 или dxe4 - это реальные ответы на защиту пешки e4.",
+        afterLineSan: Object.freeze(["e4", "e6", "d4", "d5", "Nc3"])
+      }),
+      Object.freeze({
+        san: "f6",
+        label: "Ранний подрыв без подготовки",
+        whyBad: "После 3.Nc3 ход ...f6 ослабляет короля и вскрывает центр до развития фигур черных.",
+        betterPlan: "Лучше сначала развить фигуры и только потом думать о подрыве ...f6 в подходящей структуре.",
+        afterLineSan: Object.freeze(["e4", "e6", "d4", "d5", "Nc3"])
       })
     ])
   }),
@@ -464,6 +706,20 @@ export const OPENING_SEEDS = Object.freeze([
         label: "Не решает угрозу dxe4",
         whyBad: "Слон f1 идет на d3, но черные могут забрать пешку e4, потому что она недостаточно защищена.",
         betterPlan: "Лучше сыграть Nc3, Nd2, e5 или exd5 - это сразу отвечает на давление пешки d5."
+      }),
+      Object.freeze({
+        san: "h6",
+        label: "Пропускает задачу в центре",
+        whyBad: "После 3.Nc3 ход ...h6 не берет e4, не развивает слона c8 и не помогает черным решить центральное напряжение.",
+        betterPlan: "Лучше сыграть dxe4 и затем Bf5, пока слон c8 может выйти активно.",
+        afterLineSan: Object.freeze(["e4", "c6", "d4", "d5", "Nc3"])
+      }),
+      Object.freeze({
+        san: "f6",
+        label: "Ломает крепкую структуру",
+        whyBad: "После 3.Nc3 ход ...f6 ослабляет короля и забирает поле f6 у коня, хотя Каро-Канн строится на здоровом развитии.",
+        betterPlan: "Лучше забрать e4 или выбрать продвинутую структуру через Bf5 после e5.",
+        afterLineSan: Object.freeze(["e4", "c6", "d4", "d5", "Nc3"])
       })
     ])
   }),
@@ -515,6 +771,18 @@ export const OPENING_SEEDS = Object.freeze([
         label: "Ослабляет короля и e6",
         whyBad: "Пешка f7 идет на f6, но не развивает фигуры, ослабляет короля e8 и не решает давление на d5.",
         betterPlan: "Лучше выбрать e6, dxc4 или c6 - это реальные способы ответить на Ферзевый гамбит."
+      }),
+      Object.freeze({
+        san: "h6",
+        label: "Не отвечает на давление c4",
+        whyBad: "Пешка h7 идет на h6, но белые уже атакуют d5, а черные не защищают центр и не развивают фигуры.",
+        betterPlan: "Лучше выбрать e6, dxc4 или c6 - каждый из этих ходов связан с пешкой d5."
+      }),
+      Object.freeze({
+        san: "a6",
+        label: "Крайний ход раньше решения центра",
+        whyBad: "Пешка a7 идет на a6, но в этой позиции главный вопрос - что делать с атакованной пешкой d5.",
+        betterPlan: "Лучше сначала определить структуру: e6 для отказанного гамбита, dxc4 для принятого или c6 для славянской."
       })
     ])
   }),
@@ -566,6 +834,20 @@ export const OPENING_SEEDS = Object.freeze([
         label: "Ослабляет короля",
         whyBad: "Пешка f2 идет на f3, но не развивает фигуры, закрывает естественное поле коня g1 и ослабляет короля.",
         betterPlan: "Лучше развить коня g1 на f3 или коня b1 на c3 и только потом решать центр."
+      }),
+      Object.freeze({
+        san: "h6",
+        label: "Не развивает Славянку",
+        whyBad: "После 3.Nf3 ход ...h6 не выводит коня g8 и не готовит активный выход слона c8.",
+        betterPlan: "Лучше сыграть Nf6, чтобы развить фигуру и удержать центр d5-c6.",
+        afterLineSan: Object.freeze(["d4", "d5", "c4", "c6", "Nf3"])
+      }),
+      Object.freeze({
+        san: "f6",
+        label: "Ослабляет короля в закрытой структуре",
+        whyBad: "После 3.Nf3 ход ...f6 забирает поле у коня g8 и открывает диагонали к королю, хотя черным нужно спокойно развиваться.",
+        betterPlan: "Лучше Nf6 или Bf5 после подготовки: это развивает фигуры без лишних слабостей.",
+        afterLineSan: Object.freeze(["d4", "d5", "c4", "c6", "Nf3"])
       })
     ])
   }),
@@ -617,6 +899,20 @@ export const OPENING_SEEDS = Object.freeze([
         label: "Медленный крайний ход",
         whyBad: "Пешка h2 идет на h3, но центр уже напряжен, а белые еще не завершили развитие.",
         betterPlan: "Лучше выбрать Nf3, f3 или g3 - эти ходы сразу строят понятный план против Староиндийской."
+      }),
+      Object.freeze({
+        san: "Nxe4",
+        label: "Жадный захват до рокировки",
+        whyBad: "После 5.Nf3 конь f6 берет e4, но черный король еще в центре, а белые получают темпы на коня и открывают игру.",
+        betterPlan: "Лучше сначала рокировать и только потом подрывать центр ходами ...e5 или ...c5.",
+        afterLineSan: Object.freeze(["d4", "Nf6", "c4", "g6", "Nc3", "Bg7", "e4", "d6", "Nf3"])
+      }),
+      Object.freeze({
+        san: "h6",
+        label: "Медлит с безопасностью короля",
+        whyBad: "После 5.Nf3 ход ...h6 не рокирует и не бьет по центру, а белые получают время спокойно завершить развитие.",
+        betterPlan: "Лучше O-O: после рокировки черные смогут выбирать ...e5 или ...c5 без короля в центре.",
+        afterLineSan: Object.freeze(["d4", "Nf6", "c4", "g6", "Nc3", "Bg7", "e4", "d6", "Nf3"])
       })
     ])
   }),
@@ -668,6 +964,20 @@ export const OPENING_SEEDS = Object.freeze([
         label: "Слишком ранняя атака пешкой",
         whyBad: "Пешка g2 идет на g4, но белый король еще в центре, а развитие не закончено.",
         betterPlan: "Лучше выбрать e3, Qc2 или a3 - эти ходы прямо отвечают на связку коня c3."
+      }),
+      Object.freeze({
+        san: "h6",
+        label: "Не использует связку",
+        whyBad: "После 4.e3 ход ...h6 не развивает черных и не усиливает давление на коня c3, ради которого сыгран ...Bb4.",
+        betterPlan: "Лучше O-O или d5: так черные заканчивают развитие и играют против центра.",
+        afterLineSan: Object.freeze(["d4", "Nf6", "c4", "e6", "Nc3", "Bb4", "e3"])
+      }),
+      Object.freeze({
+        san: "Ba5",
+        label: "Слон отходит без причины",
+        whyBad: "Слон b4 уходит на a5 и сам снимает полезную связку с коня c3, не вынуждая белых ничего уступить.",
+        betterPlan: "Лучше рокировать или ударить по центру ходом d5, сохраняя давление на c3.",
+        afterLineSan: Object.freeze(["d4", "Nf6", "c4", "e6", "Nc3", "Bb4", "e3"])
       })
     ])
   }),
@@ -719,6 +1029,20 @@ export const OPENING_SEEDS = Object.freeze([
         label: "Не борется за центр",
         whyBad: "Пешка h7 идет на h5, но она не развивает фигуры и не мешает белым захватить центр.",
         betterPlan: "Лучше ответить e5, c5 или Nf6 - эти ходы сразу борются за центральные поля."
+      }),
+      Object.freeze({
+        san: "h4",
+        label: "Фланг вместо развития",
+        whyBad: "После ...e5 ход h4 не развивает фигуры и не помогает белым давить на d5.",
+        betterPlan: "Лучше Nc3: конь выходит к центру и поддерживает типовой английский план.",
+        afterLineSan: Object.freeze(["c4", "e5"])
+      }),
+      Object.freeze({
+        san: "a3",
+        label: "Медленный профилактический ход",
+        whyBad: "После ...e5 ход a3 ничего не делает с центром и не развивает королевский фланг.",
+        betterPlan: "Лучше Nc3 или g3, чтобы сразу строить давление на центральные поля.",
+        afterLineSan: Object.freeze(["c4", "e5"])
       })
     ])
   }),
@@ -770,6 +1094,18 @@ export const OPENING_SEEDS = Object.freeze([
         label: "Ферзь попадает под коня",
         whyBad: "Ферзь d1 берет пешку d4, но черный конь c6 уже нападает на d4 и выигрывает темп на ферзе.",
         betterPlan: "Лучше взять пешку конем f3 на d4 или выбрать гамбитный план Bc4/c3."
+      }),
+      Object.freeze({
+        san: "e5",
+        label: "Толкает пешку, оставляя d4",
+        whyBad: "Пешка e4 идет на e5, но белые не возвращают пешку d4 и дают черным удобный темп на коня f3.",
+        betterPlan: "Лучше сначала вернуть центр ходом Nxd4 или выбрать понятный гамбитный план Bc4/c3."
+      }),
+      Object.freeze({
+        san: "Bd3",
+        label: "Закрывает развитие без возврата центра",
+        whyBad: "Слон f1 идет на d3, но пешка d4 остается у черных, а белые не используют открытую линию для быстрой игры.",
+        betterPlan: "Лучше Nxd4: белые возвращают пешку и развивают фигуру в центр."
       })
     ])
   }),
@@ -821,6 +1157,18 @@ export const OPENING_SEEDS = Object.freeze([
         label: "Забывает про пешку d5",
         whyBad: "Пешка h7 идет на h6, но черные не возвращают пешку d5 и не развивают фигуры.",
         betterPlan: "Лучше сразу играть Qxd5, Nf6 или c6 - все эти ходы связаны с пешкой d5."
+      }),
+      Object.freeze({
+        san: "a6",
+        label: "Не возвращает материал",
+        whyBad: "Пешка a7 идет на a6, но белые уже забрали d5, и черные не получают ни развития, ни компенсации.",
+        betterPlan: "Лучше Qxd5, Nf6 или c6 - каждый ход сразу работает против пешки d5."
+      }),
+      Object.freeze({
+        san: "f6",
+        label: "Ослабляет короля вместо развития",
+        whyBad: "Пешка f7 идет на f6, но не возвращает d5 и открывает диагонали к королю.",
+        betterPlan: "Лучше развить фигуру ходом Nf6 или вернуть пешку ферзем Qxd5."
       })
     ])
   }),
@@ -872,6 +1220,20 @@ export const OPENING_SEEDS = Object.freeze([
         label: "Атака без развития",
         whyBad: "Пешка g2 идет на g4, но белый король еще в центре, а фигуры королевского фланга не развиты.",
         betterPlan: "Лучше выбрать Nf3, f4 или Be3 - эти планы одновременно развивают фигуры и держат центр."
+      }),
+      Object.freeze({
+        san: "h6",
+        label: "Не завершает фианкетто",
+        whyBad: "После 4.Nf3 ход ...h6 не выводит слона g7 и оставляет черных без главной фигуры Пирца.",
+        betterPlan: "Лучше Bg7: слон сразу давит на центр и готовит рокировку.",
+        afterLineSan: Object.freeze(["e4", "d6", "d4", "Nf6", "Nc3", "g6", "Nf3"])
+      }),
+      Object.freeze({
+        san: "a6",
+        label: "Фланг раньше короля",
+        whyBad: "После 4.Nf3 ход ...a6 не помогает королю и не атакует центр белых.",
+        betterPlan: "Лучше Bg7 и O-O, а затем выбирать подрыв ...e5 или ...c5.",
+        afterLineSan: Object.freeze(["e4", "d6", "d4", "Nf6", "Nc3", "g6", "Nf3"])
       })
     ])
   }),
@@ -923,6 +1285,18 @@ export const OPENING_SEEDS = Object.freeze([
         label: "Ослабляет короля",
         whyBad: "Пешка f2 идет на f3, забирает поле у коня g1 и открывает диагонали к королю e1.",
         betterPlan: "Лучше развить коня g1 на f3 или спокойно сыграть e3."
+      }),
+      Object.freeze({
+        san: "Bxc7",
+        label: "Жадный рейд слоном",
+        whyBad: "Слон f4 забирает пешку c7, но уходит далеко от короля, теряет темпы и дает черным простую охоту на слона.",
+        betterPlan: "Лучше e3 или Nf3: белые заканчивают развитие и сохраняют лондонскую структуру."
+      }),
+      Object.freeze({
+        san: "h3",
+        label: "Медлит с развитием",
+        whyBad: "Пешка h2 идет на h3, но белые еще не открыли слона f1 и не вывели коня g1.",
+        betterPlan: "Лучше e3 или Nf3 - эти ходы сразу строят рабочую расстановку Лондона."
       })
     ])
   }),
@@ -974,6 +1348,20 @@ export const OPENING_SEEDS = Object.freeze([
         label: "Фланг раньше центра",
         whyBad: "Пешка h2 идет на h4, но белые еще не решили, как держать центр d4-c4.",
         betterPlan: "Лучше выбрать cxd5, Nf3 или Bf4 - эти ходы отвечают на давление по центру."
+      }),
+      Object.freeze({
+        san: "h6",
+        label: "Не возвращает пешку d5",
+        whyBad: "После cxd5 ход ...h6 оставляет белым лишнюю центральную пешку и не включает слона g7.",
+        betterPlan: "Лучше Nxd5: конь возвращает материал и начинает давление на центр.",
+        afterLineSan: Object.freeze(["d4", "Nf6", "c4", "g6", "Nc3", "d5", "cxd5"])
+      }),
+      Object.freeze({
+        san: "a6",
+        label: "Фланг вместо центра",
+        whyBad: "После cxd5 ход ...a6 не возвращает пешку и не давит на d4.",
+        betterPlan: "Лучше Nxd5, чтобы сразу вернуть материал и перейти к типовой игре Грюнфельда.",
+        afterLineSan: Object.freeze(["d4", "Nf6", "c4", "g6", "Nc3", "d5", "cxd5"])
       })
     ])
   }),
@@ -1025,6 +1413,20 @@ export const OPENING_SEEDS = Object.freeze([
         label: "Не развивает фигуры",
         whyBad: "Пешка h2 идет на h4, но белые не борются с идеей ...Nf6 и не развивают королевский фланг.",
         betterPlan: "Лучше играть g3, c4 или Nf3 - эти ходы развивают позицию и держат центр."
+      }),
+      Object.freeze({
+        san: "h6",
+        label: "Не развивает голландскую схему",
+        whyBad: "После 2.g3 ход ...h6 не выводит коня g8 и не помогает черным закрепить контроль над e4.",
+        betterPlan: "Лучше Nf6: конь выходит к центру и готовит нормальное развитие.",
+        afterLineSan: Object.freeze(["d4", "f5", "g3"])
+      }),
+      Object.freeze({
+        san: "a6",
+        label: "Пауза на ферзевом фланге",
+        whyBad: "После 2.g3 ход ...a6 не развивает фигуры и не отвечает на будущий слон g2.",
+        betterPlan: "Лучше Nf6 или e6, чтобы построить устойчивую голландскую расстановку.",
+        afterLineSan: Object.freeze(["d4", "f5", "g3"])
       })
     ])
   }),
@@ -1076,6 +1478,18 @@ export const OPENING_SEEDS = Object.freeze([
         label: "Слишком медленно",
         whyBad: "Пешка h2 идет на h3, но белые не давят на центр d5 и не развивают новые фигуры.",
         betterPlan: "Лучше играть c4, g3 или d4 - эти ходы задают понятную структуру."
+      }),
+      Object.freeze({
+        san: "h4",
+        label: "Фланг вместо давления на d5",
+        whyBad: "Пешка h2 идет на h4, но пешка d5 остается без давления, а белые не строят фианкетто и не занимают центр.",
+        betterPlan: "Лучше c4, g3 или d4 - это реальные планы дебюта Рети."
+      }),
+      Object.freeze({
+        san: "a3",
+        label: "Пустая профилактика",
+        whyBad: "Пешка a2 идет на a3, но черные уже стоят в центре, а белые не создают давления на d5.",
+        betterPlan: "Лучше c4 или g3, чтобы начать типовую игру против центра черных."
       })
     ])
   }),
@@ -1127,6 +1541,20 @@ export const OPENING_SEEDS = Object.freeze([
         label: "Рано снимает напряжение",
         whyBad: "Пешка d5 берет e6, но белые отпускают пространство d5 и помогают черным раскрыть фигуры.",
         betterPlan: "Лучше развить Nc3, Nf3 или g3 и сохранить давление в центре."
+      }),
+      Object.freeze({
+        san: "h6",
+        label: "Не снимает напряжение в центре",
+        whyBad: "После 4.Nc3 ход ...h6 оставляет пешку e6 под давлением и не помогает черным построить структуру Бенони.",
+        betterPlan: "Лучше exd5: черные сразу определяют центр и готовят ...d6, ...g6 и ...Bg7.",
+        afterLineSan: Object.freeze(["d4", "Nf6", "c4", "c5", "d5", "e6", "Nc3"])
+      }),
+      Object.freeze({
+        san: "a6",
+        label: "Фланг до решения центра",
+        whyBad: "После 4.Nc3 ход ...a6 не отвечает на напряжение d5-e6 и дает белым лишний темп развития.",
+        betterPlan: "Лучше exd5 и затем d6/g6, чтобы получить понятную структуру Бенони.",
+        afterLineSan: Object.freeze(["d4", "Nf6", "c4", "c5", "d5", "e6", "Nc3"])
       })
     ])
   })
@@ -1506,6 +1934,7 @@ function buildResearchSeed(variation) {
     commonTraps: freezeStringList(beginnerVariation.common_traps),
     avoid: freezeStringList(beginnerVariation.avoid),
     tags: freezeStringList(beginnerVariation.tags),
+    referenceSources: getTheoryReferences(RESEARCH_THEORY_REFERENCE_KEYS),
     sourceEvidence: Object.freeze({
       legalSan: validation?.legalSan ?? false,
       finalFen: validation?.finalFen ?? "",
@@ -1685,7 +2114,9 @@ export function buildMoveSteps(sanLine, perspective, moveGuides) {
   const steps = [];
 
   for (let index = 0; index < sanLine.length; index += 1) {
+    const fenBefore = chess.fen();
     const move = chess.move(sanLine[index], { strict: true });
+    const fenAfter = chess.fen();
     const actor = move.color === "w" ? "white" : "black";
     const actorLabel = actor === "white" ? "Белые" : "Черные";
     const pieceName = PIECE_NAMES[move.piece] ?? "фигура";
@@ -1703,6 +2134,8 @@ export function buildMoveSteps(sanLine, perspective, moveGuides) {
       title: description.title,
       explanation: description.explanation,
       purpose: description.purpose,
+      fenBefore,
+      fenAfter,
       board: buildDisplayBoard(chess, perspective, { from: move.from, to: move.to })
     });
   }
@@ -1713,10 +2146,11 @@ export function buildMoveSteps(sanLine, perspective, moveGuides) {
 /**
  * @param {OpeningSeed} seed
  * @param {BadMoveSeed} badMove
+ * @param {readonly string[]} anchorLineSan
  * @returns {MoveStep[]}
  */
-function buildBadMoveSteps(seed, badMove) {
-  const steps = buildMoveSteps([...seed.lineSan, badMove.san], seed.studySide, seed.moveGuides);
+function buildBadMoveSteps(seed, badMove, anchorLineSan) {
+  const steps = buildMoveSteps([...anchorLineSan, badMove.san], seed.studySide, seed.moveGuides);
   const badMoveStep = steps.at(-1);
 
   if (!badMoveStep) {
@@ -1732,6 +2166,24 @@ function buildBadMoveSteps(seed, badMove) {
       purpose: badMove.betterPlan
     }
   ];
+}
+
+/**
+ * @param {OpeningSeed} seed
+ * @param {BadMoveSeed} badMove
+ * @returns {BadMoveSource}
+ */
+function getBadMoveSource(seed, badMove) {
+  if (badMove.source) {
+    return badMove.source;
+  }
+
+  return Object.freeze({
+    status: "candidate",
+    kind: "manual-review",
+    title: `${seed.sourceName} · нужна внешняя проверка`,
+    note: "Ручная заметка остается в исходной базе как кандидат, но не показывается в приложении, пока не будет подтверждена внешним источником."
+  });
 }
 
 /**
@@ -1752,19 +2204,33 @@ export function buildOpeningLesson(seed) {
       steps: buildMoveSteps([...seed.lineSan, ...continuation.lineSan], seed.studySide, seed.moveGuides)
     };
   });
-  const badMoves = seed.badMoves.map((badMove) => {
-    if (!legalContinuations.has(badMove.san)) {
+  const badMoves = seed.badMoves.flatMap((badMove) => {
+    const source = getBadMoveSource(seed, badMove);
+    const anchorLineSan = badMove.afterLineSan ?? seed.lineSan;
+    const { chess: anchorChess } = playStrictSanLine(anchorLineSan);
+    const anchorFen = anchorChess.fen();
+    const anchorLegalContinuations = new Set(anchorChess.moves());
+
+    if (source.status !== "verified") {
+      return [];
+    }
+
+    if (!anchorLegalContinuations.has(badMove.san)) {
       throw new Error(`Expected bad move ${seed.key}:${badMove.san} is not legal in the reached position.`);
     }
 
-    const probe = new Chess(fen);
+    const probe = new Chess(anchorFen);
     const move = probe.move(badMove.san, { strict: true });
     return {
       ...badMove,
-      key: `${seed.key}-bad-${badMove.san}`,
+      key: `${seed.key}-bad-${anchorLineSan.length}-${badMove.san}`,
+      anchorPly: anchorLineSan.length,
+      anchorFen,
+      anchorLineSan: Object.freeze([...anchorLineSan]),
+      source,
       from: move.from,
       to: move.to,
-      steps: buildBadMoveSteps(seed, badMove)
+      steps: buildBadMoveSteps(seed, badMove, anchorLineSan)
     };
   });
 
@@ -1803,8 +2269,10 @@ export function buildOpeningLesson(seed) {
       avoid: seed.avoid,
       tags: seed.tags,
       sourceEvidence: seed.sourceEvidence,
+      referenceSources: seed.referenceSources ?? getTheoryReferences(CORE_THEORY_REFERENCE_KEYS),
       continuations,
-      badMoves
+      badMoves,
+      positionTheory: getPositionTheory(seed.key)
     }
   };
 }
