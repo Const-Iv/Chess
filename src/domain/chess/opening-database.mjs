@@ -1,9 +1,16 @@
 // @ts-check
 
 import { Chess } from "chess.js";
+import {
+  OPENING_RESEARCH_SOURCE_NOTE,
+  loadOpeningResearchSource,
+  loadOpeningResearchValidation
+} from "./opening-research-source.mjs";
 
 export const OPENING_SOURCE_NOTE =
   "Учебная база собрана вручную по справочникам Chess.com Openings, ECO-классификации, Lichess Opening Explorer и идеям из классических учебников: Fundamental Chess Openings, The Ideas Behind the Chess Openings, Modern Chess Openings и Mastering the Chess Openings. Все SAN-линии проверяются chess.js.";
+
+export const IMPORTED_OPENING_SOURCE_NOTE = OPENING_RESEARCH_SOURCE_NOTE;
 
 export const RUY_LOPEZ_SAN_LINE = Object.freeze(["e4", "e5", "Nf3", "Nc6", "Bb5"]);
 export const RUY_LOPEZ_INPUT = "1. e4 e5 2. Nf3 Nc6 3. Bb5";
@@ -12,6 +19,8 @@ export const RUY_LOPEZ_STUDY_SIDE = "black";
 
 /**
  * @typedef {"white"|"black"} StudySide
+ * @typedef {"A"|"B"|"C"} OpeningPriority
+ * @typedef {"ПРОВЕРЕНО"|"ХОДЫ ПРОВЕРЕНЫ"} OpeningLessonStatus
  * @typedef {"light"|"dark"} SquareShade
  *
  * @typedef {Readonly<{
@@ -81,6 +90,62 @@ export const RUY_LOPEZ_STUDY_SIDE = "black";
  * }>} BadMove
  *
  * @typedef {Readonly<{
+ *   kind: string;
+ *   commonPrefixPly: number;
+ *   eco: string;
+ *   name: string;
+ *   pgn: string;
+ * }>} LichessOpeningMatch
+ *
+ * @typedef {Readonly<{
+ *   legalSan: boolean;
+ *   finalFen: string;
+ *   lichessMatch: LichessOpeningMatch | null;
+ * }>} OpeningSourceEvidence
+ *
+ * @typedef {Readonly<{
+ *   ply: number;
+ *   side: StudySide;
+ *   move: string;
+ *   hint: string;
+ * }>} ResearchMoveHint
+ *
+ * @typedef {Readonly<{
+ *   id: string;
+ *   family: string;
+ *   eco: string;
+ *   name: string;
+ *   pgn: string;
+ *   moves: readonly string[];
+ *   priority: OpeningPriority;
+ *   why_it_matters: string;
+ *   white_plan: string;
+ *   black_plan: string;
+ *   middlegame_tabia: string;
+ *   key_ideas: readonly string[];
+ *   common_traps?: readonly string[];
+ *   avoid?: readonly string[];
+ *   tags?: readonly string[];
+ *   related?: readonly string[];
+ *   move_hints: readonly ResearchMoveHint[];
+ * }>} ResearchVariation
+ *
+ * @typedef {Readonly<{
+ *   variations: readonly ResearchVariation[];
+ * }>} ResearchSource
+ *
+ * @typedef {Readonly<{
+ *   id: string;
+ *   legalSan: boolean;
+ *   finalFen: string;
+ *   lichessMatch: LichessOpeningMatch | null;
+ * }>} ResearchValidationEntry
+ *
+ * @typedef {Readonly<{
+ *   variations: readonly ResearchValidationEntry[];
+ * }>} ResearchValidation
+ *
+ * @typedef {Readonly<{
  *   key: string;
  *   family: string;
  *   name: string;
@@ -98,6 +163,16 @@ export const RUY_LOPEZ_STUDY_SIDE = "black";
  *   continuations: readonly OpeningContinuationSeed[];
  *   badMoves: readonly BadMoveSeed[];
  *   moveGuides?: Readonly<Record<string, MoveGuide>>;
+ *   priority?: OpeningPriority;
+ *   whyItMatters?: string;
+ *   whitePlan?: string;
+ *   blackPlan?: string;
+ *   middlegameTabia?: string;
+ *   keyIdeas?: readonly string[];
+ *   commonTraps?: readonly string[];
+ *   avoid?: readonly string[];
+ *   tags?: readonly string[];
+ *   sourceEvidence?: OpeningSourceEvidence;
  * }>} OpeningSeed
  *
  * @typedef {Readonly<Omit<OpeningSeed, "continuations"|"badMoves"|"moveGuides"> & {
@@ -112,7 +187,7 @@ export const RUY_LOPEZ_STUDY_SIDE = "black";
  * }>} OpeningLine
  *
  * @typedef {Readonly<{
- *   status: "ПРОВЕРЕНО";
+ *   status: OpeningLessonStatus;
  *   input: string;
  *   appliedSan: readonly string[];
  *   fen: string;
@@ -1057,6 +1132,391 @@ export const OPENING_SEEDS = Object.freeze([
   })
 ]);
 
+/** @type {ResearchSource} */
+const RESEARCH_SOURCE = /** @type {ResearchSource} */ (loadOpeningResearchSource());
+/** @type {ResearchValidation} */
+const RESEARCH_VALIDATION = /** @type {ResearchValidation} */ (loadOpeningResearchValidation());
+/** @type {ReadonlyMap<string, ResearchValidationEntry>} */
+const RESEARCH_VALIDATION_BY_ID = new Map(RESEARCH_VALIDATION.variations.map((entry) => [entry.id, entry]));
+
+/** @type {Readonly<Record<string, string>>} */
+const RESEARCH_FAMILY_RU = Object.freeze({
+  "Alekhine Defense": "Защита Алехина",
+  "Benoni Defense": "Защита Бенони",
+  "Bird Opening": "Дебют Берда",
+  "Bogo-Indian Defense": "Защита Боголюбова",
+  "Caro-Kann Defense": "Защита Каро-Канн",
+  "Catalan Opening": "Каталонское начало",
+  "Dutch Defense": "Голландская защита",
+  "English Opening": "Английское начало",
+  "French Defense": "Французская защита",
+  "Grünfeld Defense": "Защита Грюнфельда",
+  "Italian Game": "Итальянская партия",
+  "King's Indian Defense": "Староиндийская защита",
+  "King’s Indian Defense": "Староиндийская защита",
+  "King’s Gambit": "Королевский гамбит",
+  "King’s Indian Attack": "Староиндийская атака",
+  "Modern Defense": "Модерн-защита",
+  "Nimzo-Indian Defense": "Защита Нимцовича",
+  "Nimzo-Larsen Attack": "Атака Нимцовича-Ларсена",
+  "Nimzowitsch Defense": "Защита Нимцовича против 1.e4",
+  "Old Indian Defense": "Староиндийская защита без фианкетто",
+  "Open Games": "Открытые игры",
+  "Petroff Defense": "Русская партия",
+  "Philidor Defense": "Защита Филидора",
+  "Pirc Defense": "Защита Пирца",
+  "Owen Defense": "Защита Оуэна",
+  "Queen’s Gambit": "Ферзевый гамбит",
+  "Queen’s Gambit Accepted": "Принятый ферзевый гамбит",
+  "Queen’s Gambit Declined": "Отказанный ферзевый гамбит",
+  "Queen's Gambit Accepted": "Принятый ферзевый гамбит",
+  "Queen's Gambit Declined": "Отказанный ферзевый гамбит",
+  "Queen's Indian Defense": "Новоиндийская защита",
+  "Queen’s Indian Defense": "Новоиндийская защита",
+  "Queen’s Pawn Game": "Дебют ферзевой пешки",
+  "Réti Opening": "Дебют Рети",
+  "Ruy Lopez": "Испанская партия",
+  "Scandinavian Defense": "Скандинавская защита",
+  "Scotch Game": "Шотландская партия",
+  "Semi-Slav Defense": "Полуславянская защита",
+  "Sicilian Defense": "Сицилианская защита",
+  "Slav Defense": "Славянская защита",
+  "Universal Systems": "Универсальные системы",
+  "Vienna Game": "Венская партия"
+});
+
+/** @type {Readonly<Record<string, string>>} */
+const RESEARCH_NAME_RU = Object.freeze({
+  albin_countergambit: "Контргамбит Альбина",
+  alekhine_modern: "Защита Алехина: современный вариант",
+  benko_gambit: "Гамбит Бенко",
+  bird_opening: "Дебют Берда",
+  bishops_opening: "Дебют слона",
+  bogo_indian: "Защита Боголюбова",
+  budapest_gambit: "Будапештский гамбит",
+  caro_advance_short: "Каро-Канн: продвинутый вариант, система Шорта",
+  caro_classical_bf5: "Каро-Канн: классический вариант с 4...Bf5",
+  caro_exchange: "Каро-Канн: разменный вариант",
+  caro_kann_karpov: "Каро-Канн: вариант Карпова с 4...Nd7",
+  caro_panov: "Каро-Канн: атака Панова-Ботвинника",
+  caro_two_knights: "Каро-Канн: вариант двух коней",
+  catalan_closed: "Закрытый Каталон",
+  catalan_open: "Открытый Каталон",
+  chigorin_defense: "Защита Чигорина",
+  colle_zukertort: "Система Колле-Цукерторта",
+  dutch_classical: "Голландская защита: классический вариант",
+  dutch_leningrad: "Голландская защита: ленинградский вариант",
+  dutch_stonewall: "Голландская защита: каменная стена",
+  english_botvinnik: "Английское начало: система Ботвинника",
+  english_four_knights: "Английское начало: четыре коня",
+  english_mikenas: "Английское начало: вариант Микенаса-Карлса",
+  english_reversed_sicilian: "Английское начало: обратная сицилианская",
+  english_symmetrical: "Английское начало: симметричный вариант",
+  four_knights: "Партия четырех коней",
+  french_advance: "Французская защита: продвинутый вариант",
+  french_classical_steinitz: "Французская защита: классический вариант / Стейниц",
+  french_exchange: "Французская защита: разменный вариант",
+  french_rubinstein: "Французская защита: вариант Рубинштейна",
+  french_tarrasch: "Французская защита: вариант Тарраша",
+  french_winawer: "Французская защита: вариант Винавера",
+  grunfeld_exchange: "Защита Грюнфельда: разменный вариант",
+  grunfeld_russian: "Защита Грюнфельда: русская система",
+  hippopotamus_setup: "Система Гиппопотам / двойное фианкетто",
+  italian_giuoco_pianissimo: "Итальянская партия: Джоко Пианиссимо",
+  italian_two_knights_ng5: "Защита двух коней: 4.Ng5",
+  jobava_london: "Лондонская система Джобавы",
+  kings_gambit_accepted: "Принятый королевский гамбит",
+  kings_indian_attack: "Староиндийская атака",
+  kings_indian_averbakh: "Староиндийская защита: вариант Авербаха",
+  kings_indian_classical: "Староиндийская защита: классическая главная линия",
+  kings_indian_four_pawns: "Староиндийская защита: атака четырех пешек",
+  kings_indian_saemisch: "Староиндийская защита: система Земиша",
+  london_system: "Лондонская система",
+  modern_benoni: "Современная Бенони",
+  modern_defense: "Модерн-защита",
+  nimzo_classical_qc2: "Защита Нимцовича: классический вариант 4.Qc2",
+  nimzo_larsen: "Атака Нимцовича-Ларсена",
+  nimzo_rubinstein: "Защита Нимцовича: вариант Рубинштейна",
+  nimzo_saemisch: "Защита Нимцовича: система Земиша",
+  nimzowitsch_defense: "Защита Нимцовича против 1.e4",
+  old_indian: "Староиндийская защита без фианкетто",
+  owen_defense: "Защита Оуэна",
+  petroff_main: "Русская партия: главная линия",
+  philidor_defense: "Защита Филидора",
+  pirc_150_attack: "Защита Пирца: атака 150",
+  pirc_austrian: "Защита Пирца: австрийская атака",
+  ponziani: "Дебют Понциани",
+  qga_main: "Принятый ферзевый гамбит: главная линия",
+  qgd_exchange: "Отказанный ферзевый гамбит: разменный вариант / Карлсбад",
+  qgd_orthodox: "Отказанный ферзевый гамбит: ортодоксальная главная линия",
+  qgd_semi_tarrasch: "Полу-Тарраш",
+  qgd_tarrasch: "Защита Тарраша",
+  qgd_tartakower: "Отказанный ферзевый гамбит: вариант Тартаковера",
+  queen_indian_main: "Новоиндийская защита: главная линия",
+  reti_opening: "Дебют Рети",
+  ruy_lopez_berlin: "Испанская партия: берлинская защита",
+  ruy_lopez_closed: "Испанская партия: закрытая главная линия",
+  ruy_lopez_exchange: "Испанская партия: разменный вариант",
+  ruy_lopez_marshall: "Испанская партия: атака Маршалла",
+  scandinavian_modern_nf6: "Скандинавская защита: современный вариант с 2...Nf6",
+  scandinavian_qa5: "Скандинавская защита: 3...Qa5",
+  scotch_game: "Шотландская партия",
+  semi_slav_meran: "Полуславянская защита: меранский вариант",
+  semi_slav_moscow_botvinnik: "Полуславянская защита: московско-ботвинниковский комплекс",
+  sicilian_accelerated_dragon_maroczy: "Сицилианская защита: ускоренный дракон, зажим Мароци",
+  sicilian_alapin: "Сицилианская защита: вариант Алапина",
+  sicilian_classical_rauzer: "Сицилианская защита: классический вариант, атака Рихтера-Раузера",
+  sicilian_closed: "Сицилианская защита: закрытая система",
+  sicilian_dragon_yugoslav: "Сицилианская защита: дракон, югославская атака",
+  sicilian_grand_prix: "Сицилианская защита: атака Гран-при",
+  sicilian_kalashnikov: "Сицилианская защита: вариант Калашникова",
+  sicilian_kan: "Сицилианская защита: вариант Кана",
+  sicilian_moscow: "Сицилианская защита: московский вариант",
+  sicilian_najdorf_classical: "Сицилианская защита: Найдорф, классический вариант / Опоценский",
+  sicilian_najdorf_english_attack: "Сицилианская защита: Найдорф, английская атака",
+  sicilian_rossolimo: "Сицилианская защита: вариант Россолимо",
+  sicilian_scheveningen_keres: "Сицилианская защита: шевенинген, атака Кереса",
+  sicilian_smith_morra: "Сицилианская защита: гамбит Смита-Морры",
+  sicilian_sveshnikov: "Сицилианская защита: вариант Свешникова",
+  sicilian_taimanov: "Сицилианская защита: вариант Тайманова",
+  slav_exchange: "Славянская защита: разменный вариант",
+  slav_main: "Славянская защита: главная линия",
+  stonewall_attack: "Атака каменной стены",
+  torre_attack: "Атака Торре",
+  trompowsky: "Атака Тромповского",
+  vienna_gambit: "Венская партия: венский гамбит"
+});
+
+const WHITE_RESEARCH_IDS = new Set([
+  "bird_opening",
+  "bishops_opening",
+  "catalan_closed",
+  "catalan_open",
+  "colle_zukertort",
+  "english_botvinnik",
+  "english_four_knights",
+  "english_mikenas",
+  "english_reversed_sicilian",
+  "english_symmetrical",
+  "four_knights",
+  "hippopotamus_setup",
+  "italian_giuoco_pianissimo",
+  "italian_two_knights_ng5",
+  "jobava_london",
+  "kings_gambit_accepted",
+  "kings_indian_attack",
+  "london_system",
+  "nimzo_larsen",
+  "ponziani",
+  "reti_opening",
+  "ruy_lopez_berlin",
+  "ruy_lopez_closed",
+  "ruy_lopez_exchange",
+  "scotch_game",
+  "sicilian_alapin",
+  "sicilian_closed",
+  "sicilian_grand_prix",
+  "sicilian_moscow",
+  "sicilian_rossolimo",
+  "sicilian_smith_morra",
+  "stonewall_attack",
+  "torre_attack",
+  "trompowsky",
+  "vienna_gambit"
+]);
+
+/** @type {Readonly<Record<string, Partial<Pick<ResearchVariation, "why_it_matters"|"white_plan"|"black_plan"|"middlegame_tabia"|"key_ideas"|"avoid">>>>} */
+const BEGINNER_RESEARCH_COPY_OVERRIDES = Object.freeze({
+  catalan_closed: Object.freeze({
+    why_it_matters:
+      "Этот вариант учит играть спокойный Каталон: белые не получают быструю тактику, зато учатся давить на центр и длинную диагональ слона g2. Он важен, потому что такие позиции часто переходят в медленный миттельшпиль, где нужно понимать план, а не помнить один ход.",
+    white_plan:
+      "Белые давят на центральную пешку d5 и не дают черным спокойно стоять в центре. Обычно план такой: при удобном случае разменять пешку c4 на d5, поставить коня на e5 и постепенно усиливать фигуры вокруг центра.",
+    black_plan:
+      "Черные спокойно заканчивают развитие: выводят слона, рокируют и решают, что делать с пешкой c7. Ее можно поставить на c6, чтобы укрепить центр, или на c5, чтобы сразу спорить за центр. Главная задача - не отдать белым давление бесплатно.",
+    middlegame_tabia:
+      "Позиция обычно становится спокойной, но напряженной: белые давят по длинной диагонали слона g2 и на центр, а черные выбирают момент для центрального разрыва пешкой c.",
+    key_ideas: Object.freeze([
+      "Если черные не берут пешку c4, белым нужно искать давление через центр и диагональ слона g2, а не ждать подарка.",
+      "Главный вопрос позиции: кто лучше подготовит борьбу за центральные поля d5 и e5.",
+      "Белым полезно усиливать фигуры вокруг центра: поставить ладью на открытую или полуоткрытую линию, подключить ферзя и только потом менять пешки.",
+      "Если черные укрепляют центр пешкой c6, белым обычно выгодно сохранять напряжение и не спешить с разменами без конкретной цели.",
+      "Если черные идут пешкой c5, позиция раскрывается быстрее: белым важно заранее понять, какой центр получится после размена."
+    ]),
+    avoid: Object.freeze([
+      "Белым не стоит просто ждать, что черные сами возьмут пешку c4. Если давления нет, черные спокойно развиваются и уравнивают игру.",
+      "Белым опасно менять пешку c4 на d5 автоматически. Ранний размен без подготовки часто снимает напряжение и облегчает черным защиту.",
+      "Белым нельзя забывать про безопасность короля после вскрытия центра: Каталон спокойный только пока фигуры готовы к центральным разрывам.",
+      "Черным вредно пассивно стоять без решения по пешке c7. Если не выбрать укрепление центра или контрудар, белые постепенно нарастят давление."
+    ])
+  })
+});
+
+/**
+ * @param {readonly string[] | undefined} values
+ * @returns {readonly string[]}
+ */
+function freezeStringList(values) {
+  return Object.freeze([...(values ?? [])].filter((value) => value.trim().length > 0));
+}
+
+/**
+ * @param {string} id
+ * @param {string} fallback
+ * @returns {string}
+ */
+function getResearchNameRu(id, fallback) {
+  return RESEARCH_NAME_RU[id] ?? fallback;
+}
+
+/**
+ * @param {string} family
+ * @returns {string}
+ */
+function getResearchFamilyRu(family) {
+  return RESEARCH_FAMILY_RU[family] ?? family;
+}
+
+/**
+ * @param {string} id
+ * @returns {StudySide}
+ */
+function getResearchStudySide(id) {
+  return WHITE_RESEARCH_IDS.has(id) ? "white" : "black";
+}
+
+/**
+ * @param {StudySide} studySide
+ * @returns {string}
+ */
+function getStudySideLabel(studySide) {
+  return studySide === "white" ? "Тренировка за белых" : "Тренировка за черных";
+}
+
+/**
+ * @param {ResearchVariation} variation
+ * @param {ResearchValidationEntry | undefined} validation
+ * @returns {string}
+ */
+function formatResearchVerification(variation, validation) {
+  const match = validation?.lichessMatch ?? null;
+  const legalPart = "Все ходы SAN проверены chess.js в строгом режиме.";
+
+  if (!match) {
+    return `${legalPart} Название, ECO и планы взяты из импортированного исследования; перед рекомендациями как "лучший ход" нужен отдельный слой Lichess/движка.`;
+  }
+
+  if (match.kind === "pgn-exact") {
+    return `${legalPart} Полный PGN совпадает с Lichess chess-openings CC0: ${getResearchNameRu(variation.id, match.name)} (${match.eco}).`;
+  }
+
+  return `${legalPart} Lichess chess-openings CC0 подтверждает известный префикс до ${match.commonPrefixPly}-го полухода: ${getResearchNameRu(variation.id, match.name)} (${match.eco}); оставшиеся ходы показаны как учебное продолжение из импортированного исследования, не как рекомендация движка.`;
+}
+
+/**
+ * @param {ResearchVariation} variation
+ * @param {StudySide} studySide
+ * @returns {Readonly<Record<string, MoveGuide>>}
+ */
+function buildResearchMoveGuides(variation, studySide) {
+  /** @type {Record<string, MoveGuide>} */
+  const guides = {};
+
+  for (const hint of variation.move_hints) {
+    guides[`${hint.ply}:${hint.move}`] = {
+      title: `Подсказка: ${hint.move}`,
+      explanation: hint.hint,
+      purpose: `Связь с твоим планом: ${getResearchSidePlan(variation, studySide)}`
+    };
+  }
+
+  return Object.freeze(guides);
+}
+
+/**
+ * @param {ResearchVariation} variation
+ * @param {StudySide} studySide
+ * @returns {string}
+ */
+function getResearchSidePlan(variation, studySide) {
+  return studySide === "white" ? variation.white_plan : variation.black_plan;
+}
+
+/**
+ * @param {ResearchVariation} variation
+ * @param {StudySide} studySide
+ * @returns {string}
+ */
+function getResearchSideMiddlegamePlan(variation, studySide) {
+  return `Дальше придерживайся этого плана: ${getResearchSidePlan(variation, studySide)}`;
+}
+
+/**
+ * @param {ResearchVariation} variation
+ * @returns {ResearchVariation}
+ */
+function applyBeginnerCopyOverrides(variation) {
+  const override = BEGINNER_RESEARCH_COPY_OVERRIDES[variation.id];
+
+  if (!override) {
+    return variation;
+  }
+
+  return {
+    ...variation,
+    ...override
+  };
+}
+
+/**
+ * @param {ResearchVariation} variation
+ * @returns {OpeningSeed}
+ */
+function buildResearchSeed(variation) {
+  const beginnerVariation = applyBeginnerCopyOverrides(variation);
+  const validation = RESEARCH_VALIDATION_BY_ID.get(variation.id);
+  const studySide = getResearchStudySide(beginnerVariation.id);
+  const familyRu = getResearchFamilyRu(beginnerVariation.family);
+  const nameRu = getResearchNameRu(beginnerVariation.id, beginnerVariation.name);
+
+  return Object.freeze({
+    key: `research-${beginnerVariation.id}`,
+    family: familyRu,
+    name: nameRu,
+    sourceName: beginnerVariation.name,
+    eco: beginnerVariation.eco,
+    aliases: Object.freeze([familyRu]),
+    studySide,
+    studyLabel: `${getStudySideLabel(studySide)} · приоритет ${beginnerVariation.priority}`,
+    turnLabel: "Позиция после основных ходов",
+    lineSan: Object.freeze([...beginnerVariation.moves]),
+    verification: formatResearchVerification(beginnerVariation, validation),
+    principle: beginnerVariation.why_it_matters,
+    positionGoal: getResearchSidePlan(beginnerVariation, studySide),
+    middlegamePlan: getResearchSideMiddlegamePlan(beginnerVariation, studySide),
+    continuations: Object.freeze([]),
+    badMoves: Object.freeze([]),
+    moveGuides: buildResearchMoveGuides(beginnerVariation, studySide),
+    priority: beginnerVariation.priority,
+    whyItMatters: beginnerVariation.why_it_matters,
+    whitePlan: beginnerVariation.white_plan,
+    blackPlan: beginnerVariation.black_plan,
+    middlegameTabia: getResearchSideMiddlegamePlan(beginnerVariation, studySide),
+    keyIdeas: freezeStringList(beginnerVariation.key_ideas),
+    commonTraps: freezeStringList(beginnerVariation.common_traps),
+    avoid: freezeStringList(beginnerVariation.avoid),
+    tags: freezeStringList(beginnerVariation.tags),
+    sourceEvidence: Object.freeze({
+      legalSan: validation?.legalSan ?? false,
+      finalFen: validation?.finalFen ?? "",
+      lichessMatch: validation?.lichessMatch ?? null
+    })
+  });
+}
+
+/** @type {readonly OpeningSeed[]} */
+export const RESEARCH_OPENING_SEEDS = Object.freeze(RESEARCH_SOURCE.variations.map((variation) => buildResearchSeed(variation)));
+
 const FILES_ASCENDING = Object.freeze(["a", "b", "c", "d", "e", "f", "g", "h"]);
 const FILES_DESCENDING = Object.freeze(["h", "g", "f", "e", "d", "c", "b", "a"]);
 const RANKS_ASCENDING = Object.freeze(["1", "2", "3", "4", "5", "6", "7", "8"]);
@@ -1309,7 +1769,7 @@ export function buildOpeningLesson(seed) {
   });
 
   return {
-    status: "ПРОВЕРЕНО",
+    status: seed.sourceEvidence ? "ХОДЫ ПРОВЕРЕНЫ" : "ПРОВЕРЕНО",
     input: formatSanLine(seed.lineSan),
     appliedSan,
     fen,
@@ -1333,6 +1793,16 @@ export function buildOpeningLesson(seed) {
       principle: seed.principle,
       positionGoal: seed.positionGoal,
       middlegamePlan: seed.middlegamePlan,
+      priority: seed.priority,
+      whyItMatters: seed.whyItMatters,
+      whitePlan: seed.whitePlan,
+      blackPlan: seed.blackPlan,
+      middlegameTabia: seed.middlegameTabia,
+      keyIdeas: seed.keyIdeas,
+      commonTraps: seed.commonTraps,
+      avoid: seed.avoid,
+      tags: seed.tags,
+      sourceEvidence: seed.sourceEvidence,
       continuations,
       badMoves
     }
@@ -1343,7 +1813,7 @@ export function buildOpeningLesson(seed) {
  * @returns {OpeningLesson[]}
  */
 export function buildOpeningLessons() {
-  return OPENING_SEEDS.map((seed) => buildOpeningLesson(seed));
+  return [...OPENING_SEEDS, ...RESEARCH_OPENING_SEEDS].map((seed) => buildOpeningLesson(seed));
 }
 
 /**

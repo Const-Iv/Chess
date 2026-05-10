@@ -1,0 +1,1176 @@
+[Event "Opening Research Line"]
+[Site "App research"]
+[Opening "Najdorf Variation — English Attack"]
+[ECO "B90"]
+[VariationId "sicilian_najdorf_english_attack"]
+[Priority "A"]
+
+1. e4 c5 2. Nf3 d6 3. d4 cxd4 4. Nxd4 Nf6 5. Nc3 a6 6. Be3 e5 7. Nb3 Be6 8. f3 *
+{ White plan: Рокировка в длинную, Qd2, g4-g5, давление по d-файлу и на короля. }
+{ Black plan: ...b5, ...Nbd7, ...Rc8, иногда ...h5; цель — контратака на ферзевом фланге и контроль d5. }
+{ Middlegame: Разноцветные атаки: белые давят на короля, чёрные вскрывают ферзевый фланг. Время важнее материала. }
+
+[Event "Opening Research Line"]
+[Site "App research"]
+[Opening "Najdorf Variation — Classical / Opocensky"]
+[ECO "B92"]
+[VariationId "sicilian_najdorf_classical"]
+[Priority "A"]
+
+1. e4 c5 2. Nf3 d6 3. d4 cxd4 4. Nxd4 Nf6 5. Nc3 a6 6. Be2 e5 7. Nb3 Be7 8. O-O O-O *
+{ White plan: Be2, O-O, a4, Be3, Qd2/Re1; игра за контроль d5 и давление в центре. }
+{ Black plan: ...b5, ...Bb7, ...Nbd7, ...Rc8; равновесие между центром и ферзевым флангом. }
+{ Middlegame: Маневренная борьба: ключ — не отдать d5 и не проспать ...d5. }
+
+[Event "Opening Research Line"]
+[Site "App research"]
+[Opening "Dragon Variation — Yugoslav Attack"]
+[ECO "B76"]
+[VariationId "sicilian_dragon_yugoslav"]
+[Priority "A"]
+
+1. e4 c5 2. Nf3 d6 3. d4 cxd4 4. Nxd4 Nf6 5. Nc3 g6 6. Be3 Bg7 7. f3 O-O 8. Qd2 Nc6 9. O-O-O *
+{ White plan: Длинная рокировка, h4-h5, Bh6, размен слона g7, атака по h-линии. }
+{ Black plan: ...Rc8, ...Ne5, ...Nc4, ...Qa5, давление на c3 и b2. }
+{ Middlegame: Кто быстрее вскроет линию у короля соперника, тот диктует игру. }
+
+[Event "Opening Research Line"]
+[Site "App research"]
+[Opening "Accelerated Dragon — Maroczy Bind"]
+[ECO "B36"]
+[VariationId "sicilian_accelerated_dragon_maroczy"]
+[Priority "A"]
+
+1. e4 c5 2. Nf3 Nc6 3. d4 cxd4 4. Nxd4 g6 5. c4 Bg7 6. Be3 Nf6 7. Nc3 O-O *
+{ White plan: Зажим c4+e4, Be2, O-O, Qd2, Rfd1; контролируй d5. }
+{ Black plan: ...d6, ...a5, ...Nd7, ...Nc5; чёрные ломают зажим через ...a4 или ...b5/ ...d5. }
+{ Middlegame: Позиционная борьба за d5: белые душат, чёрные ищут освобождение. }
+
+[Event "Opening Research Line"]
+[Site "App research"]
+[Opening "Classical Sicilian — Richter-Rauzer"]
+[ECO "B60-B69"]
+[VariationId "sicilian_classical_rauzer"]
+[Priority "A"]
+
+1. e4 c5 2. Nf3 Nc6 3. d4 cxd4 4. Nxd4 Nf6 5. Nc3 d6 6. Bg5 e6 7. Qd2 Be7 8. O-O-O *
+{ White plan: Связка коня f6, длинная рокировка, f4/e5 или атака по h-линии. }
+{ Black plan: ...a6, ...Be7, ...O-O, ...Bd7; подготовить ...b5 или ...d5. }
+{ Middlegame: Структура похожа на Найдорф, но без ...a6 в ранний момент — у белых больше давления на f6. }
+
+[Event "Opening Research Line"]
+[Site "App research"]
+[Opening "Scheveningen — Keres Attack"]
+[ECO "B80-B89"]
+[VariationId "sicilian_scheveningen_keres"]
+[Priority "A"]
+
+1. e4 c5 2. Nf3 d6 3. d4 cxd4 4. Nxd4 Nf6 5. Nc3 e6 6. g4 *
+{ White plan: g4-g5, h4, Bg2/Be3, давление на f6 и d6. }
+{ Black plan: ...h6, ...a6, ...Nc6, ...Be7; иногда контрудар ...d5. }
+{ Middlegame: Острая позиция: белые покупают пространство ценой риска для короля. }
+
+[Event "Opening Research Line"]
+[Site "App research"]
+[Opening "Taimanov Variation"]
+[ECO "B47"]
+[VariationId "sicilian_taimanov"]
+[Priority "A"]
+
+1. e4 c5 2. Nf3 e6 3. d4 cxd4 4. Nxd4 Nc6 5. Nc3 Qc7 *
+{ White plan: Be3, Qd2, O-O-O или c4; следи за ...Nf6 и ...Bb4. }
+{ Black plan: ...a6, ...Nf6, ...Bb4, ...b5; чёрные не спешат с ...d6. }
+{ Middlegame: Главная интрига — сможет ли белый закрепить центр или чёрный ударит ...Nf6/...Bb4. }
+
+[Event "Opening Research Line"]
+[Site "App research"]
+[Opening "Kan Variation"]
+[ECO "B41-B43"]
+[VariationId "sicilian_kan"]
+[Priority "A"]
+
+1. e4 c5 2. Nf3 e6 3. d4 cxd4 4. Nxd4 a6 5. Bd3 Nf6 6. O-O Qc7 *
+{ White plan: Bd3, O-O, c4 или Qe2; держи e4 и готовь f4/e5. }
+{ Black plan: ...Qc7, ...Nf6, ...b5, ...Bb7; удар по e4 и ферзевый фланг. }
+{ Middlegame: Белые имеют пространство; чёрные играют на провокацию пешечных слабостей. }
+
+[Event "Opening Research Line"]
+[Site "App research"]
+[Opening "Sveshnikov Variation"]
+[ECO "B33"]
+[VariationId "sicilian_sveshnikov"]
+[Priority "A"]
+
+1. e4 c5 2. Nf3 Nc6 3. d4 cxd4 4. Nxd4 Nf6 5. Nc3 e5 6. Ndb5 d6 7. Bg5 a6 8. Na3 b5 *
+{ White plan: Nd5, Bxf6, c3, Nc2-e3; использовать поле d5 и структуру. }
+{ Black plan: ...b5, ...Be6, ...Rc8, ...f5; активность и давление на центр. }
+{ Middlegame: Стратегия против динамики: белые давят на d5, чёрные доказывают, что темпы важнее. }
+
+[Event "Opening Research Line"]
+[Site "App research"]
+[Opening "Kalashnikov Variation"]
+[ECO "B32"]
+[VariationId "sicilian_kalashnikov"]
+[Priority "B"]
+
+1. e4 c5 2. Nf3 Nc6 3. d4 cxd4 4. Nxd4 e5 5. Nb5 d6 6. c4 *
+{ White plan: c4, Nc3, Be2, O-O; зажим d5 и контроль чёрных рычагов. }
+{ Black plan: ...Be7, ...f5, ...Nf6, ...a6; чёрные играют на темпы и фланговую активность. }
+{ Middlegame: Мароци-подобный зажим против динамического ...f5. }
+
+[Event "Opening Research Line"]
+[Site "App research"]
+[Opening "Alapin Variation"]
+[ECO "B22"]
+[VariationId "sicilian_alapin"]
+[Priority "A"]
+
+1. e4 c5 2. c3 d5 3. exd5 Qxd5 4. d4 Nf6 5. Nf3 *
+{ White plan: Построить центр d4/e4, быстро развиться, иногда изолятор d4. }
+{ Black plan: ...d5 или ...Nf6; цель — немедленно бить центр, не дать белым идеальный пешечный дуэт. }
+{ Middlegame: Часто возникает изолированная пешка d4: белые получают активность, чёрные — блокаду. }
+
+[Event "Opening Research Line"]
+[Site "App research"]
+[Opening "Rossolimo Variation"]
+[ECO "B30-B31"]
+[VariationId "sicilian_rossolimo"]
+[Priority "A"]
+
+1. e4 c5 2. Nf3 Nc6 3. Bb5 g6 4. O-O Bg7 5. c3 *
+{ White plan: Иногда Bxc6, c3-d4, давление на слабые поля. }
+{ Black plan: ...g6/ ...e6, развитие и компенсация парой слонов. }
+{ Middlegame: Белые играют против структуры, чёрные — за активность слонов. }
+
+[Event "Opening Research Line"]
+[Site "App research"]
+[Opening "Moscow Variation"]
+[ECO "B51-B52"]
+[VariationId "sicilian_moscow"]
+[Priority "A"]
+
+1. e4 c5 2. Nf3 d6 3. Bb5+ Bd7 4. Bxd7+ Qxd7 5. O-O *
+{ White plan: Быстрая рокировка, c3/d4 или Re1; игра против чуть неловкого ферзя. }
+{ Black plan: ...Nf6, ...g6, ...Nc6; чёрные принимают спокойную позицию без худших слабостей. }
+{ Middlegame: Позиционная игра без тактической мясорубки Open Sicilian. }
+
+[Event "Opening Research Line"]
+[Site "App research"]
+[Opening "Closed Sicilian"]
+[ECO "B23-B26"]
+[VariationId "sicilian_closed"]
+[Priority "B"]
+
+1. e4 c5 2. Nc3 Nc6 3. g3 g6 4. Bg2 Bg7 5. d3 *
+{ White plan: f4, Nf3, Be3, Qd2, королевская атака; иногда b4 на ферзевом фланге. }
+{ Black plan: ...e6, ...Nge7, ...d6, ...b5; чёрные борются за пространство и центр. }
+{ Middlegame: Маневренная игра: белые часто атакуют короля, чёрные — ферзевый фланг и центр. }
+
+[Event "Opening Research Line"]
+[Site "App research"]
+[Opening "Grand Prix Attack"]
+[ECO "B23"]
+[VariationId "sicilian_grand_prix"]
+[Priority "B"]
+
+1. e4 c5 2. Nc3 Nc6 3. f4 g6 4. Nf3 Bg7 5. Bb5 *
+{ White plan: f4-f5, Qe1-h4, Bb5, атака на короля. }
+{ Black plan: ...g6, ...d6, ...e6; держать центр и не пустить f5 бесплатно. }
+{ Middlegame: Белые давят на короля; чёрные выигрывают, если центр вскрывается вовремя. }
+
+[Event "Opening Research Line"]
+[Site "App research"]
+[Opening "Smith-Morra Gambit"]
+[ECO "B21"]
+[VariationId "sicilian_smith_morra"]
+[Priority "B"]
+
+1. e4 c5 2. d4 cxd4 3. c3 dxc3 4. Nxc3 Nc6 5. Nf3 *
+{ White plan: Развитие с темпом: Bc4, O-O, Re1, давление по c/d-файлам. }
+{ Black plan: Принять или отказаться; при принятии быстро развиться: ...d6, ...e6, ...Nf6. }
+{ Middlegame: Белые получают активность за пешку; чёрные выживают развитием, не жадностью. }
+
+[Event "Opening Research Line"]
+[Site "App research"]
+[Opening "Ruy Lopez — Closed Main Line"]
+[ECO "C88-C99"]
+[VariationId "ruy_lopez_closed"]
+[Priority "A"]
+
+1. e4 e5 2. Nf3 Nc6 3. Bb5 a6 4. Ba4 Nf6 5. O-O Be7 6. Re1 b5 7. Bb3 d6 8. c3 O-O 9. h3 *
+{ White plan: c3-d4, Re1, Nbd2-f1-g3, давление на e5 и короля. }
+{ Black plan: ...b5, ...d6, ...O-O, ...Na5/...c5; контригра против центра и слона b3. }
+{ Middlegame: Испанская табия: белые медленно усиливают центр, чёрные ищут ...c5 или ...d5. }
+
+[Event "Opening Research Line"]
+[Site "App research"]
+[Opening "Ruy Lopez — Berlin Defense"]
+[ECO "C65-C67"]
+[VariationId "ruy_lopez_berlin"]
+[Priority "A"]
+
+1. e4 e5 2. Nf3 Nc6 3. Bb5 Nf6 4. O-O Nxe4 5. d4 Nd6 6. Bxc6 dxc6 7. dxe5 Nf5 *
+{ White plan: Использовать пространство и более активные фигуры; не ждать быстрой атаки. }
+{ Black plan: Принять структуру с парой слонов и крепкой обороной; размены выгодны при точной игре. }
+{ Middlegame: Berlin Endgame/структура: белые активнее, чёрные устойчивы. }
+
+[Event "Opening Research Line"]
+[Site "App research"]
+[Opening "Ruy Lopez — Exchange Variation"]
+[ECO "C68-C69"]
+[VariationId "ruy_lopez_exchange"]
+[Priority "B"]
+
+1. e4 e5 2. Nf3 Nc6 3. Bb5 a6 4. Bxc6 dxc6 5. O-O *
+{ White plan: Быстро рокировать, иногда d4; использовать структуру c6+c7 в эндшпиле. }
+{ Black plan: Компенсация парой слонов и открытой d-линией; активность важнее пешечной красоты. }
+{ Middlegame: Белые играют на долгосрочную структуру; чёрные — на активных слонов. }
+
+[Event "Opening Research Line"]
+[Site "App research"]
+[Opening "Ruy Lopez — Marshall Attack"]
+[ECO "C89"]
+[VariationId "ruy_lopez_marshall"]
+[Priority "A"]
+
+1. e4 e5 2. Nf3 Nc6 3. Bb5 a6 4. Ba4 Nf6 5. O-O Be7 6. Re1 b5 7. Bb3 O-O 8. c3 d5 *
+{ White plan: Знать анти-Маршалл или принимать с точной защитой; не играть по общим принципам. }
+{ Black plan: Жертва ...d5 даёт линии и темпы против белого короля. }
+{ Middlegame: После принятия — дебютная теория превращается в тактическую защиту белых. }
+
+[Event "Opening Research Line"]
+[Site "App research"]
+[Opening "Giuoco Pianissimo"]
+[ECO "C50-C54"]
+[VariationId "italian_giuoco_pianissimo"]
+[Priority "A"]
+
+1. e4 e5 2. Nf3 Nc6 3. Bc4 Bc5 4. c3 Nf6 5. d3 d6 6. O-O O-O *
+{ White plan: c3, d3, O-O, Re1, Nbd2-f1-g3; затем d4 или атака на короля. }
+{ Black plan: Зеркально развиться, выбрать ...a6/...h6, ...O-O, иногда ...d5. }
+{ Middlegame: Медленная борьба за d4/d5; кто лучше подготовит разрыв, тот получает инициативу. }
+
+[Event "Opening Research Line"]
+[Site "App research"]
+[Opening "Two Knights Defense — 4.Ng5"]
+[ECO "C55-C59"]
+[VariationId "italian_two_knights_ng5"]
+[Priority "B"]
+
+1. e4 e5 2. Nf3 Nc6 3. Bc4 Nf6 4. Ng5 d5 5. exd5 Na5 6. Bb5+ c6 7. dxc6 bxc6 *
+{ White plan: Давление на f7, но после ...Na5 надо не потерять темпы. }
+{ Black plan: Жертвовать пешку/структуру за темпы: ...c6, ...bxc6, активные фигуры. }
+{ Middlegame: Чёрные получают активность за пешку; белые должны играть точно, иначе инициатива исчезает. }
+
+[Event "Opening Research Line"]
+[Site "App research"]
+[Opening "Scotch Game"]
+[ECO "C45"]
+[VariationId "scotch_game"]
+[Priority "A"]
+
+1. e4 e5 2. Nf3 Nc6 3. d4 exd4 4. Nxd4 Nf6 5. Nc3 Bb4 *
+{ White plan: Быстрое развитие, давление в центре, иногда Nxc6 и e5. }
+{ Black plan: Развиваться с темпами на центр: ...Nf6, ...Bb4, ...Bc5. }
+{ Middlegame: Открытый центр: ошибки в развитии наказываются быстрее, чем в Испанской. }
+
+[Event "Opening Research Line"]
+[Site "App research"]
+[Opening "Four Knights Game"]
+[ECO "C47-C49"]
+[VariationId "four_knights"]
+[Priority "B"]
+
+1. e4 e5 2. Nf3 Nc6 3. Nc3 Nf6 4. Bb5 Bb4 *
+{ White plan: Bb5, O-O, d3 или d4; игра без раннего риска. }
+{ Black plan: Развиваться симметрично, затем выбрать ...Bb4 или ...d5. }
+{ Middlegame: Малые преимущества: структура, поле d5, темпы на связках. }
+
+[Event "Opening Research Line"]
+[Site "App research"]
+[Opening "Vienna Game — Vienna Gambit"]
+[ECO "C25-C29"]
+[VariationId "vienna_gambit"]
+[Priority "B"]
+
+1. e4 e5 2. Nc3 Nf6 3. f4 d5 4. fxe5 Nxe4 *
+{ White plan: f4 даёт атаку, но центр должен быть под контролем. }
+{ Black plan: ...d5 — лучший принцип: бей центр, не защищайся пассивно. }
+{ Middlegame: Открытые линии и нестабильный центр; ранний фланговый удар требует точности. }
+
+[Event "Opening Research Line"]
+[Site "App research"]
+[Opening "King’s Gambit Accepted"]
+[ECO "C33-C39"]
+[VariationId "kings_gambit_accepted"]
+[Priority "B"]
+
+1. e4 e5 2. f4 exf4 3. Nf3 g5 4. h4 g4 5. Ne5 *
+{ White plan: Вернуть/играть за пешку через развитие, h4, Bc4, O-O. }
+{ Black plan: Принять и удерживать только если развитие не страдает; ...g5-g4 — остро. }
+{ Middlegame: Белые вскрывают королевский фланг, чёрные получают материальный плюс и риск. }
+
+[Event "Opening Research Line"]
+[Site "App research"]
+[Opening "Petroff Defense — Main Line"]
+[ECO "C42-C43"]
+[VariationId "petroff_main"]
+[Priority "A"]
+
+1. e4 e5 2. Nf3 Nf6 3. Nxe5 d6 4. Nf3 Nxe4 5. d4 d5 *
+{ White plan: Использовать лишний темп развития, c4 или Bd3, давление на e4/d5. }
+{ Black plan: Вернуть симметрию и получить крепкий центр. }
+{ Middlegame: Ровная структура; перевес рождается из темпов и лучшего развития, не из «атаки». }
+
+[Event "Opening Research Line"]
+[Site "App research"]
+[Opening "Philidor Defense"]
+[ECO "C41"]
+[VariationId "philidor_defense"]
+[Priority "B"]
+
+1. e4 e5 2. Nf3 d6 3. d4 Nf6 4. Nc3 exd4 5. Nxd4 *
+{ White plan: d4, Nc3, Be2/Bc4, O-O; использовать пассивность ...d6. }
+{ Black plan: Держать e5, развиться без зажатия; иногда ...exd4 и ...Be7. }
+{ Middlegame: Белые имеют пространство; чёрные должны вовремя освободиться ...c6/...d5. }
+
+[Event "Opening Research Line"]
+[Site "App research"]
+[Opening "Ponziani Opening"]
+[ECO "C44"]
+[VariationId "ponziani"]
+[Priority "C"]
+
+1. e4 e5 2. Nf3 Nc6 3. c3 Nf6 4. d4 *
+{ White plan: c3-d4, выиграть центр, но не отстать в развитии. }
+{ Black plan: ...Nf6 или ...d5 — немедленный удар по центру. }
+{ Middlegame: Белые получают пешечный центр, чёрные атакуют его фигурами. }
+
+[Event "Opening Research Line"]
+[Site "App research"]
+[Opening "Bishop’s Opening"]
+[ECO "C23-C24"]
+[VariationId "bishops_opening"]
+[Priority "C"]
+
+1. e4 e5 2. Bc4 Nf6 3. d3 Nc6 4. Nf3 *
+{ White plan: Развитие, d3, Nf3, O-O; часто переход в Italian structures. }
+{ Black plan: ...Nf6, ...Nc6, ...Bc5; нормальное развитие и контроль d4. }
+{ Middlegame: Часто транспонирует, поэтому app должен связывать с Italian/Vienna. }
+
+[Event "Opening Research Line"]
+[Site "App research"]
+[Opening "Winawer Variation"]
+[ECO "C15-C19"]
+[VariationId "french_winawer"]
+[Priority "A"]
+
+1. e4 e6 2. d4 d5 3. Nc3 Bb4 4. e5 c5 5. a3 Bxc3+ 6. bxc3 *
+{ White plan: Пространство e5, атака на короля, использовать пару слонов и центр. }
+{ Black plan: Давление на c3/d4, ...c5, ...Qa5, ...Ne7, ...b6; подрыв центра. }
+{ Middlegame: Белые атакуют, но имеют слабые пешки c; чёрные играют по структуре. }
+
+[Event "Opening Research Line"]
+[Site "App research"]
+[Opening "Classical / Steinitz Variation"]
+[ECO "C11-C14"]
+[VariationId "french_classical_steinitz"]
+[Priority "A"]
+
+1. e4 e6 2. d4 d5 3. Nc3 Nf6 4. e5 Nfd7 5. f4 c5 6. Nf3 *
+{ White plan: Пространство e5+f4, развить фигуры, поддержать d4, атака на короля. }
+{ Black plan: ...c5, ...Nc6, ...Qb6; давление на d4 и белые поля. }
+{ Middlegame: Цепь d4-e5 против ...c5/...f6: кто лучше ломает центр. }
+
+[Event "Opening Research Line"]
+[Site "App research"]
+[Opening "Tarrasch Variation"]
+[ECO "C03-C09"]
+[VariationId "french_tarrasch"]
+[Priority "A"]
+
+1. e4 e6 2. d4 d5 3. Nd2 c5 4. exd5 exd5 5. Ngf3 *
+{ White plan: Nd2 поддерживает e4 и избегает ...Bb4; играть c3/Ngf3/Bd3. }
+{ Black plan: ...c5 сразу давит на d4; чёрные получают активную структуру. }
+{ Middlegame: Борьба вокруг изолятора d4/d5 и темпа развития. }
+
+[Event "Opening Research Line"]
+[Site "App research"]
+[Opening "Advance Variation"]
+[ECO "C02"]
+[VariationId "french_advance"]
+[Priority "A"]
+
+1. e4 e6 2. d4 d5 3. e5 c5 4. c3 Nc6 5. Nf3 Qb6 *
+{ White plan: Цепь c3-d4-e5, развитие, иногда a3/b4, атака на короля. }
+{ Black plan: ...c5, ...Qb6, ...Nc6, ...f6; атаковать основание d4. }
+{ Middlegame: Учебная структура: белые играют на пространстве, чёрные — на подрывах. }
+
+[Event "Opening Research Line"]
+[Site "App research"]
+[Opening "Exchange Variation"]
+[ECO "C01"]
+[VariationId "french_exchange"]
+[Priority "B"]
+
+1. e4 e6 2. d4 d5 3. exd5 exd5 4. Nf3 Nf6 5. Bd3 *
+{ White plan: Развитие, Bd3, O-O, c3; играть против симметрии активностью. }
+{ Black plan: Не соглашаться на мёртвую симметрию: ...Bd6, ...Nf6, ...O-O, ...c5. }
+{ Middlegame: Симметричная структура, где инициативу дают темпы и активные фигуры. }
+
+[Event "Opening Research Line"]
+[Site "App research"]
+[Opening "Rubinstein Variation"]
+[ECO "C10"]
+[VariationId "french_rubinstein"]
+[Priority "B"]
+
+1. e4 e6 2. d4 d5 3. Nc3 dxe4 4. Nxe4 Nd7 *
+{ White plan: Развиться с Nf3, Bd3, O-O; использовать пространство и активность. }
+{ Black plan: ...Nd7, ...Nf6, ...Be7; размены и крепкая структура. }
+{ Middlegame: Белые активнее, чёрные стабильны. Главная задача белых — не дать равенство без борьбы. }
+
+[Event "Opening Research Line"]
+[Site "App research"]
+[Opening "Advance Variation — Short System"]
+[ECO "B12"]
+[VariationId "caro_advance_short"]
+[Priority "A"]
+
+1. e4 c6 2. d4 d5 3. e5 Bf5 4. Nf3 e6 5. Be2 c5 6. O-O *
+{ White plan: e5, Nf3, Be2/O-O; затем c4 или атака на короля. }
+{ Black plan: ...Bf5 до ...e6, затем ...c5; подрыв центра. }
+{ Middlegame: Белые имеют пространство, чёрные целятся в d4 и играют активным слоном f5. }
+
+[Event "Opening Research Line"]
+[Site "App research"]
+[Opening "Classical Variation — 4...Bf5"]
+[ECO "B18-B19"]
+[VariationId "caro_classical_bf5"]
+[Priority "A"]
+
+1. e4 c6 2. d4 d5 3. Nc3 dxe4 4. Nxe4 Bf5 5. Ng3 Bg6 6. h4 h6 *
+{ White plan: Ng3, h4, Nf3, Bc4; давить на королевский фланг и центр. }
+{ Black plan: Слон g6, ...h6, ...e6, ...Nd7; крепкая структура. }
+{ Middlegame: Белые атакуют слона и пространство, чёрные выдерживают и развиваются. }
+
+[Event "Opening Research Line"]
+[Site "App research"]
+[Opening "Karpov Variation — 4...Nd7"]
+[ECO "B17"]
+[VariationId "caro_kann_karpov"]
+[Priority "B"]
+
+1. e4 c6 2. d4 d5 3. Nc3 dxe4 4. Nxe4 Nd7 5. Nf3 Ngf6 *
+{ White plan: Развиться, Bd3/Bc4, O-O; использовать пространство. }
+{ Black plan: ...Ngf6, ...e6, ...Be7; разменять активные фигуры белых. }
+{ Middlegame: Позиционная игра: белые активнее, чёрные строят крепость. }
+
+[Event "Opening Research Line"]
+[Site "App research"]
+[Opening "Panov-Botvinnik Attack"]
+[ECO "B13-B14"]
+[VariationId "caro_panov"]
+[Priority "A"]
+
+1. e4 c6 2. d4 d5 3. exd5 cxd5 4. c4 Nf6 5. Nc3 e6 *
+{ White plan: c4, Nc3, Nf3; играть на активность и d5/d4. }
+{ Black plan: Блокировать изолятор, разменивать фигуры, давить на d4. }
+{ Middlegame: Классика IQP: белые атакуют, чёрные блокируют. }
+
+[Event "Opening Research Line"]
+[Site "App research"]
+[Opening "Exchange Variation"]
+[ECO "B13"]
+[VariationId "caro_exchange"]
+[Priority "B"]
+
+1. e4 c6 2. d4 d5 3. exd5 cxd5 4. Bd3 Nc6 5. c3 *
+{ White plan: Bd3, c3, Nf3, Bf4/Bg5; развиваться и искать атаку. }
+{ Black plan: ...Nc6, ...Nf6, ...Bg4; активность фигур компенсирует симметрию. }
+{ Middlegame: Симметричная структура; игра идёт за активные фигуры и контроль e-файла. }
+
+[Event "Opening Research Line"]
+[Site "App research"]
+[Opening "Two Knights Variation"]
+[ECO "B11"]
+[VariationId "caro_two_knights"]
+[Priority "B"]
+
+1. e4 c6 2. Nc3 d5 3. Nf3 dxe4 4. Nxe4 Nf6 *
+{ White plan: Развитие без d4, быстрые фигуры и давление на f6/e4. }
+{ Black plan: ...dxe4, ...Nf6; не дать белым бесплатную атаку. }
+{ Middlegame: Менее структурная, более фигурная игра, чем классический Caro. }
+
+[Event "Opening Research Line"]
+[Site "App research"]
+[Opening "Scandinavian — 3...Qa5"]
+[ECO "B01"]
+[VariationId "scandinavian_qa5"]
+[Priority "A"]
+
+1. e4 d5 2. exd5 Qxd5 3. Nc3 Qa5 4. d4 Nf6 5. Nf3 *
+{ White plan: Развиться с d4/Nf3/Bc4, выиграть темпы, но не гонять ферзя бесконечно. }
+{ Black plan: Ферзь на a5, ...Nf6, ...c6, ...Bf5; крепкая скандинавская структура. }
+{ Middlegame: Белые имеют темпы, чёрные — ясную структуру и лёгкое развитие. }
+
+[Event "Opening Research Line"]
+[Site "App research"]
+[Opening "Modern Scandinavian — 2...Nf6"]
+[ECO "B01"]
+[VariationId "scandinavian_modern_nf6"]
+[Priority "B"]
+
+1. e4 d5 2. exd5 Nf6 3. d4 Nxd5 4. c4 Nb6 *
+{ White plan: Занять центр d4/c4 и развиться. }
+{ Black plan: Вернуть пешку фигурой, давить на центр, иногда ...g6. }
+{ Middlegame: Позиции напоминают открытый центр с лишним пространством у белых. }
+
+[Event "Opening Research Line"]
+[Site "App research"]
+[Opening "Austrian Attack"]
+[ECO "B09"]
+[VariationId "pirc_austrian"]
+[Priority "A"]
+
+1. e4 d6 2. d4 Nf6 3. Nc3 g6 4. f4 Bg7 5. Nf3 O-O *
+{ White plan: e4-d4-f4, Nf3, Be2/Bd3, O-O; атака и контроль e5. }
+{ Black plan: ...Bg7, ...O-O, ...c5 или ...e5; подорвать центр. }
+{ Middlegame: Белые имеют пространство; чёрные ждут момент, чтобы ударить по центру. }
+
+[Event "Opening Research Line"]
+[Site "App research"]
+[Opening "150 Attack"]
+[ECO "B07-B09"]
+[VariationId "pirc_150_attack"]
+[Priority "A"]
+
+1. e4 d6 2. d4 Nf6 3. Nc3 g6 4. Be3 Bg7 5. Qd2 O-O 6. O-O-O *
+{ White plan: Be3-Qd2-O-O, h4-h5, Bh6; атака на короля. }
+{ Black plan: ...c6/ ...a6/ ...b5 или ...e5; контрудар до атаки белых. }
+{ Middlegame: Рокировки в разные стороны: темп и пешечные рычаги решают. }
+
+[Event "Opening Research Line"]
+[Site "App research"]
+[Opening "Modern Defense"]
+[ECO "B06"]
+[VariationId "modern_defense"]
+[Priority "B"]
+
+1. e4 g6 2. d4 Bg7 3. Nc3 d6 4. Be3 a6 *
+{ White plan: Занять центр, развиться, выбрать Be3/Qd2 или f4. }
+{ Black plan: Фианкетто, ...a6/...b5 или ...c5; провоцировать чрезмерное расширение центра. }
+{ Middlegame: Белые имеют центр, чёрные атакуют его с фланга. }
+
+[Event "Opening Research Line"]
+[Site "App research"]
+[Opening "Alekhine — Modern Variation"]
+[ECO "B04-B05"]
+[VariationId "alekhine_modern"]
+[Priority "B"]
+
+1. e4 Nf6 2. e5 Nd5 3. d4 d6 4. Nf3 Bg4 5. Be2 e6 *
+{ White plan: Строить центр без перегиба; развиваться и поддерживать d4/e5. }
+{ Black plan: Атаковать центр: ...d6, ...Bg4, ...e6, ...c5. }
+{ Middlegame: Белый центр против чёрных подрывов; не путать пространство с выигрышем. }
+
+[Event "Opening Research Line"]
+[Site "App research"]
+[Opening "Owen Defense"]
+[ECO "B00"]
+[VariationId "owen_defense"]
+[Priority "C"]
+
+1. e4 b6 2. d4 Bb7 3. Bd3 e6 4. Nf3 *
+{ White plan: Занять центр, развиться, не зевнуть давление на e4. }
+{ Black plan: ...Bb7 давит на e4; затем ...Nf6, ...c5 или ...d5. }
+{ Middlegame: Белый центр под прицелом диагонали a8-h1. }
+
+[Event "Opening Research Line"]
+[Site "App research"]
+[Opening "Nimzowitsch Defense"]
+[ECO "B00"]
+[VariationId "nimzowitsch_defense"]
+[Priority "C"]
+
+1. e4 Nc6 2. d4 d5 3. e5 Bf5 *
+{ White plan: d4/e5, развить фигуры, не закрыть все линии без плана. }
+{ Black plan: ...d5, ...Bf5, ...e6; давление на центр. }
+{ Middlegame: Похожа на French/Caro гибрид: центр белых против подрывов. }
+
+[Event "Opening Research Line"]
+[Site "App research"]
+[Opening "QGD — Orthodox Main Line"]
+[ECO "D35-D69"]
+[VariationId "qgd_orthodox"]
+[Priority "A"]
+
+1. d4 d5 2. c4 e6 3. Nc3 Nf6 4. Bg5 Be7 5. e3 O-O 6. Nf3 h6 7. Bh4 *
+{ White plan: Развить фигуры, cxd5 в нужный момент, давление на c/e-линии. }
+{ Black plan: ...Be7, ...O-O, ...h6, ...c6/ ...b6; освободиться через ...c5 или ...e5. }
+{ Middlegame: Плотная структура: главный вопрос — кто лучше подготовит центральный разрыв. }
+
+[Event "Opening Research Line"]
+[Site "App research"]
+[Opening "QGD — Exchange Variation / Carlsbad"]
+[ECO "D35"]
+[VariationId "qgd_exchange"]
+[Priority "A"]
+
+1. d4 d5 2. c4 e6 3. Nc3 Nf6 4. cxd5 exd5 5. Bg5 Be7 6. e3 O-O *
+{ White plan: Minority attack: b4-b5 против пешек c6/d5; либо атака на короля. }
+{ Black plan: ...c6, ...Bf5/ ...Be6, ...Ne4; держать c6 и создавать контригру. }
+{ Middlegame: Белые часто атакуют ферзевый фланг меньшинством, чёрные — центр/короля. }
+
+[Event "Opening Research Line"]
+[Site "App research"]
+[Opening "QGD — Tartakower / Makogonov-Bondarevsky"]
+[ECO "D58-D59"]
+[VariationId "qgd_tartakower"]
+[Priority "A"]
+
+1. d4 d5 2. c4 e6 3. Nc3 Nf6 4. Bg5 Be7 5. e3 O-O 6. Nf3 h6 7. Bh4 b6 *
+{ White plan: Давить на центр, cxd5, развить ладьи; следить за ...Bb7. }
+{ Black plan: ...b6, ...Bb7, ...Ne4; решить проблему слона c8. }
+{ Middlegame: Чёрные получают активного слона, белые — стабильный центр. }
+
+[Event "Opening Research Line"]
+[Site "App research"]
+[Opening "Tarrasch Defense"]
+[ECO "D32-D34"]
+[VariationId "qgd_tarrasch"]
+[Priority "A"]
+
+1. d4 d5 2. c4 e6 3. Nc3 c5 4. cxd5 exd5 5. Nf3 Nc6 *
+{ White plan: Блокировать изолятор d5, разменивать активные фигуры, давить на d5. }
+{ Black plan: Использовать активность IQP: ...Nc6, ...cxd4, ...Bg4, ...Nf6. }
+{ Middlegame: Изолированная пешка d5: чёрные активнее в миттельшпиле, слабее в эндшпиле. }
+
+[Event "Opening Research Line"]
+[Site "App research"]
+[Opening "Semi-Tarrasch Defense"]
+[ECO "D40-D42"]
+[VariationId "qgd_semi_tarrasch"]
+[Priority "B"]
+
+1. d4 d5 2. c4 e6 3. Nc3 Nf6 4. Nf3 c5 5. cxd5 Nxd5 *
+{ White plan: Развиваться, e4 в нужный момент, использовать пространство. }
+{ Black plan: Разменять центр, получить активные фигуры и равную структуру. }
+{ Middlegame: Борьба за e4/e5 и темпы развития. }
+
+[Event "Opening Research Line"]
+[Site "App research"]
+[Opening "Slav Defense — Main Line"]
+[ECO "D10-D19"]
+[VariationId "slav_main"]
+[Priority "A"]
+
+1. d4 d5 2. c4 c6 3. Nf3 Nf6 4. Nc3 dxc4 5. a4 Bf5 6. e3 *
+{ White plan: Вернуть пешку c4 через e3/Bxc4, развиться, не дать ...b5 удержать пешку. }
+{ Black plan: Сохранить слона c8 активным через ...Bf5, иногда удерживать c4. }
+{ Middlegame: Чёрные получают крепкую структуру, белые — пространство и темпы против c4. }
+
+[Event "Opening Research Line"]
+[Site "App research"]
+[Opening "Slav Defense — Exchange Variation"]
+[ECO "D10-D14"]
+[VariationId "slav_exchange"]
+[Priority "B"]
+
+1. d4 d5 2. c4 c6 3. cxd5 cxd5 4. Nc3 Nf6 5. Bf4 *
+{ White plan: Развить Bf4, e3, Nf3; играть на маленькие темпы. }
+{ Black plan: Симметрия, но можно играть ...Nc6, ...Bf5, ...e6, активные фигуры. }
+{ Middlegame: Почти симметричная структура: выигрывает тот, кто лучше расставит фигуры. }
+
+[Event "Opening Research Line"]
+[Site "App research"]
+[Opening "Semi-Slav — Meran Variation"]
+[ECO "D45-D49"]
+[VariationId "semi_slav_meran"]
+[Priority "A"]
+
+1. d4 d5 2. c4 c6 3. Nf3 Nf6 4. Nc3 e6 5. e3 Nbd7 6. Bd3 dxc4 7. Bxc4 b5 *
+{ White plan: Развиться, e4 в нужный момент, использовать центр против ...b5. }
+{ Black plan: ...dxc4 и ...b5 выигрывают темпы, затем ...Bb7 и ...c5. }
+{ Middlegame: Чёрные расширяются на ферзевом фланге; белые стремятся к центральному e4. }
+
+[Event "Opening Research Line"]
+[Site "App research"]
+[Opening "Semi-Slav — Moscow / Botvinnik Complex"]
+[ECO "D43-D44"]
+[VariationId "semi_slav_moscow_botvinnik"]
+[Priority "A"]
+
+1. d4 d5 2. c4 c6 3. Nf3 Nf6 4. Nc3 e6 5. Bg5 h6 6. Bh4 dxc4 *
+{ White plan: Bg5 провоцирует ...h6; дальше либо e4, либо спокойные схемы. }
+{ Black plan: ...h6, ...dxc4, иногда ...g5; активная, но рискованная игра. }
+{ Middlegame: Тактические позиции с нарушенной структурой и инициативой. }
+
+[Event "Opening Research Line"]
+[Site "App research"]
+[Opening "Queen’s Gambit Accepted — Main Line"]
+[ECO "D20-D29"]
+[VariationId "qga_main"]
+[Priority "A"]
+
+1. d4 d5 2. c4 dxc4 3. Nf3 Nf6 4. e3 e6 5. Bxc4 c5 *
+{ White plan: Вернуть c4, быстро развиться, использовать центр. }
+{ Black plan: Вернуть пешку в обмен на темпы, играть ...c5 и ...e6. }
+{ Middlegame: Открытая ферзевая игра: центр и развитие важнее пешки c4. }
+
+[Event "Opening Research Line"]
+[Site "App research"]
+[Opening "Albin Countergambit"]
+[ECO "D08-D09"]
+[VariationId "albin_countergambit"]
+[Priority "B"]
+
+1. d4 d5 2. c4 e5 3. dxe5 d4 4. Nf3 Nc6 *
+{ White plan: Принять центр, развиться, не попасть в ловушки на e5/d4. }
+{ Black plan: Пешка d4 мешает развитию белых; чёрные играют на быстрые темпы. }
+{ Middlegame: Чёрные получают пространство и тактику за пешку. }
+
+[Event "Opening Research Line"]
+[Site "App research"]
+[Opening "Chigorin Defense"]
+[ECO "D07"]
+[VariationId "chigorin_defense"]
+[Priority "B"]
+
+1. d4 d5 2. c4 Nc6 3. Nf3 Bg4 4. Nc3 e6 *
+{ White plan: Использовать то, что ...Nc6 блокирует c-пешку; развиться и давить на d5. }
+{ Black plan: Фигурное давление на центр: ...Nc6, ...Bg4, ...e6. }
+{ Middlegame: Чёрные развиваются активно, но структура менее гибкая. }
+
+[Event "Opening Research Line"]
+[Site "App research"]
+[Opening "London System"]
+[ECO "D02"]
+[VariationId "london_system"]
+[Priority "A"]
+
+1. d4 Nf6 2. Bf4 d5 3. e3 c5 4. c3 Nc6 5. Nf3 *
+{ White plan: Bf4/e3/c3/Nf3/Bd3; играть e4 или атаку на короля, не засыпать. }
+{ Black plan: ...c5, ...Nc6, ...Qb6; немедленно давить на b2/d4. }
+{ Middlegame: Система против системы: чёрные должны бить центр, белые — найти активный план. }
+
+[Event "Opening Research Line"]
+[Site "App research"]
+[Opening "Jobava London"]
+[ECO "D00"]
+[VariationId "jobava_london"]
+[Priority "B"]
+
+1. d4 d5 2. Nc3 Nf6 3. Bf4 e6 4. e3 Bb4 *
+{ White plan: Nc3+Bf4, e3, Qf3/O-O-O иногда; давление на c7/e4. }
+{ Black plan: ...e6, ...Bb4, ...c5; ударить центр и связать коня. }
+{ Middlegame: Более острый Лондон: белые получают развитие, но конь c3 блокирует c-пешку. }
+
+[Event "Opening Research Line"]
+[Site "App research"]
+[Opening "Colle-Zukertort System"]
+[ECO "D04-D05"]
+[VariationId "colle_zukertort"]
+[Priority "B"]
+
+1. d4 d5 2. Nf3 Nf6 3. e3 e6 4. Bd3 c5 5. b3 *
+{ White plan: Nf3/e3/Bd3/b3/Bb2; подготовить e4. }
+{ Black plan: ...c5, ...Nc6, ...Bd6; не дать e4 бесплатно. }
+{ Middlegame: Белые строят фигуры для e4; чёрные давят на центр заранее. }
+
+[Event "Opening Research Line"]
+[Site "App research"]
+[Opening "Torre Attack"]
+[ECO "D03"]
+[VariationId "torre_attack"]
+[Priority "B"]
+
+1. d4 Nf6 2. Nf3 e6 3. Bg5 c5 4. e3 *
+{ White plan: Bg5, e3, Bd3, c3; давление на f6 и e4. }
+{ Black plan: ...c5, ...Qb6, ...Be7; атаковать d4/b2 и развязаться. }
+{ Middlegame: Белые играют через связку и e4; чёрные через давление на ферзевом фланге. }
+
+[Event "Opening Research Line"]
+[Site "App research"]
+[Opening "Trompowsky Attack"]
+[ECO "A45"]
+[VariationId "trompowsky"]
+[Priority "B"]
+
+1. d4 Nf6 2. Bg5 Ne4 3. Bf4 c5 4. f3 *
+{ White plan: Bg5 провоцирует, затем f3/e4; играть нестандартную структуру. }
+{ Black plan: ...Ne4 или ...d5; не дать белым бесплатную пару слонов/центр. }
+{ Middlegame: Ранняя борьба за коня f6 и центр; много несимметричных структур. }
+
+[Event "Opening Research Line"]
+[Site "App research"]
+[Opening "Stonewall Attack"]
+[ECO "A45/D00"]
+[VariationId "stonewall_attack"]
+[Priority "C"]
+
+1. d4 d5 2. e3 Nf6 3. f4 c5 4. c3 Nc6 5. Bd3 *
+{ White plan: Фигурами на королевский фланг: Nf3, Bd3, O-O, Ne5, Qf3. }
+{ Black plan: Бить по тёмным полям и центру: ...c5, ...Nc6, ...Bf5. }
+{ Middlegame: Белые получают контроль e5, но ослабляют e4 и диагонали. }
+
+[Event "Opening Research Line"]
+[Site "App research"]
+[Opening "Nimzo-Indian — Rubinstein"]
+[ECO "E40-E59"]
+[VariationId "nimzo_rubinstein"]
+[Priority "A"]
+
+1. d4 Nf6 2. c4 e6 3. Nc3 Bb4 4. e3 O-O 5. Bd3 d5 6. Nf3 *
+{ White plan: e3, Bd3, Nf3, O-O; решить, когда играть a3/cxd5/e4. }
+{ Black plan: Связка коня c3, давление на c4/e4, иногда ...d5 или ...c5. }
+{ Middlegame: Белые имеют центр, чёрные могут испортить структуру и играть по слабостям. }
+
+[Event "Opening Research Line"]
+[Site "App research"]
+[Opening "Nimzo-Indian — Classical 4.Qc2"]
+[ECO "E32-E39"]
+[VariationId "nimzo_classical_qc2"]
+[Priority "A"]
+
+1. d4 Nf6 2. c4 e6 3. Nc3 Bb4 4. Qc2 O-O 5. a3 Bxc3+ 6. Qxc3 *
+{ White plan: Qc2, a3, вернуть ферзём, затем e4 или Nf3/g3. }
+{ Black plan: Быстро развиться и доказать, что темпы важнее пары слонов белых. }
+{ Middlegame: Белые имеют пару слонов, чёрные — темпы и шанс атаковать центр. }
+
+[Event "Opening Research Line"]
+[Site "App research"]
+[Opening "Nimzo-Indian — Sämisch"]
+[ECO "E24-E29"]
+[VariationId "nimzo_saemisch"]
+[Priority "B"]
+
+1. d4 Nf6 2. c4 e6 3. Nc3 Bb4 4. a3 Bxc3+ 5. bxc3 *
+{ White plan: Пара слонов, e4, f3, расширение центра; играть активно до эндшпиля. }
+{ Black plan: Бить по c4/c3, блокировать центр, провоцировать слабости. }
+{ Middlegame: Структурный дисбаланс: активность белых против слабых пешек. }
+
+[Event "Opening Research Line"]
+[Site "App research"]
+[Opening "Queen’s Indian Defense — Main Line"]
+[ECO "E12-E19"]
+[VariationId "queen_indian_main"]
+[Priority "A"]
+
+1. d4 Nf6 2. c4 e6 3. Nf3 b6 4. g3 Ba6 5. b3 Bb4+ *
+{ White plan: g3/Bg2, развиться, держать центр и c4. }
+{ Black plan: ...b6, ...Ba6, давление на c4 и белые поля. }
+{ Middlegame: Позиционная борьба за c4/e4 и диагонали. }
+
+[Event "Opening Research Line"]
+[Site "App research"]
+[Opening "Bogo-Indian Defense"]
+[ECO "E11"]
+[VariationId "bogo_indian"]
+[Priority "B"]
+
+1. d4 Nf6 2. c4 e6 3. Nf3 Bb4+ 4. Bd2 Be7 *
+{ White plan: Bd2, g3/e3; развиться и получить небольшой плюс пространства. }
+{ Black plan: Шахом заставить белых определиться, затем крепкая структура. }
+{ Middlegame: Много маневров, мало ранних тактик; важны диагонали и темпы. }
+
+[Event "Opening Research Line"]
+[Site "App research"]
+[Opening "King’s Indian — Classical Main Line"]
+[ECO "E90-E99"]
+[VariationId "kings_indian_classical"]
+[Priority "A"]
+
+1. d4 Nf6 2. c4 g6 3. Nc3 Bg7 4. e4 d6 5. Nf3 O-O 6. Be2 e5 7. O-O Nc6 *
+{ White plan: d5, Be3, Nd2/f3, ферзевый фланг c5/b4; иногда королевская атака. }
+{ Black plan: ...e5, ...Nc6, ...f5; атака на короля после закрытия центра. }
+{ Middlegame: После d5 — белые играют на ферзевом фланге, чёрные на королевском. }
+
+[Event "Opening Research Line"]
+[Site "App research"]
+[Opening "King’s Indian — Sämisch"]
+[ECO "E80-E89"]
+[VariationId "kings_indian_saemisch"]
+[Priority "A"]
+
+1. d4 Nf6 2. c4 g6 3. Nc3 Bg7 4. e4 d6 5. f3 O-O 6. Be3 *
+{ White plan: f3 поддерживает e4; Be3, Qd2, O-O-O или медленный центр. }
+{ Black plan: ...c5, ...e5, ...a6; подрывать до атаки белых. }
+{ Middlegame: Белые получают крепкий центр, чёрные ищут контрудар по нему. }
+
+[Event "Opening Research Line"]
+[Site "App research"]
+[Opening "King’s Indian — Averbakh"]
+[ECO "E73-E75"]
+[VariationId "kings_indian_averbakh"]
+[Priority "B"]
+
+1. d4 Nf6 2. c4 g6 3. Nc3 Bg7 4. e4 d6 5. Be2 O-O 6. Bg5 *
+{ White plan: Bg5, Be2, Qd2, h4 иногда; мешать ...e5/...f5. }
+{ Black plan: ...c5 или ...h6/ ...Na6; не дать белым комфортно связать структуру. }
+{ Middlegame: Белые борются за профилактику, чёрные — за своевременный центральный подрыв. }
+
+[Event "Opening Research Line"]
+[Site "App research"]
+[Opening "King’s Indian — Four Pawns Attack"]
+[ECO "E76-E79"]
+[VariationId "kings_indian_four_pawns"]
+[Priority "B"]
+
+1. d4 Nf6 2. c4 g6 3. Nc3 Bg7 4. e4 d6 5. f4 O-O 6. Nf3 *
+{ White plan: Большой центр, развитие, e5 или f5; не развалиться от ...c5/...e5. }
+{ Black plan: ...c5, ...e5, ...Na6; атаковать центр до того, как он пойдёт вперёд. }
+{ Middlegame: Белые сильны, если центр движется; чёрные сильны, если центр становится мишенью. }
+
+[Event "Opening Research Line"]
+[Site "App research"]
+[Opening "Grünfeld — Exchange Variation"]
+[ECO "D85-D89"]
+[VariationId "grunfeld_exchange"]
+[Priority "A"]
+
+1. d4 Nf6 2. c4 g6 3. Nc3 d5 4. cxd5 Nxd5 5. e4 Nxc3 6. bxc3 Bg7 *
+{ White plan: Большой центр c3/d4/e4, Be3/Qd2; продвигать центр осторожно. }
+{ Black plan: ...Bg7, ...c5, ...Qa5; давление на d4 и центр. }
+{ Middlegame: Белый центр против давления по диагонали g7-a1 и рычага ...c5. }
+
+[Event "Opening Research Line"]
+[Site "App research"]
+[Opening "Grünfeld — Russian System"]
+[ECO "D97"]
+[VariationId "grunfeld_russian"]
+[Priority "B"]
+
+1. d4 Nf6 2. c4 g6 3. Nc3 d5 4. Nf3 Bg7 5. Qb3 dxc4 6. Qxc4 O-O *
+{ White plan: Qb3/Qxc4, e4, развиться; следить за темпами на ферзя. }
+{ Black plan: ...dxc4, ...O-O, ...a6; атаковать ферзя и центр. }
+{ Middlegame: Ферзь белых активен, но может стать объектом темпов. }
+
+[Event "Opening Research Line"]
+[Site "App research"]
+[Opening "Open Catalan"]
+[ECO "E01-E09"]
+[VariationId "catalan_open"]
+[Priority "A"]
+
+1. d4 Nf6 2. c4 e6 3. g3 d5 4. Bg2 dxc4 5. Nf3 Be7 6. O-O O-O *
+{ White plan: Фианкетто, давление на c4/d5, вернуть пешку или получить компенсацию. }
+{ Black plan: Принять c4, развиться, удержать пешку только если это не тормозит развитие. }
+{ Middlegame: Белые давят по диагонали g2-a8; чёрные решают судьбу пешки c4. }
+
+[Event "Opening Research Line"]
+[Site "App research"]
+[Opening "Closed Catalan"]
+[ECO "E06-E09"]
+[VariationId "catalan_closed"]
+[Priority "A"]
+
+1. d4 Nf6 2. c4 e6 3. g3 d5 4. Bg2 Be7 5. Nf3 O-O 6. O-O *
+{ White plan: Давление на d5, cxd5 или Ne5, медленное усиление. }
+{ Black plan: ...Be7, ...O-O, ...c6/ ...c5; держать центр. }
+{ Middlegame: Позиционная борьба за диагонали и центральные разрывы. }
+
+[Event "Opening Research Line"]
+[Site "App research"]
+[Opening "Modern Benoni"]
+[ECO "A60-A79"]
+[VariationId "modern_benoni"]
+[Priority "A"]
+
+1. d4 Nf6 2. c4 c5 3. d5 e6 4. Nc3 exd5 5. cxd5 d6 6. e4 g6 *
+{ White plan: Пространство d5/e4, e5 или f4; давить на d6. }
+{ Black plan: ...g6, ...Bg7, ...O-O, ...Re8, ...b5; контригра по флангам. }
+{ Middlegame: Белые имеют центр, чёрные атакуют слабые поля и ферзевый фланг. }
+
+[Event "Opening Research Line"]
+[Site "App research"]
+[Opening "Benko Gambit"]
+[ECO "A57-A59"]
+[VariationId "benko_gambit"]
+[Priority "B"]
+
+1. d4 Nf6 2. c4 c5 3. d5 b5 4. cxb5 a6 5. bxa6 g6 *
+{ White plan: Принять или отказаться; если принять — развиться и нейтрализовать линии. }
+{ Black plan: Жертва пешки за открытые a/b-линии и давление на ферзевом фланге. }
+{ Middlegame: Чёрные получают позиционную компенсацию, не одноходовую тактику. }
+
+[Event "Opening Research Line"]
+[Site "App research"]
+[Opening "Dutch — Leningrad Variation"]
+[ECO "A80-A99"]
+[VariationId "dutch_leningrad"]
+[Priority "A"]
+
+1. d4 f5 2. g3 Nf6 3. Bg2 g6 4. Nf3 Bg7 5. O-O O-O *
+{ White plan: g3/Bg2, Nf3, c4; давить на диагонали и поле e4. }
+{ Black plan: ...f5, ...g6, ...Bg7, ...d6, ...e5; королевская активность. }
+{ Middlegame: Чёрные получают активность ценой ослабления e6/e5/короля. }
+
+[Event "Opening Research Line"]
+[Site "App research"]
+[Opening "Dutch — Stonewall"]
+[ECO "A90-A95"]
+[VariationId "dutch_stonewall"]
+[Priority "B"]
+
+1. d4 f5 2. g3 Nf6 3. Bg2 e6 4. Nf3 d5 5. O-O Bd6 *
+{ White plan: Бить по слабым полям e5/c5, менять плохого слона чёрных. }
+{ Black plan: Контроль e4, атака на короля, слон d6, конь e4. }
+{ Middlegame: Чёрные получают форпост e4, но их слон c8 часто проблемный. }
+
+[Event "Opening Research Line"]
+[Site "App research"]
+[Opening "Dutch — Classical Variation"]
+[ECO "A90"]
+[VariationId "dutch_classical"]
+[Priority "B"]
+
+1. d4 f5 2. g3 Nf6 3. Bg2 e6 4. Nf3 Be7 5. O-O O-O *
+{ White plan: Развитие, c4, Nc3; давить на e4/e5 и диагональ. }
+{ Black plan: ...Be7, ...O-O, ...d6/ ...Ne4; играть за королевский фланг. }
+{ Middlegame: Маневренная борьба за e4 и безопасность чёрного короля. }
+
+[Event "Opening Research Line"]
+[Site "App research"]
+[Opening "Budapest Gambit"]
+[ECO "A51-A52"]
+[VariationId "budapest_gambit"]
+[Priority "B"]
+
+1. d4 Nf6 2. c4 e5 3. dxe5 Ng4 4. Nf3 Nc6 *
+{ White plan: Вернуть пешку при необходимости, развиться, не попасть под темпы. }
+{ Black plan: Атаковать e5, развиться с темпом, иногда ...Bb4+. }
+{ Middlegame: Чёрные играют на активность за пешку; белые — на развитие и структуру. }
+
+[Event "Opening Research Line"]
+[Site "App research"]
+[Opening "Old Indian Defense"]
+[ECO "A53-A55"]
+[VariationId "old_indian"]
+[Priority "C"]
+
+1. d4 Nf6 2. c4 d6 3. Nc3 e5 4. Nf3 Nbd7 *
+{ White plan: Развиться, d5 или e4, использовать пространство. }
+{ Black plan: ...e5, ...Nbd7, ...Be7; крепко, но пассивнее КИД. }
+{ Middlegame: Белые имеют пространство; чёрные ищут ...c6/...a5/...Nc5. }
+
+[Event "Opening Research Line"]
+[Site "App research"]
+[Opening "Symmetrical English"]
+[ECO "A30-A39"]
+[VariationId "english_symmetrical"]
+[Priority "A"]
+
+1. c4 c5 2. Nf3 Nf6 3. g3 b6 4. Bg2 Bb7 *
+{ White plan: g3/Bg2, Nc3, d4 в нужный момент; давление на диагонали. }
+{ Black plan: Зеркальное развитие, ...d5 или ...e6; не дать белым бесплатный центр. }
+{ Middlegame: Борьба за d4/d5 и диагонали; часто транспонирует в Hedgehog. }
+
+[Event "Opening Research Line"]
+[Site "App research"]
+[Opening "King’s English — Reversed Sicilian"]
+[ECO "A20-A29"]
+[VariationId "english_reversed_sicilian"]
+[Priority "A"]
+
+1. c4 e5 2. Nc3 Nf6 3. g3 d5 4. cxd5 Nxd5 5. Bg2 *
+{ White plan: Фианкетто, давление на d5, выбор d3 или d4. }
+{ Black plan: ...d5 активно занимает центр; чёрные не должны играть пассивно. }
+{ Middlegame: Белые получают гибкость, чёрные — ясный центр. }
+
+[Event "Opening Research Line"]
+[Site "App research"]
+[Opening "English Four Knights"]
+[ECO "A28-A29"]
+[VariationId "english_four_knights"]
+[Priority "A"]
+
+1. c4 e5 2. Nc3 Nf6 3. Nf3 Nc6 4. g3 *
+{ White plan: g3/Bg2, d3 или d4, игра по центру и диагонали. }
+{ Black plan: ...Bb4/ ...d5/ ...Bc5; активное развитие. }
+{ Middlegame: Фигурная борьба без раннего фиксированного центра. }
+
+[Event "Opening Research Line"]
+[Site "App research"]
+[Opening "English — Botvinnik System"]
+[ECO "A20-A29"]
+[VariationId "english_botvinnik"]
+[Priority "B"]
+
+1. c4 e5 2. g3 d6 3. Bg2 g6 4. Nc3 Bg7 5. e4 *
+{ White plan: c4/e4, Nc3, Nge2, d3; контролировать d5 и играть f4. }
+{ Black plan: ...d6, ...g6, ...Nf6; подрывы ...f5 или ...c6/...d5. }
+{ Middlegame: Закрытая структура: белые давят на d5, чёрные ищут подрыв. }
+
+[Event "Opening Research Line"]
+[Site "App research"]
+[Opening "Mikenas-Carls Variation"]
+[ECO "A18-A19"]
+[VariationId "english_mikenas"]
+[Priority "B"]
+
+1. c4 Nf6 2. Nc3 e6 3. e4 d5 4. e5 *
+{ White plan: e4-e5, пространство, быстрый центр. }
+{ Black plan: ...d5 провоцирует закрытие; атаковать центр через ...d4/...c5. }
+{ Middlegame: Белые получают пространство, чёрные — цели для подрыва. }
+
+[Event "Opening Research Line"]
+[Site "App research"]
+[Opening "Réti Opening"]
+[ECO "A09"]
+[VariationId "reti_opening"]
+[Priority "A"]
+
+1. Nf3 d5 2. c4 d4 3. b4 *
+{ White plan: Nf3/c4/b4/g3; давить на d5/d4, не спешить с d4. }
+{ Black plan: Занять центр, но не перерасширяться; ...d4 требует поддержки. }
+{ Middlegame: Белые подрывают центр с флангов; чёрные пытаются удержать пространство. }
+
+[Event "Opening Research Line"]
+[Site "App research"]
+[Opening "King’s Indian Attack"]
+[ECO "A05-A08"]
+[VariationId "kings_indian_attack"]
+[Priority "A"]
+
+1. Nf3 Nf6 2. g3 d5 3. Bg2 c6 4. O-O Bf5 5. d3 *
+{ White plan: Nf3/g3/Bg2/O-O/d3, затем e4 и атака на короля. }
+{ Black plan: Занять центр, развить слона c8, не дать e4 бесплатно. }
+{ Middlegame: Белые строят индийскую атаку с лишним темпом; чёрные должны занять центр. }
+
+[Event "Opening Research Line"]
+[Site "App research"]
+[Opening "Nimzo-Larsen Attack"]
+[ECO "A01"]
+[VariationId "nimzo_larsen"]
+[Priority "C"]
+
+1. b3 d5 2. Bb2 Nf6 3. e3 e6 4. Nf3 *
+{ White plan: Bb2, e3, Nf3, c4 или f4; давление на диагональ a1-h8. }
+{ Black plan: Занять центр пешками, не дать белым бесплатное e4. }
+{ Middlegame: Белые играют по большой диагонали, чёрные занимают центр. }
+
+[Event "Opening Research Line"]
+[Site "App research"]
+[Opening "Bird Opening"]
+[ECO "A02-A03"]
+[VariationId "bird_opening"]
+[Priority "C"]
+
+1. f4 d5 2. Nf3 Nf6 3. e3 g6 4. b3 *
+{ White plan: Контроль e5, Nf3/e3/b3/Bb2, иногда Stonewall. }
+{ Black plan: ...d5, ...Nf6, ...g6 или ...e6; бить по e4/e5 и не бояться центра. }
+{ Middlegame: Белые играют зеркальную Голландскую; сильны на e5, слабы на короле. }
+
+[Event "Opening Research Line"]
+[Site "App research"]
+[Opening "Hippopotamus / Double Fianchetto Setup"]
+[ECO "A00/B06"]
+[VariationId "hippopotamus_setup"]
+[Priority "C"]
+
+1. g3 g6 2. Bg2 Bg7 3. d3 d6 4. e4 e6 5. Nf3 Ne7 *
+{ White plan: Занять центр аккуратно, не вскрывать игру без развития. }
+{ Black plan: Гибко держать центр, потом ...c5/...e5; не стать слишком пассивным. }
+{ Middlegame: Закрытая маневренная игра; первый сильный центральный разрыв решает. }
+

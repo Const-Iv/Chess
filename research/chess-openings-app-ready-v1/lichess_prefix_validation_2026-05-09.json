@@ -1,0 +1,2693 @@
+{
+  "generatedAt": "2026-05-09",
+  "purpose": "Deterministic validation for imported ChatGPT deep-research opening lines before using them in the local trainer.",
+  "sources": [
+    {
+      "name": "Imported ChatGPT app-ready v1 JSON",
+      "path": "research/chess-openings-app-ready-v1/chess_openings_knowledge_base_ru.json"
+    },
+    {
+      "name": "Lichess chess-openings root TSV files a.tsv-e.tsv",
+      "url": "https://github.com/lichess-org/chess-openings",
+      "license": "CC0-1.0/public domain facts as stated by upstream README"
+    }
+  ],
+  "summary": {
+    "total": 98,
+    "legalSan": 98,
+    "lichessMatches": {
+      "lichess-prefix": 78,
+      "pgn-exact": 20
+    }
+  },
+  "notes": [
+    "legalSan=true means chess.js accepted every SAN move in strict mode.",
+    "pgn-exact means the imported full PGN exactly matches a Lichess chess-openings line.",
+    "lichess-prefix means the imported line continues a known Lichess chess-openings PGN prefix; the extra plies are treated as app research, not a separate Lichess opening-name assertion."
+  ],
+  "variations": [
+    {
+      "id": "sicilian_najdorf_english_attack",
+      "name": "Najdorf Variation — English Attack",
+      "eco": "B90",
+      "legalSan": true,
+      "appliedSan": [
+        "e4",
+        "c5",
+        "Nf3",
+        "d6",
+        "d4",
+        "cxd4",
+        "Nxd4",
+        "Nf6",
+        "Nc3",
+        "a6",
+        "Be3",
+        "e5",
+        "Nb3",
+        "Be6",
+        "f3"
+      ],
+      "finalFen": "rn1qkb1r/1p3ppp/p2pbn2/4p3/4P3/1NN1BP2/PPP3PP/R2QKB1R b KQkq - 0 8",
+      "sourceMoveCount": 15,
+      "lichessMatch": {
+        "kind": "lichess-prefix",
+        "commonPrefixPly": 11,
+        "eco": "B90",
+        "name": "Sicilian Defense: Najdorf Variation, English Attack",
+        "pgn": "1. e4 c5 2. Nf3 d6 3. d4 cxd4 4. Nxd4 Nf6 5. Nc3 a6 6. Be3"
+      }
+    },
+    {
+      "id": "sicilian_najdorf_classical",
+      "name": "Najdorf Variation — Classical / Opocensky",
+      "eco": "B92",
+      "legalSan": true,
+      "appliedSan": [
+        "e4",
+        "c5",
+        "Nf3",
+        "d6",
+        "d4",
+        "cxd4",
+        "Nxd4",
+        "Nf6",
+        "Nc3",
+        "a6",
+        "Be2",
+        "e5",
+        "Nb3",
+        "Be7",
+        "O-O",
+        "O-O"
+      ],
+      "finalFen": "rnbq1rk1/1p2bppp/p2p1n2/4p3/4P3/1NN5/PPP1BPPP/R1BQ1RK1 w - - 4 9",
+      "sourceMoveCount": 16,
+      "lichessMatch": {
+        "kind": "pgn-exact",
+        "commonPrefixPly": 16,
+        "eco": "B92",
+        "name": "Sicilian Defense: Najdorf Variation, Opocensky Variation, Traditional Line",
+        "pgn": "1. e4 c5 2. Nf3 d6 3. d4 cxd4 4. Nxd4 Nf6 5. Nc3 a6 6. Be2 e5 7. Nb3 Be7 8. O-O O-O"
+      }
+    },
+    {
+      "id": "sicilian_dragon_yugoslav",
+      "name": "Dragon Variation — Yugoslav Attack",
+      "eco": "B76",
+      "legalSan": true,
+      "appliedSan": [
+        "e4",
+        "c5",
+        "Nf3",
+        "d6",
+        "d4",
+        "cxd4",
+        "Nxd4",
+        "Nf6",
+        "Nc3",
+        "g6",
+        "Be3",
+        "Bg7",
+        "f3",
+        "O-O",
+        "Qd2",
+        "Nc6",
+        "O-O-O"
+      ],
+      "finalFen": "r1bq1rk1/pp2ppbp/2np1np1/8/3NP3/2N1BP2/PPPQ2PP/2KR1B1R b - - 4 9",
+      "sourceMoveCount": 17,
+      "lichessMatch": {
+        "kind": "lichess-prefix",
+        "commonPrefixPly": 16,
+        "eco": "B76",
+        "name": "Sicilian Defense: Dragon Variation, Yugoslav Attack",
+        "pgn": "1. e4 c5 2. Nf3 d6 3. d4 cxd4 4. Nxd4 Nf6 5. Nc3 g6 6. Be3 Bg7 7. f3 O-O 8. Qd2 Nc6"
+      }
+    },
+    {
+      "id": "sicilian_accelerated_dragon_maroczy",
+      "name": "Accelerated Dragon — Maroczy Bind",
+      "eco": "B36",
+      "legalSan": true,
+      "appliedSan": [
+        "e4",
+        "c5",
+        "Nf3",
+        "Nc6",
+        "d4",
+        "cxd4",
+        "Nxd4",
+        "g6",
+        "c4",
+        "Bg7",
+        "Be3",
+        "Nf6",
+        "Nc3",
+        "O-O"
+      ],
+      "finalFen": "r1bq1rk1/pp1pppbp/2n2np1/8/2PNP3/2N1B3/PP3PPP/R2QKB1R w KQ - 5 8",
+      "sourceMoveCount": 14,
+      "lichessMatch": {
+        "kind": "lichess-prefix",
+        "commonPrefixPly": 11,
+        "eco": "B38",
+        "name": "Sicilian Defense: Accelerated Dragon, Maróczy Bind",
+        "pgn": "1. e4 c5 2. Nf3 Nc6 3. d4 cxd4 4. Nxd4 g6 5. c4 Bg7 6. Be3"
+      }
+    },
+    {
+      "id": "sicilian_classical_rauzer",
+      "name": "Classical Sicilian — Richter-Rauzer",
+      "eco": "B60-B69",
+      "legalSan": true,
+      "appliedSan": [
+        "e4",
+        "c5",
+        "Nf3",
+        "Nc6",
+        "d4",
+        "cxd4",
+        "Nxd4",
+        "Nf6",
+        "Nc3",
+        "d6",
+        "Bg5",
+        "e6",
+        "Qd2",
+        "Be7",
+        "O-O-O"
+      ],
+      "finalFen": "r1bqk2r/pp2bppp/2nppn2/6B1/3NP3/2N5/PPPQ1PPP/2KR1B1R b kq - 3 8",
+      "sourceMoveCount": 15,
+      "lichessMatch": {
+        "kind": "lichess-prefix",
+        "commonPrefixPly": 8,
+        "eco": "B33",
+        "name": "Sicilian Defense: Open",
+        "pgn": "1. e4 c5 2. Nf3 Nc6 3. d4 cxd4 4. Nxd4 Nf6"
+      }
+    },
+    {
+      "id": "sicilian_scheveningen_keres",
+      "name": "Scheveningen — Keres Attack",
+      "eco": "B80-B89",
+      "legalSan": true,
+      "appliedSan": [
+        "e4",
+        "c5",
+        "Nf3",
+        "d6",
+        "d4",
+        "cxd4",
+        "Nxd4",
+        "Nf6",
+        "Nc3",
+        "e6",
+        "g4"
+      ],
+      "finalFen": "rnbqkb1r/pp3ppp/3ppn2/8/3NP1P1/2N5/PPP2P1P/R1BQKB1R b KQkq - 0 6",
+      "sourceMoveCount": 11,
+      "lichessMatch": {
+        "kind": "lichess-prefix",
+        "commonPrefixPly": 8,
+        "eco": "B54",
+        "name": "Sicilian Defense: Modern Variations, Main Line",
+        "pgn": "1. e4 c5 2. Nf3 d6 3. d4 cxd4 4. Nxd4 Nf6"
+      }
+    },
+    {
+      "id": "sicilian_taimanov",
+      "name": "Taimanov Variation",
+      "eco": "B47",
+      "legalSan": true,
+      "appliedSan": [
+        "e4",
+        "c5",
+        "Nf3",
+        "e6",
+        "d4",
+        "cxd4",
+        "Nxd4",
+        "Nc6",
+        "Nc3",
+        "Qc7"
+      ],
+      "finalFen": "r1b1kbnr/ppqp1ppp/2n1p3/8/3NP3/2N5/PPP2PPP/R1BQKB1R w KQkq - 3 6",
+      "sourceMoveCount": 10,
+      "lichessMatch": {
+        "kind": "pgn-exact",
+        "commonPrefixPly": 10,
+        "eco": "B47",
+        "name": "Sicilian Defense: Taimanov Variation, Bastrikov Variation",
+        "pgn": "1. e4 c5 2. Nf3 e6 3. d4 cxd4 4. Nxd4 Nc6 5. Nc3 Qc7"
+      }
+    },
+    {
+      "id": "sicilian_kan",
+      "name": "Kan Variation",
+      "eco": "B41-B43",
+      "legalSan": true,
+      "appliedSan": [
+        "e4",
+        "c5",
+        "Nf3",
+        "e6",
+        "d4",
+        "cxd4",
+        "Nxd4",
+        "a6",
+        "Bd3",
+        "Nf6",
+        "O-O",
+        "Qc7"
+      ],
+      "finalFen": "rnb1kb1r/1pqp1ppp/p3pn2/8/3NP3/3B4/PPP2PPP/RNBQ1RK1 w kq - 4 7",
+      "sourceMoveCount": 12,
+      "lichessMatch": {
+        "kind": "lichess-prefix",
+        "commonPrefixPly": 9,
+        "eco": "B42",
+        "name": "Sicilian Defense: Kan Variation, Modern Variation",
+        "pgn": "1. e4 c5 2. Nf3 e6 3. d4 cxd4 4. Nxd4 a6 5. Bd3"
+      }
+    },
+    {
+      "id": "sicilian_sveshnikov",
+      "name": "Sveshnikov Variation",
+      "eco": "B33",
+      "legalSan": true,
+      "appliedSan": [
+        "e4",
+        "c5",
+        "Nf3",
+        "Nc6",
+        "d4",
+        "cxd4",
+        "Nxd4",
+        "Nf6",
+        "Nc3",
+        "e5",
+        "Ndb5",
+        "d6",
+        "Bg5",
+        "a6",
+        "Na3",
+        "b5"
+      ],
+      "finalFen": "r1bqkb1r/5ppp/p1np1n2/1p2p1B1/4P3/N1N5/PPP2PPP/R2QKB1R w KQkq - 0 9",
+      "sourceMoveCount": 16,
+      "lichessMatch": {
+        "kind": "pgn-exact",
+        "commonPrefixPly": 16,
+        "eco": "B33",
+        "name": "Sicilian Defense: Lasker-Pelikan Variation, Sveshnikov Variation",
+        "pgn": "1. e4 c5 2. Nf3 Nc6 3. d4 cxd4 4. Nxd4 Nf6 5. Nc3 e5 6. Ndb5 d6 7. Bg5 a6 8. Na3 b5"
+      }
+    },
+    {
+      "id": "sicilian_kalashnikov",
+      "name": "Kalashnikov Variation",
+      "eco": "B32",
+      "legalSan": true,
+      "appliedSan": [
+        "e4",
+        "c5",
+        "Nf3",
+        "Nc6",
+        "d4",
+        "cxd4",
+        "Nxd4",
+        "e5",
+        "Nb5",
+        "d6",
+        "c4"
+      ],
+      "finalFen": "r1bqkbnr/pp3ppp/2np4/1N2p3/2P1P3/8/PP3PPP/RNBQKB1R b KQkq - 0 6",
+      "sourceMoveCount": 11,
+      "lichessMatch": {
+        "kind": "lichess-prefix",
+        "commonPrefixPly": 10,
+        "eco": "B32",
+        "name": "Sicilian Defense: Kalashnikov Variation",
+        "pgn": "1. e4 c5 2. Nf3 Nc6 3. d4 cxd4 4. Nxd4 e5 5. Nb5 d6"
+      }
+    },
+    {
+      "id": "sicilian_alapin",
+      "name": "Alapin Variation",
+      "eco": "B22",
+      "legalSan": true,
+      "appliedSan": [
+        "e4",
+        "c5",
+        "c3",
+        "d5",
+        "exd5",
+        "Qxd5",
+        "d4",
+        "Nf6",
+        "Nf3"
+      ],
+      "finalFen": "rnb1kb1r/pp2pppp/5n2/2pq4/3P4/2P2N2/PP3PPP/RNBQKB1R b KQkq - 2 5",
+      "sourceMoveCount": 9,
+      "lichessMatch": {
+        "kind": "lichess-prefix",
+        "commonPrefixPly": 6,
+        "eco": "B22",
+        "name": "Sicilian Defense: Alapin Variation, Barmen Defense",
+        "pgn": "1. e4 c5 2. c3 d5 3. exd5 Qxd5"
+      }
+    },
+    {
+      "id": "sicilian_rossolimo",
+      "name": "Rossolimo Variation",
+      "eco": "B30-B31",
+      "legalSan": true,
+      "appliedSan": [
+        "e4",
+        "c5",
+        "Nf3",
+        "Nc6",
+        "Bb5",
+        "g6",
+        "O-O",
+        "Bg7",
+        "c3"
+      ],
+      "finalFen": "r1bqk1nr/pp1pppbp/2n3p1/1Bp5/4P3/2P2N2/PP1P1PPP/RNBQ1RK1 b kq - 0 5",
+      "sourceMoveCount": 9,
+      "lichessMatch": {
+        "kind": "lichess-prefix",
+        "commonPrefixPly": 6,
+        "eco": "B31",
+        "name": "Sicilian Defense: Nyezhmetdinov-Rossolimo Attack, Fianchetto Variation",
+        "pgn": "1. e4 c5 2. Nf3 Nc6 3. Bb5 g6"
+      }
+    },
+    {
+      "id": "sicilian_moscow",
+      "name": "Moscow Variation",
+      "eco": "B51-B52",
+      "legalSan": true,
+      "appliedSan": [
+        "e4",
+        "c5",
+        "Nf3",
+        "d6",
+        "Bb5+",
+        "Bd7",
+        "Bxd7+",
+        "Qxd7",
+        "O-O"
+      ],
+      "finalFen": "rn2kbnr/pp1qpppp/3p4/2p5/4P3/5N2/PPPP1PPP/RNBQ1RK1 b kq - 1 5",
+      "sourceMoveCount": 9,
+      "lichessMatch": {
+        "kind": "lichess-prefix",
+        "commonPrefixPly": 6,
+        "eco": "B52",
+        "name": "Sicilian Defense: Moscow Variation, Main Line",
+        "pgn": "1. e4 c5 2. Nf3 d6 3. Bb5+ Bd7"
+      }
+    },
+    {
+      "id": "sicilian_closed",
+      "name": "Closed Sicilian",
+      "eco": "B23-B26",
+      "legalSan": true,
+      "appliedSan": [
+        "e4",
+        "c5",
+        "Nc3",
+        "Nc6",
+        "g3",
+        "g6",
+        "Bg2",
+        "Bg7",
+        "d3"
+      ],
+      "finalFen": "r1bqk1nr/pp1pppbp/2n3p1/2p5/4P3/2NP2P1/PPP2PBP/R1BQK1NR b KQkq - 0 5",
+      "sourceMoveCount": 9,
+      "lichessMatch": {
+        "kind": "lichess-prefix",
+        "commonPrefixPly": 8,
+        "eco": "B24",
+        "name": "Sicilian Defense: Closed",
+        "pgn": "1. e4 c5 2. Nc3 Nc6 3. g3 g6 4. Bg2 Bg7"
+      }
+    },
+    {
+      "id": "sicilian_grand_prix",
+      "name": "Grand Prix Attack",
+      "eco": "B23",
+      "legalSan": true,
+      "appliedSan": [
+        "e4",
+        "c5",
+        "Nc3",
+        "Nc6",
+        "f4",
+        "g6",
+        "Nf3",
+        "Bg7",
+        "Bb5"
+      ],
+      "finalFen": "r1bqk1nr/pp1pppbp/2n3p1/1Bp5/4PP2/2N2N2/PPPP2PP/R1BQK2R b KQkq - 3 5",
+      "sourceMoveCount": 9,
+      "lichessMatch": {
+        "kind": "lichess-prefix",
+        "commonPrefixPly": 5,
+        "eco": "B23",
+        "name": "Sicilian Defense: Grand Prix Attack",
+        "pgn": "1. e4 c5 2. Nc3 Nc6 3. f4"
+      }
+    },
+    {
+      "id": "sicilian_smith_morra",
+      "name": "Smith-Morra Gambit",
+      "eco": "B21",
+      "legalSan": true,
+      "appliedSan": [
+        "e4",
+        "c5",
+        "d4",
+        "cxd4",
+        "c3",
+        "dxc3",
+        "Nxc3",
+        "Nc6",
+        "Nf3"
+      ],
+      "finalFen": "r1bqkbnr/pp1ppppp/2n5/8/4P3/2N2N2/PP3PPP/R1BQKB1R b KQkq - 2 5",
+      "sourceMoveCount": 9,
+      "lichessMatch": {
+        "kind": "lichess-prefix",
+        "commonPrefixPly": 6,
+        "eco": "B21",
+        "name": "Sicilian Defense: Smith-Morra Gambit Accepted",
+        "pgn": "1. e4 c5 2. d4 cxd4 3. c3 dxc3"
+      }
+    },
+    {
+      "id": "ruy_lopez_closed",
+      "name": "Ruy Lopez — Closed Main Line",
+      "eco": "C88-C99",
+      "legalSan": true,
+      "appliedSan": [
+        "e4",
+        "e5",
+        "Nf3",
+        "Nc6",
+        "Bb5",
+        "a6",
+        "Ba4",
+        "Nf6",
+        "O-O",
+        "Be7",
+        "Re1",
+        "b5",
+        "Bb3",
+        "d6",
+        "c3",
+        "O-O",
+        "h3"
+      ],
+      "finalFen": "r1bq1rk1/2p1bppp/p1np1n2/1p2p3/4P3/1BP2N1P/PP1P1PP1/RNBQR1K1 b - - 0 9",
+      "sourceMoveCount": 17,
+      "lichessMatch": {
+        "kind": "pgn-exact",
+        "commonPrefixPly": 17,
+        "eco": "C92",
+        "name": "Ruy Lopez: Closed",
+        "pgn": "1. e4 e5 2. Nf3 Nc6 3. Bb5 a6 4. Ba4 Nf6 5. O-O Be7 6. Re1 b5 7. Bb3 d6 8. c3 O-O 9. h3"
+      }
+    },
+    {
+      "id": "ruy_lopez_berlin",
+      "name": "Ruy Lopez — Berlin Defense",
+      "eco": "C65-C67",
+      "legalSan": true,
+      "appliedSan": [
+        "e4",
+        "e5",
+        "Nf3",
+        "Nc6",
+        "Bb5",
+        "Nf6",
+        "O-O",
+        "Nxe4",
+        "d4",
+        "Nd6",
+        "Bxc6",
+        "dxc6",
+        "dxe5",
+        "Nf5"
+      ],
+      "finalFen": "r1bqkb1r/ppp2ppp/2p5/4Pn2/8/5N2/PPP2PPP/RNBQ1RK1 w kq - 1 8",
+      "sourceMoveCount": 14,
+      "lichessMatch": {
+        "kind": "lichess-prefix",
+        "commonPrefixPly": 10,
+        "eco": "C67",
+        "name": "Ruy Lopez: Berlin Defense, l'Hermet Variation",
+        "pgn": "1. e4 e5 2. Nf3 Nc6 3. Bb5 Nf6 4. O-O Nxe4 5. d4 Nd6"
+      }
+    },
+    {
+      "id": "ruy_lopez_exchange",
+      "name": "Ruy Lopez — Exchange Variation",
+      "eco": "C68-C69",
+      "legalSan": true,
+      "appliedSan": [
+        "e4",
+        "e5",
+        "Nf3",
+        "Nc6",
+        "Bb5",
+        "a6",
+        "Bxc6",
+        "dxc6",
+        "O-O"
+      ],
+      "finalFen": "r1bqkbnr/1pp2ppp/p1p5/4p3/4P3/5N2/PPPP1PPP/RNBQ1RK1 b kq - 1 5",
+      "sourceMoveCount": 9,
+      "lichessMatch": {
+        "kind": "pgn-exact",
+        "commonPrefixPly": 9,
+        "eco": "C69",
+        "name": "Ruy Lopez: Exchange Variation, Normal Variation",
+        "pgn": "1. e4 e5 2. Nf3 Nc6 3. Bb5 a6 4. Bxc6 dxc6 5. O-O"
+      }
+    },
+    {
+      "id": "ruy_lopez_marshall",
+      "name": "Ruy Lopez — Marshall Attack",
+      "eco": "C89",
+      "legalSan": true,
+      "appliedSan": [
+        "e4",
+        "e5",
+        "Nf3",
+        "Nc6",
+        "Bb5",
+        "a6",
+        "Ba4",
+        "Nf6",
+        "O-O",
+        "Be7",
+        "Re1",
+        "b5",
+        "Bb3",
+        "O-O",
+        "c3",
+        "d5"
+      ],
+      "finalFen": "r1bq1rk1/2p1bppp/p1n2n2/1p1pp3/4P3/1BP2N2/PP1P1PPP/RNBQR1K1 w - - 0 9",
+      "sourceMoveCount": 16,
+      "lichessMatch": {
+        "kind": "pgn-exact",
+        "commonPrefixPly": 16,
+        "eco": "C89",
+        "name": "Ruy Lopez: Marshall Attack",
+        "pgn": "1. e4 e5 2. Nf3 Nc6 3. Bb5 a6 4. Ba4 Nf6 5. O-O Be7 6. Re1 b5 7. Bb3 O-O 8. c3 d5"
+      }
+    },
+    {
+      "id": "italian_giuoco_pianissimo",
+      "name": "Giuoco Pianissimo",
+      "eco": "C50-C54",
+      "legalSan": true,
+      "appliedSan": [
+        "e4",
+        "e5",
+        "Nf3",
+        "Nc6",
+        "Bc4",
+        "Bc5",
+        "c3",
+        "Nf6",
+        "d3",
+        "d6",
+        "O-O",
+        "O-O"
+      ],
+      "finalFen": "r1bq1rk1/ppp2ppp/2np1n2/2b1p3/2B1P3/2PP1N2/PP3PPP/RNBQ1RK1 w - - 2 7",
+      "sourceMoveCount": 12,
+      "lichessMatch": {
+        "kind": "lichess-prefix",
+        "commonPrefixPly": 10,
+        "eco": "C54",
+        "name": "Italian Game: Classical Variation, Giuoco Pianissimo",
+        "pgn": "1. e4 e5 2. Nf3 Nc6 3. Bc4 Bc5 4. c3 Nf6 5. d3 d6"
+      }
+    },
+    {
+      "id": "italian_two_knights_ng5",
+      "name": "Two Knights Defense — 4.Ng5",
+      "eco": "C55-C59",
+      "legalSan": true,
+      "appliedSan": [
+        "e4",
+        "e5",
+        "Nf3",
+        "Nc6",
+        "Bc4",
+        "Nf6",
+        "Ng5",
+        "d5",
+        "exd5",
+        "Na5",
+        "Bb5+",
+        "c6",
+        "dxc6",
+        "bxc6"
+      ],
+      "finalFen": "r1bqkb1r/p4ppp/2p2n2/nB2p1N1/8/8/PPPP1PPP/RNBQK2R w KQkq - 0 8",
+      "sourceMoveCount": 14,
+      "lichessMatch": {
+        "kind": "lichess-prefix",
+        "commonPrefixPly": 11,
+        "eco": "C58",
+        "name": "Italian Game: Two Knights Defense, Polerio Defense, Bishop Check Line",
+        "pgn": "1. e4 e5 2. Nf3 Nc6 3. Bc4 Nf6 4. Ng5 d5 5. exd5 Na5 6. Bb5+"
+      }
+    },
+    {
+      "id": "scotch_game",
+      "name": "Scotch Game",
+      "eco": "C45",
+      "legalSan": true,
+      "appliedSan": [
+        "e4",
+        "e5",
+        "Nf3",
+        "Nc6",
+        "d4",
+        "exd4",
+        "Nxd4",
+        "Nf6",
+        "Nc3",
+        "Bb4"
+      ],
+      "finalFen": "r1bqk2r/pppp1ppp/2n2n2/8/1b1NP3/2N5/PPP2PPP/R1BQKB1R w KQkq - 3 6",
+      "sourceMoveCount": 10,
+      "lichessMatch": {
+        "kind": "lichess-prefix",
+        "commonPrefixPly": 8,
+        "eco": "C45",
+        "name": "Scotch Game: Schmidt Variation",
+        "pgn": "1. e4 e5 2. Nf3 Nc6 3. d4 exd4 4. Nxd4 Nf6"
+      }
+    },
+    {
+      "id": "four_knights",
+      "name": "Four Knights Game",
+      "eco": "C47-C49",
+      "legalSan": true,
+      "appliedSan": [
+        "e4",
+        "e5",
+        "Nf3",
+        "Nc6",
+        "Nc3",
+        "Nf6",
+        "Bb5",
+        "Bb4"
+      ],
+      "finalFen": "r1bqk2r/pppp1ppp/2n2n2/1B2p3/1b2P3/2N2N2/PPPP1PPP/R1BQK2R w KQkq - 6 5",
+      "sourceMoveCount": 8,
+      "lichessMatch": {
+        "kind": "pgn-exact",
+        "commonPrefixPly": 8,
+        "eco": "C49",
+        "name": "Four Knights Game: Spanish Variation, Double Spanish",
+        "pgn": "1. e4 e5 2. Nf3 Nc6 3. Nc3 Nf6 4. Bb5 Bb4"
+      }
+    },
+    {
+      "id": "vienna_gambit",
+      "name": "Vienna Game — Vienna Gambit",
+      "eco": "C25-C29",
+      "legalSan": true,
+      "appliedSan": [
+        "e4",
+        "e5",
+        "Nc3",
+        "Nf6",
+        "f4",
+        "d5",
+        "fxe5",
+        "Nxe4"
+      ],
+      "finalFen": "rnbqkb1r/ppp2ppp/8/3pP3/4n3/2N5/PPPP2PP/R1BQKBNR w KQkq - 0 5",
+      "sourceMoveCount": 8,
+      "lichessMatch": {
+        "kind": "lichess-prefix",
+        "commonPrefixPly": 6,
+        "eco": "C29",
+        "name": "Vienna Game: Vienna Gambit, Main Line",
+        "pgn": "1. e4 e5 2. Nc3 Nf6 3. f4 d5"
+      }
+    },
+    {
+      "id": "kings_gambit_accepted",
+      "name": "King’s Gambit Accepted",
+      "eco": "C33-C39",
+      "legalSan": true,
+      "appliedSan": [
+        "e4",
+        "e5",
+        "f4",
+        "exf4",
+        "Nf3",
+        "g5",
+        "h4",
+        "g4",
+        "Ne5"
+      ],
+      "finalFen": "rnbqkbnr/pppp1p1p/8/4N3/4PppP/8/PPPP2P1/RNBQKB1R b KQkq - 1 5",
+      "sourceMoveCount": 9,
+      "lichessMatch": {
+        "kind": "pgn-exact",
+        "commonPrefixPly": 9,
+        "eco": "C39",
+        "name": "King's Gambit Accepted: Kieseritzky Gambit",
+        "pgn": "1. e4 e5 2. f4 exf4 3. Nf3 g5 4. h4 g4 5. Ne5"
+      }
+    },
+    {
+      "id": "petroff_main",
+      "name": "Petroff Defense — Main Line",
+      "eco": "C42-C43",
+      "legalSan": true,
+      "appliedSan": [
+        "e4",
+        "e5",
+        "Nf3",
+        "Nf6",
+        "Nxe5",
+        "d6",
+        "Nf3",
+        "Nxe4",
+        "d4",
+        "d5"
+      ],
+      "finalFen": "rnbqkb1r/ppp2ppp/8/3p4/3Pn3/5N2/PPP2PPP/RNBQKB1R w KQkq - 0 6",
+      "sourceMoveCount": 10,
+      "lichessMatch": {
+        "kind": "lichess-prefix",
+        "commonPrefixPly": 9,
+        "eco": "C42",
+        "name": "Petrov's Defense: Classical Attack",
+        "pgn": "1. e4 e5 2. Nf3 Nf6 3. Nxe5 d6 4. Nf3 Nxe4 5. d4"
+      }
+    },
+    {
+      "id": "philidor_defense",
+      "name": "Philidor Defense",
+      "eco": "C41",
+      "legalSan": true,
+      "appliedSan": [
+        "e4",
+        "e5",
+        "Nf3",
+        "d6",
+        "d4",
+        "Nf6",
+        "Nc3",
+        "exd4",
+        "Nxd4"
+      ],
+      "finalFen": "rnbqkb1r/ppp2ppp/3p1n2/8/3NP3/2N5/PPP2PPP/R1BQKB1R b KQkq - 0 5",
+      "sourceMoveCount": 9,
+      "lichessMatch": {
+        "kind": "lichess-prefix",
+        "commonPrefixPly": 6,
+        "eco": "C41",
+        "name": "Philidor Defense: Nimzowitsch Variation",
+        "pgn": "1. e4 e5 2. Nf3 d6 3. d4 Nf6"
+      }
+    },
+    {
+      "id": "ponziani",
+      "name": "Ponziani Opening",
+      "eco": "C44",
+      "legalSan": true,
+      "appliedSan": [
+        "e4",
+        "e5",
+        "Nf3",
+        "Nc6",
+        "c3",
+        "Nf6",
+        "d4"
+      ],
+      "finalFen": "r1bqkb1r/pppp1ppp/2n2n2/4p3/3PP3/2P2N2/PP3PPP/RNBQKB1R b KQkq - 0 4",
+      "sourceMoveCount": 7,
+      "lichessMatch": {
+        "kind": "lichess-prefix",
+        "commonPrefixPly": 6,
+        "eco": "C44",
+        "name": "Ponziani Opening: Jaenisch Counterattack",
+        "pgn": "1. e4 e5 2. Nf3 Nc6 3. c3 Nf6"
+      }
+    },
+    {
+      "id": "bishops_opening",
+      "name": "Bishop’s Opening",
+      "eco": "C23-C24",
+      "legalSan": true,
+      "appliedSan": [
+        "e4",
+        "e5",
+        "Bc4",
+        "Nf6",
+        "d3",
+        "Nc6",
+        "Nf3"
+      ],
+      "finalFen": "r1bqkb1r/pppp1ppp/2n2n2/4p3/2B1P3/3P1N2/PPP2PPP/RNBQK2R b KQkq - 2 4",
+      "sourceMoveCount": 7,
+      "lichessMatch": {
+        "kind": "lichess-prefix",
+        "commonPrefixPly": 4,
+        "eco": "C24",
+        "name": "Bishop's Opening: Berlin Defense",
+        "pgn": "1. e4 e5 2. Bc4 Nf6"
+      }
+    },
+    {
+      "id": "french_winawer",
+      "name": "Winawer Variation",
+      "eco": "C15-C19",
+      "legalSan": true,
+      "appliedSan": [
+        "e4",
+        "e6",
+        "d4",
+        "d5",
+        "Nc3",
+        "Bb4",
+        "e5",
+        "c5",
+        "a3",
+        "Bxc3+",
+        "bxc3"
+      ],
+      "finalFen": "rnbqk1nr/pp3ppp/4p3/2ppP3/3P4/P1P5/2P2PPP/R1BQKBNR b KQkq - 0 6",
+      "sourceMoveCount": 11,
+      "lichessMatch": {
+        "kind": "pgn-exact",
+        "commonPrefixPly": 11,
+        "eco": "C18",
+        "name": "French Defense: Winawer Variation, Advance Variation",
+        "pgn": "1. e4 e6 2. d4 d5 3. Nc3 Bb4 4. e5 c5 5. a3 Bxc3+ 6. bxc3"
+      }
+    },
+    {
+      "id": "french_classical_steinitz",
+      "name": "Classical / Steinitz Variation",
+      "eco": "C11-C14",
+      "legalSan": true,
+      "appliedSan": [
+        "e4",
+        "e6",
+        "d4",
+        "d5",
+        "Nc3",
+        "Nf6",
+        "e5",
+        "Nfd7",
+        "f4",
+        "c5",
+        "Nf3"
+      ],
+      "finalFen": "rnbqkb1r/pp1n1ppp/4p3/2ppP3/3P1P2/2N2N2/PPP3PP/R1BQKB1R b KQkq - 1 6",
+      "sourceMoveCount": 11,
+      "lichessMatch": {
+        "kind": "pgn-exact",
+        "commonPrefixPly": 11,
+        "eco": "C11",
+        "name": "French Defense: Steinitz Variation",
+        "pgn": "1. e4 e6 2. d4 d5 3. Nc3 Nf6 4. e5 Nfd7 5. f4 c5 6. Nf3"
+      }
+    },
+    {
+      "id": "french_tarrasch",
+      "name": "Tarrasch Variation",
+      "eco": "C03-C09",
+      "legalSan": true,
+      "appliedSan": [
+        "e4",
+        "e6",
+        "d4",
+        "d5",
+        "Nd2",
+        "c5",
+        "exd5",
+        "exd5",
+        "Ngf3"
+      ],
+      "finalFen": "rnbqkbnr/pp3ppp/8/2pp4/3P4/5N2/PPPN1PPP/R1BQKB1R b KQkq - 1 5",
+      "sourceMoveCount": 9,
+      "lichessMatch": {
+        "kind": "lichess-prefix",
+        "commonPrefixPly": 8,
+        "eco": "C08",
+        "name": "French Defense: Tarrasch Variation, Open System",
+        "pgn": "1. e4 e6 2. d4 d5 3. Nd2 c5 4. exd5 exd5"
+      }
+    },
+    {
+      "id": "french_advance",
+      "name": "Advance Variation",
+      "eco": "C02",
+      "legalSan": true,
+      "appliedSan": [
+        "e4",
+        "e6",
+        "d4",
+        "d5",
+        "e5",
+        "c5",
+        "c3",
+        "Nc6",
+        "Nf3",
+        "Qb6"
+      ],
+      "finalFen": "r1b1kbnr/pp3ppp/1qn1p3/2ppP3/3P4/2P2N2/PP3PPP/RNBQKB1R w KQkq - 3 6",
+      "sourceMoveCount": 10,
+      "lichessMatch": {
+        "kind": "lichess-prefix",
+        "commonPrefixPly": 9,
+        "eco": "C02",
+        "name": "French Defense: Advance Variation, Paulsen Attack",
+        "pgn": "1. e4 e6 2. d4 d5 3. e5 c5 4. c3 Nc6 5. Nf3"
+      }
+    },
+    {
+      "id": "french_exchange",
+      "name": "Exchange Variation",
+      "eco": "C01",
+      "legalSan": true,
+      "appliedSan": [
+        "e4",
+        "e6",
+        "d4",
+        "d5",
+        "exd5",
+        "exd5",
+        "Nf3",
+        "Nf6",
+        "Bd3"
+      ],
+      "finalFen": "rnbqkb1r/ppp2ppp/5n2/3p4/3P4/3B1N2/PPP2PPP/RNBQK2R b KQkq - 3 5",
+      "sourceMoveCount": 9,
+      "lichessMatch": {
+        "kind": "lichess-prefix",
+        "commonPrefixPly": 7,
+        "eco": "C01",
+        "name": "French Defense: Exchange Variation",
+        "pgn": "1. e4 e6 2. d4 d5 3. exd5 exd5 4. Nf3"
+      }
+    },
+    {
+      "id": "french_rubinstein",
+      "name": "Rubinstein Variation",
+      "eco": "C10",
+      "legalSan": true,
+      "appliedSan": [
+        "e4",
+        "e6",
+        "d4",
+        "d5",
+        "Nc3",
+        "dxe4",
+        "Nxe4",
+        "Nd7"
+      ],
+      "finalFen": "r1bqkbnr/pppn1ppp/4p3/8/3PN3/8/PPP2PPP/R1BQKBNR w KQkq - 1 5",
+      "sourceMoveCount": 8,
+      "lichessMatch": {
+        "kind": "pgn-exact",
+        "commonPrefixPly": 8,
+        "eco": "C10",
+        "name": "French Defense: Rubinstein Variation, Blackburne Defense",
+        "pgn": "1. e4 e6 2. d4 d5 3. Nc3 dxe4 4. Nxe4 Nd7"
+      }
+    },
+    {
+      "id": "caro_advance_short",
+      "name": "Advance Variation — Short System",
+      "eco": "B12",
+      "legalSan": true,
+      "appliedSan": [
+        "e4",
+        "c6",
+        "d4",
+        "d5",
+        "e5",
+        "Bf5",
+        "Nf3",
+        "e6",
+        "Be2",
+        "c5",
+        "O-O"
+      ],
+      "finalFen": "rn1qkbnr/pp3ppp/4p3/2ppPb2/3P4/5N2/PPP1BPPP/RNBQ1RK1 b kq - 1 6",
+      "sourceMoveCount": 11,
+      "lichessMatch": {
+        "kind": "lichess-prefix",
+        "commonPrefixPly": 7,
+        "eco": "B12",
+        "name": "Caro-Kann Defense: Advance Variation, Short Variation",
+        "pgn": "1. e4 c6 2. d4 d5 3. e5 Bf5 4. Nf3"
+      }
+    },
+    {
+      "id": "caro_classical_bf5",
+      "name": "Classical Variation — 4...Bf5",
+      "eco": "B18-B19",
+      "legalSan": true,
+      "appliedSan": [
+        "e4",
+        "c6",
+        "d4",
+        "d5",
+        "Nc3",
+        "dxe4",
+        "Nxe4",
+        "Bf5",
+        "Ng3",
+        "Bg6",
+        "h4",
+        "h6"
+      ],
+      "finalFen": "rn1qkbnr/pp2ppp1/2p3bp/8/3P3P/6N1/PPP2PP1/R1BQKBNR w KQkq - 0 7",
+      "sourceMoveCount": 12,
+      "lichessMatch": {
+        "kind": "lichess-prefix",
+        "commonPrefixPly": 6,
+        "eco": "B15",
+        "name": "Caro-Kann Defense",
+        "pgn": "1. e4 c6 2. d4 d5 3. Nc3 dxe4"
+      }
+    },
+    {
+      "id": "caro_kann_karpov",
+      "name": "Karpov Variation — 4...Nd7",
+      "eco": "B17",
+      "legalSan": true,
+      "appliedSan": [
+        "e4",
+        "c6",
+        "d4",
+        "d5",
+        "Nc3",
+        "dxe4",
+        "Nxe4",
+        "Nd7",
+        "Nf3",
+        "Ngf6"
+      ],
+      "finalFen": "r1bqkb1r/pp1npppp/2p2n2/8/3PN3/5N2/PPP2PPP/R1BQKB1R w KQkq - 3 6",
+      "sourceMoveCount": 10,
+      "lichessMatch": {
+        "kind": "lichess-prefix",
+        "commonPrefixPly": 6,
+        "eco": "B15",
+        "name": "Caro-Kann Defense",
+        "pgn": "1. e4 c6 2. d4 d5 3. Nc3 dxe4"
+      }
+    },
+    {
+      "id": "caro_panov",
+      "name": "Panov-Botvinnik Attack",
+      "eco": "B13-B14",
+      "legalSan": true,
+      "appliedSan": [
+        "e4",
+        "c6",
+        "d4",
+        "d5",
+        "exd5",
+        "cxd5",
+        "c4",
+        "Nf6",
+        "Nc3",
+        "e6"
+      ],
+      "finalFen": "rnbqkb1r/pp3ppp/4pn2/3p4/2PP4/2N5/PP3PPP/R1BQKBNR w KQkq - 0 6",
+      "sourceMoveCount": 10,
+      "lichessMatch": {
+        "kind": "pgn-exact",
+        "commonPrefixPly": 10,
+        "eco": "B14",
+        "name": "Caro-Kann Defense: Panov Attack",
+        "pgn": "1. e4 c6 2. d4 d5 3. exd5 cxd5 4. c4 Nf6 5. Nc3 e6"
+      }
+    },
+    {
+      "id": "caro_exchange",
+      "name": "Exchange Variation",
+      "eco": "B13",
+      "legalSan": true,
+      "appliedSan": [
+        "e4",
+        "c6",
+        "d4",
+        "d5",
+        "exd5",
+        "cxd5",
+        "Bd3",
+        "Nc6",
+        "c3"
+      ],
+      "finalFen": "r1bqkbnr/pp2pppp/2n5/3p4/3P4/2PB4/PP3PPP/RNBQK1NR b KQkq - 0 5",
+      "sourceMoveCount": 9,
+      "lichessMatch": {
+        "kind": "lichess-prefix",
+        "commonPrefixPly": 6,
+        "eco": "B13",
+        "name": "Caro-Kann Defense: Exchange Variation",
+        "pgn": "1. e4 c6 2. d4 d5 3. exd5 cxd5"
+      }
+    },
+    {
+      "id": "caro_two_knights",
+      "name": "Two Knights Variation",
+      "eco": "B11",
+      "legalSan": true,
+      "appliedSan": [
+        "e4",
+        "c6",
+        "Nc3",
+        "d5",
+        "Nf3",
+        "dxe4",
+        "Nxe4",
+        "Nf6"
+      ],
+      "finalFen": "rnbqkb1r/pp2pppp/2p2n2/8/4N3/5N2/PPPP1PPP/R1BQKB1R w KQkq - 1 5",
+      "sourceMoveCount": 8,
+      "lichessMatch": {
+        "kind": "lichess-prefix",
+        "commonPrefixPly": 5,
+        "eco": "B10",
+        "name": "Caro-Kann Defense: Two Knights Attack",
+        "pgn": "1. e4 c6 2. Nc3 d5 3. Nf3"
+      }
+    },
+    {
+      "id": "scandinavian_qa5",
+      "name": "Scandinavian — 3...Qa5",
+      "eco": "B01",
+      "legalSan": true,
+      "appliedSan": [
+        "e4",
+        "d5",
+        "exd5",
+        "Qxd5",
+        "Nc3",
+        "Qa5",
+        "d4",
+        "Nf6",
+        "Nf3"
+      ],
+      "finalFen": "rnb1kb1r/ppp1pppp/5n2/q7/3P4/2N2N2/PPP2PPP/R1BQKB1R b KQkq - 2 5",
+      "sourceMoveCount": 9,
+      "lichessMatch": {
+        "kind": "lichess-prefix",
+        "commonPrefixPly": 8,
+        "eco": "B01",
+        "name": "Scandinavian Defense: Main Line, Mieses Variation",
+        "pgn": "1. e4 d5 2. exd5 Qxd5 3. Nc3 Qa5 4. d4 Nf6"
+      }
+    },
+    {
+      "id": "scandinavian_modern_nf6",
+      "name": "Modern Scandinavian — 2...Nf6",
+      "eco": "B01",
+      "legalSan": true,
+      "appliedSan": [
+        "e4",
+        "d5",
+        "exd5",
+        "Nf6",
+        "d4",
+        "Nxd5",
+        "c4",
+        "Nb6"
+      ],
+      "finalFen": "rnbqkb1r/ppp1pppp/1n6/8/2PP4/8/PP3PPP/RNBQKBNR w KQkq - 1 5",
+      "sourceMoveCount": 8,
+      "lichessMatch": {
+        "kind": "lichess-prefix",
+        "commonPrefixPly": 6,
+        "eco": "B01",
+        "name": "Scandinavian Defense: Marshall Variation",
+        "pgn": "1. e4 d5 2. exd5 Nf6 3. d4 Nxd5"
+      }
+    },
+    {
+      "id": "pirc_austrian",
+      "name": "Austrian Attack",
+      "eco": "B09",
+      "legalSan": true,
+      "appliedSan": [
+        "e4",
+        "d6",
+        "d4",
+        "Nf6",
+        "Nc3",
+        "g6",
+        "f4",
+        "Bg7",
+        "Nf3",
+        "O-O"
+      ],
+      "finalFen": "rnbq1rk1/ppp1ppbp/3p1np1/8/3PPP2/2N2N2/PPP3PP/R1BQKB1R w KQ - 3 6",
+      "sourceMoveCount": 10,
+      "lichessMatch": {
+        "kind": "pgn-exact",
+        "commonPrefixPly": 10,
+        "eco": "B09",
+        "name": "Pirc Defense: Austrian Attack",
+        "pgn": "1. e4 d6 2. d4 Nf6 3. Nc3 g6 4. f4 Bg7 5. Nf3 O-O"
+      }
+    },
+    {
+      "id": "pirc_150_attack",
+      "name": "150 Attack",
+      "eco": "B07-B09",
+      "legalSan": true,
+      "appliedSan": [
+        "e4",
+        "d6",
+        "d4",
+        "Nf6",
+        "Nc3",
+        "g6",
+        "Be3",
+        "Bg7",
+        "Qd2",
+        "O-O",
+        "O-O-O"
+      ],
+      "finalFen": "rnbq1rk1/ppp1ppbp/3p1np1/8/3PP3/2N1B3/PPPQ1PPP/2KR1BNR b - - 5 6",
+      "sourceMoveCount": 11,
+      "lichessMatch": {
+        "kind": "lichess-prefix",
+        "commonPrefixPly": 6,
+        "eco": "B07",
+        "name": "Pirc Defense",
+        "pgn": "1. e4 d6 2. d4 Nf6 3. Nc3 g6"
+      }
+    },
+    {
+      "id": "modern_defense",
+      "name": "Modern Defense",
+      "eco": "B06",
+      "legalSan": true,
+      "appliedSan": [
+        "e4",
+        "g6",
+        "d4",
+        "Bg7",
+        "Nc3",
+        "d6",
+        "Be3",
+        "a6"
+      ],
+      "finalFen": "rnbqk1nr/1pp1ppbp/p2p2p1/8/3PP3/2N1B3/PPP2PPP/R2QKBNR w KQkq - 0 5",
+      "sourceMoveCount": 8,
+      "lichessMatch": {
+        "kind": "lichess-prefix",
+        "commonPrefixPly": 6,
+        "eco": "B06",
+        "name": "Modern Defense: Standard Defense",
+        "pgn": "1. e4 g6 2. d4 Bg7 3. Nc3 d6"
+      }
+    },
+    {
+      "id": "alekhine_modern",
+      "name": "Alekhine — Modern Variation",
+      "eco": "B04-B05",
+      "legalSan": true,
+      "appliedSan": [
+        "e4",
+        "Nf6",
+        "e5",
+        "Nd5",
+        "d4",
+        "d6",
+        "Nf3",
+        "Bg4",
+        "Be2",
+        "e6"
+      ],
+      "finalFen": "rn1qkb1r/ppp2ppp/3pp3/3nP3/3P2b1/5N2/PPP1BPPP/RNBQK2R w KQkq - 0 6",
+      "sourceMoveCount": 10,
+      "lichessMatch": {
+        "kind": "lichess-prefix",
+        "commonPrefixPly": 8,
+        "eco": "B05",
+        "name": "Alekhine Defense: Modern Variation, Main Line",
+        "pgn": "1. e4 Nf6 2. e5 Nd5 3. d4 d6 4. Nf3 Bg4"
+      }
+    },
+    {
+      "id": "owen_defense",
+      "name": "Owen Defense",
+      "eco": "B00",
+      "legalSan": true,
+      "appliedSan": [
+        "e4",
+        "b6",
+        "d4",
+        "Bb7",
+        "Bd3",
+        "e6",
+        "Nf3"
+      ],
+      "finalFen": "rn1qkbnr/pbpp1ppp/1p2p3/8/3PP3/3B1N2/PPP2PPP/RNBQK2R b KQkq - 1 4",
+      "sourceMoveCount": 7,
+      "lichessMatch": {
+        "kind": "lichess-prefix",
+        "commonPrefixPly": 2,
+        "eco": "B00",
+        "name": "Owen Defense",
+        "pgn": "1. e4 b6"
+      }
+    },
+    {
+      "id": "nimzowitsch_defense",
+      "name": "Nimzowitsch Defense",
+      "eco": "B00",
+      "legalSan": true,
+      "appliedSan": [
+        "e4",
+        "Nc6",
+        "d4",
+        "d5",
+        "e5",
+        "Bf5"
+      ],
+      "finalFen": "r2qkbnr/ppp1pppp/2n5/3pPb2/3P4/8/PPP2PPP/RNBQKBNR w KQkq - 1 4",
+      "sourceMoveCount": 6,
+      "lichessMatch": {
+        "kind": "lichess-prefix",
+        "commonPrefixPly": 5,
+        "eco": "B00",
+        "name": "Nimzowitsch Defense: Scandinavian Variation, Advance Variation",
+        "pgn": "1. e4 Nc6 2. d4 d5 3. e5"
+      }
+    },
+    {
+      "id": "qgd_orthodox",
+      "name": "QGD — Orthodox Main Line",
+      "eco": "D35-D69",
+      "legalSan": true,
+      "appliedSan": [
+        "d4",
+        "d5",
+        "c4",
+        "e6",
+        "Nc3",
+        "Nf6",
+        "Bg5",
+        "Be7",
+        "e3",
+        "O-O",
+        "Nf3",
+        "h6",
+        "Bh4"
+      ],
+      "finalFen": "rnbq1rk1/ppp1bpp1/4pn1p/3p4/2PP3B/2N1PN2/PP3PPP/R2QKB1R b KQ - 1 7",
+      "sourceMoveCount": 13,
+      "lichessMatch": {
+        "kind": "lichess-prefix",
+        "commonPrefixPly": 8,
+        "eco": "D53",
+        "name": "Queen's Gambit Declined",
+        "pgn": "1. d4 d5 2. c4 e6 3. Nc3 Nf6 4. Bg5 Be7"
+      }
+    },
+    {
+      "id": "qgd_exchange",
+      "name": "QGD — Exchange Variation / Carlsbad",
+      "eco": "D35",
+      "legalSan": true,
+      "appliedSan": [
+        "d4",
+        "d5",
+        "c4",
+        "e6",
+        "Nc3",
+        "Nf6",
+        "cxd5",
+        "exd5",
+        "Bg5",
+        "Be7",
+        "e3",
+        "O-O"
+      ],
+      "finalFen": "rnbq1rk1/ppp1bppp/5n2/3p2B1/3P4/2N1P3/PP3PPP/R2QKBNR w KQ - 1 7",
+      "sourceMoveCount": 12,
+      "lichessMatch": {
+        "kind": "lichess-prefix",
+        "commonPrefixPly": 6,
+        "eco": "D35",
+        "name": "Queen's Gambit Declined: Normal Defense",
+        "pgn": "1. d4 d5 2. c4 e6 3. Nc3 Nf6"
+      }
+    },
+    {
+      "id": "qgd_tartakower",
+      "name": "QGD — Tartakower / Makogonov-Bondarevsky",
+      "eco": "D58-D59",
+      "legalSan": true,
+      "appliedSan": [
+        "d4",
+        "d5",
+        "c4",
+        "e6",
+        "Nc3",
+        "Nf6",
+        "Bg5",
+        "Be7",
+        "e3",
+        "O-O",
+        "Nf3",
+        "h6",
+        "Bh4",
+        "b6"
+      ],
+      "finalFen": "rnbq1rk1/p1p1bpp1/1p2pn1p/3p4/2PP3B/2N1PN2/PP3PPP/R2QKB1R w KQ - 0 8",
+      "sourceMoveCount": 14,
+      "lichessMatch": {
+        "kind": "lichess-prefix",
+        "commonPrefixPly": 8,
+        "eco": "D53",
+        "name": "Queen's Gambit Declined",
+        "pgn": "1. d4 d5 2. c4 e6 3. Nc3 Nf6 4. Bg5 Be7"
+      }
+    },
+    {
+      "id": "qgd_tarrasch",
+      "name": "Tarrasch Defense",
+      "eco": "D32-D34",
+      "legalSan": true,
+      "appliedSan": [
+        "d4",
+        "d5",
+        "c4",
+        "e6",
+        "Nc3",
+        "c5",
+        "cxd5",
+        "exd5",
+        "Nf3",
+        "Nc6"
+      ],
+      "finalFen": "r1bqkbnr/pp3ppp/2n5/2pp4/3P4/2N2N2/PP2PPPP/R1BQKB1R w KQkq - 2 6",
+      "sourceMoveCount": 10,
+      "lichessMatch": {
+        "kind": "lichess-prefix",
+        "commonPrefixPly": 9,
+        "eco": "D32",
+        "name": "Tarrasch Defense: Two Knights Variation",
+        "pgn": "1. d4 d5 2. c4 e6 3. Nc3 c5 4. cxd5 exd5 5. Nf3"
+      }
+    },
+    {
+      "id": "qgd_semi_tarrasch",
+      "name": "Semi-Tarrasch Defense",
+      "eco": "D40-D42",
+      "legalSan": true,
+      "appliedSan": [
+        "d4",
+        "d5",
+        "c4",
+        "e6",
+        "Nc3",
+        "Nf6",
+        "Nf3",
+        "c5",
+        "cxd5",
+        "Nxd5"
+      ],
+      "finalFen": "rnbqkb1r/pp3ppp/4p3/2pn4/3P4/2N2N2/PP2PPPP/R1BQKB1R w KQkq - 0 6",
+      "sourceMoveCount": 10,
+      "lichessMatch": {
+        "kind": "lichess-prefix",
+        "commonPrefixPly": 6,
+        "eco": "D35",
+        "name": "Queen's Gambit Declined: Normal Defense",
+        "pgn": "1. d4 d5 2. c4 e6 3. Nc3 Nf6"
+      }
+    },
+    {
+      "id": "slav_main",
+      "name": "Slav Defense — Main Line",
+      "eco": "D10-D19",
+      "legalSan": true,
+      "appliedSan": [
+        "d4",
+        "d5",
+        "c4",
+        "c6",
+        "Nf3",
+        "Nf6",
+        "Nc3",
+        "dxc4",
+        "a4",
+        "Bf5",
+        "e3"
+      ],
+      "finalFen": "rn1qkb1r/pp2pppp/2p2n2/5b2/P1pP4/2N1PN2/1P3PPP/R1BQKB1R b KQkq - 0 6",
+      "sourceMoveCount": 11,
+      "lichessMatch": {
+        "kind": "pgn-exact",
+        "commonPrefixPly": 11,
+        "eco": "D18",
+        "name": "Slav Defense: Czech Variation, Classical System",
+        "pgn": "1. d4 d5 2. c4 c6 3. Nf3 Nf6 4. Nc3 dxc4 5. a4 Bf5 6. e3"
+      }
+    },
+    {
+      "id": "slav_exchange",
+      "name": "Slav Defense — Exchange Variation",
+      "eco": "D10-D14",
+      "legalSan": true,
+      "appliedSan": [
+        "d4",
+        "d5",
+        "c4",
+        "c6",
+        "cxd5",
+        "cxd5",
+        "Nc3",
+        "Nf6",
+        "Bf4"
+      ],
+      "finalFen": "rnbqkb1r/pp2pppp/5n2/3p4/3P1B2/2N5/PP2PPPP/R2QKBNR b KQkq - 3 5",
+      "sourceMoveCount": 9,
+      "lichessMatch": {
+        "kind": "lichess-prefix",
+        "commonPrefixPly": 5,
+        "eco": "D10",
+        "name": "Slav Defense: Exchange Variation",
+        "pgn": "1. d4 d5 2. c4 c6 3. cxd5"
+      }
+    },
+    {
+      "id": "semi_slav_meran",
+      "name": "Semi-Slav — Meran Variation",
+      "eco": "D45-D49",
+      "legalSan": true,
+      "appliedSan": [
+        "d4",
+        "d5",
+        "c4",
+        "c6",
+        "Nf3",
+        "Nf6",
+        "Nc3",
+        "e6",
+        "e3",
+        "Nbd7",
+        "Bd3",
+        "dxc4",
+        "Bxc4",
+        "b5"
+      ],
+      "finalFen": "r1bqkb1r/p2n1ppp/2p1pn2/1p6/2BP4/2N1PN2/PP3PPP/R1BQK2R w KQkq - 0 8",
+      "sourceMoveCount": 14,
+      "lichessMatch": {
+        "kind": "lichess-prefix",
+        "commonPrefixPly": 8,
+        "eco": "D43",
+        "name": "Semi-Slav Defense",
+        "pgn": "1. d4 d5 2. c4 c6 3. Nf3 Nf6 4. Nc3 e6"
+      }
+    },
+    {
+      "id": "semi_slav_moscow_botvinnik",
+      "name": "Semi-Slav — Moscow / Botvinnik Complex",
+      "eco": "D43-D44",
+      "legalSan": true,
+      "appliedSan": [
+        "d4",
+        "d5",
+        "c4",
+        "c6",
+        "Nf3",
+        "Nf6",
+        "Nc3",
+        "e6",
+        "Bg5",
+        "h6",
+        "Bh4",
+        "dxc4"
+      ],
+      "finalFen": "rnbqkb1r/pp3pp1/2p1pn1p/8/2pP3B/2N2N2/PP2PPPP/R2QKB1R w KQkq - 0 7",
+      "sourceMoveCount": 12,
+      "lichessMatch": {
+        "kind": "lichess-prefix",
+        "commonPrefixPly": 11,
+        "eco": "D43",
+        "name": "Semi-Slav Defense: Anti-Moscow Gambit",
+        "pgn": "1. d4 d5 2. c4 c6 3. Nf3 Nf6 4. Nc3 e6 5. Bg5 h6 6. Bh4"
+      }
+    },
+    {
+      "id": "qga_main",
+      "name": "Queen’s Gambit Accepted — Main Line",
+      "eco": "D20-D29",
+      "legalSan": true,
+      "appliedSan": [
+        "d4",
+        "d5",
+        "c4",
+        "dxc4",
+        "Nf3",
+        "Nf6",
+        "e3",
+        "e6",
+        "Bxc4",
+        "c5"
+      ],
+      "finalFen": "rnbqkb1r/pp3ppp/4pn2/2p5/2BP4/4PN2/PP3PPP/RNBQK2R w KQkq - 0 6",
+      "sourceMoveCount": 10,
+      "lichessMatch": {
+        "kind": "pgn-exact",
+        "commonPrefixPly": 10,
+        "eco": "D26",
+        "name": "Queen's Gambit Accepted: Classical Defense",
+        "pgn": "1. d4 d5 2. c4 dxc4 3. Nf3 Nf6 4. e3 e6 5. Bxc4 c5"
+      }
+    },
+    {
+      "id": "albin_countergambit",
+      "name": "Albin Countergambit",
+      "eco": "D08-D09",
+      "legalSan": true,
+      "appliedSan": [
+        "d4",
+        "d5",
+        "c4",
+        "e5",
+        "dxe5",
+        "d4",
+        "Nf3",
+        "Nc6"
+      ],
+      "finalFen": "r1bqkbnr/ppp2ppp/2n5/4P3/2Pp4/5N2/PP2PPPP/RNBQKB1R w KQkq - 2 5",
+      "sourceMoveCount": 8,
+      "lichessMatch": {
+        "kind": "lichess-prefix",
+        "commonPrefixPly": 7,
+        "eco": "D08",
+        "name": "Queen's Gambit Declined: Albin Countergambit, Normal Line",
+        "pgn": "1. d4 d5 2. c4 e5 3. dxe5 d4 4. Nf3"
+      }
+    },
+    {
+      "id": "chigorin_defense",
+      "name": "Chigorin Defense",
+      "eco": "D07",
+      "legalSan": true,
+      "appliedSan": [
+        "d4",
+        "d5",
+        "c4",
+        "Nc6",
+        "Nf3",
+        "Bg4",
+        "Nc3",
+        "e6"
+      ],
+      "finalFen": "r2qkbnr/ppp2ppp/2n1p3/3p4/2PP2b1/2N2N2/PP2PPPP/R1BQKB1R w KQkq - 0 5",
+      "sourceMoveCount": 8,
+      "lichessMatch": {
+        "kind": "lichess-prefix",
+        "commonPrefixPly": 6,
+        "eco": "D07",
+        "name": "Queen's Gambit Declined: Chigorin Defense, Main Line",
+        "pgn": "1. d4 d5 2. c4 Nc6 3. Nf3 Bg4"
+      }
+    },
+    {
+      "id": "london_system",
+      "name": "London System",
+      "eco": "D02",
+      "legalSan": true,
+      "appliedSan": [
+        "d4",
+        "Nf6",
+        "Bf4",
+        "d5",
+        "e3",
+        "c5",
+        "c3",
+        "Nc6",
+        "Nf3"
+      ],
+      "finalFen": "r1bqkb1r/pp2pppp/2n2n2/2pp4/3P1B2/2P1PN2/PP3PPP/RN1QKB1R b KQkq - 2 5",
+      "sourceMoveCount": 9,
+      "lichessMatch": {
+        "kind": "lichess-prefix",
+        "commonPrefixPly": 3,
+        "eco": "A45",
+        "name": "Indian Defense: Accelerated London System",
+        "pgn": "1. d4 Nf6 2. Bf4"
+      }
+    },
+    {
+      "id": "jobava_london",
+      "name": "Jobava London",
+      "eco": "D00",
+      "legalSan": true,
+      "appliedSan": [
+        "d4",
+        "d5",
+        "Nc3",
+        "Nf6",
+        "Bf4",
+        "e6",
+        "e3",
+        "Bb4"
+      ],
+      "finalFen": "rnbqk2r/ppp2ppp/4pn2/3p4/1b1P1B2/2N1P3/PPP2PPP/R2QKBNR w KQkq - 1 5",
+      "sourceMoveCount": 8,
+      "lichessMatch": {
+        "kind": "lichess-prefix",
+        "commonPrefixPly": 6,
+        "eco": "D01",
+        "name": "Rapport-Jobava System",
+        "pgn": "1. d4 d5 2. Nc3 Nf6 3. Bf4 e6"
+      }
+    },
+    {
+      "id": "colle_zukertort",
+      "name": "Colle-Zukertort System",
+      "eco": "D04-D05",
+      "legalSan": true,
+      "appliedSan": [
+        "d4",
+        "d5",
+        "Nf3",
+        "Nf6",
+        "e3",
+        "e6",
+        "Bd3",
+        "c5",
+        "b3"
+      ],
+      "finalFen": "rnbqkb1r/pp3ppp/4pn2/2pp4/3P4/1P1BPN2/P1P2PPP/RNBQK2R b KQkq - 0 5",
+      "sourceMoveCount": 9,
+      "lichessMatch": {
+        "kind": "lichess-prefix",
+        "commonPrefixPly": 7,
+        "eco": "D05",
+        "name": "Queen's Pawn Game: Colle System",
+        "pgn": "1. d4 d5 2. Nf3 Nf6 3. e3 e6 4. Bd3"
+      }
+    },
+    {
+      "id": "torre_attack",
+      "name": "Torre Attack",
+      "eco": "D03",
+      "legalSan": true,
+      "appliedSan": [
+        "d4",
+        "Nf6",
+        "Nf3",
+        "e6",
+        "Bg5",
+        "c5",
+        "e3"
+      ],
+      "finalFen": "rnbqkb1r/pp1p1ppp/4pn2/2p3B1/3P4/4PN2/PPP2PPP/RN1QKB1R b KQkq - 0 4",
+      "sourceMoveCount": 7,
+      "lichessMatch": {
+        "kind": "lichess-prefix",
+        "commonPrefixPly": 5,
+        "eco": "A46",
+        "name": "Torre Attack: Classical Defense",
+        "pgn": "1. d4 Nf6 2. Nf3 e6 3. Bg5"
+      }
+    },
+    {
+      "id": "trompowsky",
+      "name": "Trompowsky Attack",
+      "eco": "A45",
+      "legalSan": true,
+      "appliedSan": [
+        "d4",
+        "Nf6",
+        "Bg5",
+        "Ne4",
+        "Bf4",
+        "c5",
+        "f3"
+      ],
+      "finalFen": "rnbqkb1r/pp1ppppp/8/2p5/3PnB2/5P2/PPP1P1PP/RN1QKBNR b KQkq - 0 4",
+      "sourceMoveCount": 7,
+      "lichessMatch": {
+        "kind": "lichess-prefix",
+        "commonPrefixPly": 3,
+        "eco": "A45",
+        "name": "Trompowsky Attack",
+        "pgn": "1. d4 Nf6 2. Bg5"
+      }
+    },
+    {
+      "id": "stonewall_attack",
+      "name": "Stonewall Attack",
+      "eco": "A45/D00",
+      "legalSan": true,
+      "appliedSan": [
+        "d4",
+        "d5",
+        "e3",
+        "Nf6",
+        "f4",
+        "c5",
+        "c3",
+        "Nc6",
+        "Bd3"
+      ],
+      "finalFen": "r1bqkb1r/pp2pppp/2n2n2/2pp4/3P1P2/2PBP3/PP4PP/RNBQK1NR b KQkq - 2 5",
+      "sourceMoveCount": 9,
+      "lichessMatch": {
+        "kind": "lichess-prefix",
+        "commonPrefixPly": 4,
+        "eco": "D00",
+        "name": "Queen's Pawn Game",
+        "pgn": "1. d4 d5 2. e3 Nf6"
+      }
+    },
+    {
+      "id": "nimzo_rubinstein",
+      "name": "Nimzo-Indian — Rubinstein",
+      "eco": "E40-E59",
+      "legalSan": true,
+      "appliedSan": [
+        "d4",
+        "Nf6",
+        "c4",
+        "e6",
+        "Nc3",
+        "Bb4",
+        "e3",
+        "O-O",
+        "Bd3",
+        "d5",
+        "Nf3"
+      ],
+      "finalFen": "rnbq1rk1/ppp2ppp/4pn2/3p4/1bPP4/2NBPN2/PP3PPP/R1BQK2R b KQ - 1 6",
+      "sourceMoveCount": 11,
+      "lichessMatch": {
+        "kind": "lichess-prefix",
+        "commonPrefixPly": 10,
+        "eco": "E48",
+        "name": "Nimzo-Indian Defense: Normal Variation, Classical Defense",
+        "pgn": "1. d4 Nf6 2. c4 e6 3. Nc3 Bb4 4. e3 O-O 5. Bd3 d5"
+      }
+    },
+    {
+      "id": "nimzo_classical_qc2",
+      "name": "Nimzo-Indian — Classical 4.Qc2",
+      "eco": "E32-E39",
+      "legalSan": true,
+      "appliedSan": [
+        "d4",
+        "Nf6",
+        "c4",
+        "e6",
+        "Nc3",
+        "Bb4",
+        "Qc2",
+        "O-O",
+        "a3",
+        "Bxc3+",
+        "Qxc3"
+      ],
+      "finalFen": "rnbq1rk1/pppp1ppp/4pn2/8/2PP4/P1Q5/1P2PPPP/R1B1KBNR b KQ - 0 6",
+      "sourceMoveCount": 11,
+      "lichessMatch": {
+        "kind": "lichess-prefix",
+        "commonPrefixPly": 7,
+        "eco": "E32",
+        "name": "Nimzo-Indian Defense: Classical Variation",
+        "pgn": "1. d4 Nf6 2. c4 e6 3. Nc3 Bb4 4. Qc2"
+      }
+    },
+    {
+      "id": "nimzo_saemisch",
+      "name": "Nimzo-Indian — Sämisch",
+      "eco": "E24-E29",
+      "legalSan": true,
+      "appliedSan": [
+        "d4",
+        "Nf6",
+        "c4",
+        "e6",
+        "Nc3",
+        "Bb4",
+        "a3",
+        "Bxc3+",
+        "bxc3"
+      ],
+      "finalFen": "rnbqk2r/pppp1ppp/4pn2/8/2PP4/P1P5/4PPPP/R1BQKBNR b KQkq - 0 5",
+      "sourceMoveCount": 9,
+      "lichessMatch": {
+        "kind": "lichess-prefix",
+        "commonPrefixPly": 7,
+        "eco": "E24",
+        "name": "Nimzo-Indian Defense: Sämisch Variation",
+        "pgn": "1. d4 Nf6 2. c4 e6 3. Nc3 Bb4 4. a3"
+      }
+    },
+    {
+      "id": "queen_indian_main",
+      "name": "Queen’s Indian Defense — Main Line",
+      "eco": "E12-E19",
+      "legalSan": true,
+      "appliedSan": [
+        "d4",
+        "Nf6",
+        "c4",
+        "e6",
+        "Nf3",
+        "b6",
+        "g3",
+        "Ba6",
+        "b3",
+        "Bb4+"
+      ],
+      "finalFen": "rn1qk2r/p1pp1ppp/bp2pn2/8/1bPP4/1P3NP1/P3PP1P/RNBQKB1R w KQkq - 1 6",
+      "sourceMoveCount": 10,
+      "lichessMatch": {
+        "kind": "pgn-exact",
+        "commonPrefixPly": 10,
+        "eco": "E15",
+        "name": "Queen's Indian Defense: Fianchetto Variation, Check Variation",
+        "pgn": "1. d4 Nf6 2. c4 e6 3. Nf3 b6 4. g3 Ba6 5. b3 Bb4+"
+      }
+    },
+    {
+      "id": "bogo_indian",
+      "name": "Bogo-Indian Defense",
+      "eco": "E11",
+      "legalSan": true,
+      "appliedSan": [
+        "d4",
+        "Nf6",
+        "c4",
+        "e6",
+        "Nf3",
+        "Bb4+",
+        "Bd2",
+        "Be7"
+      ],
+      "finalFen": "rnbqk2r/ppppbppp/4pn2/8/2PP4/5N2/PP1BPPPP/RN1QKB1R w KQkq - 4 5",
+      "sourceMoveCount": 8,
+      "lichessMatch": {
+        "kind": "pgn-exact",
+        "commonPrefixPly": 8,
+        "eco": "E11",
+        "name": "Bogo-Indian Defense: Retreat Variation",
+        "pgn": "1. d4 Nf6 2. c4 e6 3. Nf3 Bb4+ 4. Bd2 Be7"
+      }
+    },
+    {
+      "id": "kings_indian_classical",
+      "name": "King’s Indian — Classical Main Line",
+      "eco": "E90-E99",
+      "legalSan": true,
+      "appliedSan": [
+        "d4",
+        "Nf6",
+        "c4",
+        "g6",
+        "Nc3",
+        "Bg7",
+        "e4",
+        "d6",
+        "Nf3",
+        "O-O",
+        "Be2",
+        "e5",
+        "O-O",
+        "Nc6"
+      ],
+      "finalFen": "r1bq1rk1/ppp2pbp/2np1np1/4p3/2PPP3/2N2N2/PP2BPPP/R1BQ1RK1 w - - 2 8",
+      "sourceMoveCount": 14,
+      "lichessMatch": {
+        "kind": "pgn-exact",
+        "commonPrefixPly": 14,
+        "eco": "E97",
+        "name": "King's Indian Defense: Orthodox Variation, Aronin-Taimanov Defense",
+        "pgn": "1. d4 Nf6 2. c4 g6 3. Nc3 Bg7 4. e4 d6 5. Nf3 O-O 6. Be2 e5 7. O-O Nc6"
+      }
+    },
+    {
+      "id": "kings_indian_saemisch",
+      "name": "King’s Indian — Sämisch",
+      "eco": "E80-E89",
+      "legalSan": true,
+      "appliedSan": [
+        "d4",
+        "Nf6",
+        "c4",
+        "g6",
+        "Nc3",
+        "Bg7",
+        "e4",
+        "d6",
+        "f3",
+        "O-O",
+        "Be3"
+      ],
+      "finalFen": "rnbq1rk1/ppp1ppbp/3p1np1/8/2PPP3/2N1BP2/PP4PP/R2QKBNR b KQ - 2 6",
+      "sourceMoveCount": 11,
+      "lichessMatch": {
+        "kind": "lichess-prefix",
+        "commonPrefixPly": 10,
+        "eco": "E81",
+        "name": "King's Indian Defense: Sämisch Variation, Normal Defense",
+        "pgn": "1. d4 Nf6 2. c4 g6 3. Nc3 Bg7 4. e4 d6 5. f3 O-O"
+      }
+    },
+    {
+      "id": "kings_indian_averbakh",
+      "name": "King’s Indian — Averbakh",
+      "eco": "E73-E75",
+      "legalSan": true,
+      "appliedSan": [
+        "d4",
+        "Nf6",
+        "c4",
+        "g6",
+        "Nc3",
+        "Bg7",
+        "e4",
+        "d6",
+        "Be2",
+        "O-O",
+        "Bg5"
+      ],
+      "finalFen": "rnbq1rk1/ppp1ppbp/3p1np1/6B1/2PPP3/2N5/PP2BPPP/R2QK1NR b KQ - 3 6",
+      "sourceMoveCount": 11,
+      "lichessMatch": {
+        "kind": "pgn-exact",
+        "commonPrefixPly": 11,
+        "eco": "E73",
+        "name": "King's Indian Defense: Averbakh Variation",
+        "pgn": "1. d4 Nf6 2. c4 g6 3. Nc3 Bg7 4. e4 d6 5. Be2 O-O 6. Bg5"
+      }
+    },
+    {
+      "id": "kings_indian_four_pawns",
+      "name": "King’s Indian — Four Pawns Attack",
+      "eco": "E76-E79",
+      "legalSan": true,
+      "appliedSan": [
+        "d4",
+        "Nf6",
+        "c4",
+        "g6",
+        "Nc3",
+        "Bg7",
+        "e4",
+        "d6",
+        "f4",
+        "O-O",
+        "Nf3"
+      ],
+      "finalFen": "rnbq1rk1/ppp1ppbp/3p1np1/8/2PPPP2/2N2N2/PP4PP/R1BQKB1R b KQ - 2 6",
+      "sourceMoveCount": 11,
+      "lichessMatch": {
+        "kind": "lichess-prefix",
+        "commonPrefixPly": 9,
+        "eco": "E76",
+        "name": "King's Indian Defense: Four Pawns Attack",
+        "pgn": "1. d4 Nf6 2. c4 g6 3. Nc3 Bg7 4. e4 d6 5. f4"
+      }
+    },
+    {
+      "id": "grunfeld_exchange",
+      "name": "Grünfeld — Exchange Variation",
+      "eco": "D85-D89",
+      "legalSan": true,
+      "appliedSan": [
+        "d4",
+        "Nf6",
+        "c4",
+        "g6",
+        "Nc3",
+        "d5",
+        "cxd5",
+        "Nxd5",
+        "e4",
+        "Nxc3",
+        "bxc3",
+        "Bg7"
+      ],
+      "finalFen": "rnbqk2r/ppp1ppbp/6p1/8/3PP3/2P5/P4PPP/R1BQKBNR w KQkq - 1 7",
+      "sourceMoveCount": 12,
+      "lichessMatch": {
+        "kind": "lichess-prefix",
+        "commonPrefixPly": 8,
+        "eco": "D85",
+        "name": "Grünfeld Defense: Exchange Variation",
+        "pgn": "1. d4 Nf6 2. c4 g6 3. Nc3 d5 4. cxd5 Nxd5"
+      }
+    },
+    {
+      "id": "grunfeld_russian",
+      "name": "Grünfeld — Russian System",
+      "eco": "D97",
+      "legalSan": true,
+      "appliedSan": [
+        "d4",
+        "Nf6",
+        "c4",
+        "g6",
+        "Nc3",
+        "d5",
+        "Nf3",
+        "Bg7",
+        "Qb3",
+        "dxc4",
+        "Qxc4",
+        "O-O"
+      ],
+      "finalFen": "rnbq1rk1/ppp1ppbp/5np1/8/2QP4/2N2N2/PP2PPPP/R1B1KB1R w KQ - 1 7",
+      "sourceMoveCount": 12,
+      "lichessMatch": {
+        "kind": "lichess-prefix",
+        "commonPrefixPly": 9,
+        "eco": "D96",
+        "name": "Grünfeld Defense: Russian Variation",
+        "pgn": "1. d4 Nf6 2. c4 g6 3. Nc3 d5 4. Nf3 Bg7 5. Qb3"
+      }
+    },
+    {
+      "id": "catalan_open",
+      "name": "Open Catalan",
+      "eco": "E01-E09",
+      "legalSan": true,
+      "appliedSan": [
+        "d4",
+        "Nf6",
+        "c4",
+        "e6",
+        "g3",
+        "d5",
+        "Bg2",
+        "dxc4",
+        "Nf3",
+        "Be7",
+        "O-O",
+        "O-O"
+      ],
+      "finalFen": "rnbq1rk1/ppp1bppp/4pn2/8/2pP4/5NP1/PP2PPBP/RNBQ1RK1 w - - 4 7",
+      "sourceMoveCount": 12,
+      "lichessMatch": {
+        "kind": "lichess-prefix",
+        "commonPrefixPly": 10,
+        "eco": "E05",
+        "name": "Catalan Opening: Open Defense, Classical Line",
+        "pgn": "1. d4 Nf6 2. c4 e6 3. g3 d5 4. Bg2 dxc4 5. Nf3 Be7"
+      }
+    },
+    {
+      "id": "catalan_closed",
+      "name": "Closed Catalan",
+      "eco": "E06-E09",
+      "legalSan": true,
+      "appliedSan": [
+        "d4",
+        "Nf6",
+        "c4",
+        "e6",
+        "g3",
+        "d5",
+        "Bg2",
+        "Be7",
+        "Nf3",
+        "O-O",
+        "O-O"
+      ],
+      "finalFen": "rnbq1rk1/ppp1bppp/4pn2/3p4/2PP4/5NP1/PP2PPBP/RNBQ1RK1 b - - 5 6",
+      "sourceMoveCount": 11,
+      "lichessMatch": {
+        "kind": "lichess-prefix",
+        "commonPrefixPly": 9,
+        "eco": "E06",
+        "name": "Catalan Opening: Closed",
+        "pgn": "1. d4 Nf6 2. c4 e6 3. g3 d5 4. Bg2 Be7 5. Nf3"
+      }
+    },
+    {
+      "id": "modern_benoni",
+      "name": "Modern Benoni",
+      "eco": "A60-A79",
+      "legalSan": true,
+      "appliedSan": [
+        "d4",
+        "Nf6",
+        "c4",
+        "c5",
+        "d5",
+        "e6",
+        "Nc3",
+        "exd5",
+        "cxd5",
+        "d6",
+        "e4",
+        "g6"
+      ],
+      "finalFen": "rnbqkb1r/pp3p1p/3p1np1/2pP4/4P3/2N5/PP3PPP/R1BQKBNR w KQkq - 0 7",
+      "sourceMoveCount": 12,
+      "lichessMatch": {
+        "kind": "lichess-prefix",
+        "commonPrefixPly": 11,
+        "eco": "A65",
+        "name": "Benoni Defense: King's Pawn Line",
+        "pgn": "1. d4 Nf6 2. c4 c5 3. d5 e6 4. Nc3 exd5 5. cxd5 d6 6. e4"
+      }
+    },
+    {
+      "id": "benko_gambit",
+      "name": "Benko Gambit",
+      "eco": "A57-A59",
+      "legalSan": true,
+      "appliedSan": [
+        "d4",
+        "Nf6",
+        "c4",
+        "c5",
+        "d5",
+        "b5",
+        "cxb5",
+        "a6",
+        "bxa6",
+        "g6"
+      ],
+      "finalFen": "rnbqkb1r/3ppp1p/P4np1/2pP4/8/8/PP2PPPP/RNBQKBNR w KQkq - 0 6",
+      "sourceMoveCount": 10,
+      "lichessMatch": {
+        "kind": "lichess-prefix",
+        "commonPrefixPly": 9,
+        "eco": "A58",
+        "name": "Benko Gambit Accepted: Fully Accepted Variation",
+        "pgn": "1. d4 Nf6 2. c4 c5 3. d5 b5 4. cxb5 a6 5. bxa6"
+      }
+    },
+    {
+      "id": "dutch_leningrad",
+      "name": "Dutch — Leningrad Variation",
+      "eco": "A80-A99",
+      "legalSan": true,
+      "appliedSan": [
+        "d4",
+        "f5",
+        "g3",
+        "Nf6",
+        "Bg2",
+        "g6",
+        "Nf3",
+        "Bg7",
+        "O-O",
+        "O-O"
+      ],
+      "finalFen": "rnbq1rk1/ppppp1bp/5np1/5p2/3P4/5NP1/PPP1PPBP/RNBQ1RK1 w - - 4 6",
+      "sourceMoveCount": 10,
+      "lichessMatch": {
+        "kind": "lichess-prefix",
+        "commonPrefixPly": 6,
+        "eco": "A81",
+        "name": "Dutch Defense: Semi-Leningrad Variation",
+        "pgn": "1. d4 f5 2. g3 Nf6 3. Bg2 g6"
+      }
+    },
+    {
+      "id": "dutch_stonewall",
+      "name": "Dutch — Stonewall",
+      "eco": "A90-A95",
+      "legalSan": true,
+      "appliedSan": [
+        "d4",
+        "f5",
+        "g3",
+        "Nf6",
+        "Bg2",
+        "e6",
+        "Nf3",
+        "d5",
+        "O-O",
+        "Bd6"
+      ],
+      "finalFen": "rnbqk2r/ppp3pp/3bpn2/3p1p2/3P4/5NP1/PPP1PPBP/RNBQ1RK1 w kq - 2 6",
+      "sourceMoveCount": 10,
+      "lichessMatch": {
+        "kind": "lichess-prefix",
+        "commonPrefixPly": 3,
+        "eco": "A81",
+        "name": "Dutch Defense: Fianchetto Attack",
+        "pgn": "1. d4 f5 2. g3"
+      }
+    },
+    {
+      "id": "dutch_classical",
+      "name": "Dutch — Classical Variation",
+      "eco": "A90",
+      "legalSan": true,
+      "appliedSan": [
+        "d4",
+        "f5",
+        "g3",
+        "Nf6",
+        "Bg2",
+        "e6",
+        "Nf3",
+        "Be7",
+        "O-O",
+        "O-O"
+      ],
+      "finalFen": "rnbq1rk1/ppppb1pp/4pn2/5p2/3P4/5NP1/PPP1PPBP/RNBQ1RK1 w - - 4 6",
+      "sourceMoveCount": 10,
+      "lichessMatch": {
+        "kind": "lichess-prefix",
+        "commonPrefixPly": 3,
+        "eco": "A81",
+        "name": "Dutch Defense: Fianchetto Attack",
+        "pgn": "1. d4 f5 2. g3"
+      }
+    },
+    {
+      "id": "budapest_gambit",
+      "name": "Budapest Gambit",
+      "eco": "A51-A52",
+      "legalSan": true,
+      "appliedSan": [
+        "d4",
+        "Nf6",
+        "c4",
+        "e5",
+        "dxe5",
+        "Ng4",
+        "Nf3",
+        "Nc6"
+      ],
+      "finalFen": "r1bqkb1r/pppp1ppp/2n5/4P3/2P3n1/5N2/PP2PPPP/RNBQKB1R w KQkq - 3 5",
+      "sourceMoveCount": 8,
+      "lichessMatch": {
+        "kind": "lichess-prefix",
+        "commonPrefixPly": 7,
+        "eco": "A52",
+        "name": "Indian Defense: Budapest Defense, Adler Variation",
+        "pgn": "1. d4 Nf6 2. c4 e5 3. dxe5 Ng4 4. Nf3"
+      }
+    },
+    {
+      "id": "old_indian",
+      "name": "Old Indian Defense",
+      "eco": "A53-A55",
+      "legalSan": true,
+      "appliedSan": [
+        "d4",
+        "Nf6",
+        "c4",
+        "d6",
+        "Nc3",
+        "e5",
+        "Nf3",
+        "Nbd7"
+      ],
+      "finalFen": "r1bqkb1r/pppn1ppp/3p1n2/4p3/2PP4/2N2N2/PP2PPPP/R1BQKB1R w KQkq - 2 5",
+      "sourceMoveCount": 8,
+      "lichessMatch": {
+        "kind": "lichess-prefix",
+        "commonPrefixPly": 7,
+        "eco": "A54",
+        "name": "Old Indian Defense: Two Knights Variation",
+        "pgn": "1. d4 Nf6 2. c4 d6 3. Nc3 e5 4. Nf3"
+      }
+    },
+    {
+      "id": "english_symmetrical",
+      "name": "Symmetrical English",
+      "eco": "A30-A39",
+      "legalSan": true,
+      "appliedSan": [
+        "c4",
+        "c5",
+        "Nf3",
+        "Nf6",
+        "g3",
+        "b6",
+        "Bg2",
+        "Bb7"
+      ],
+      "finalFen": "rn1qkb1r/pb1ppppp/1p3n2/2p5/2P5/5NP1/PP1PPPBP/RNBQK2R w KQkq - 2 5",
+      "sourceMoveCount": 8,
+      "lichessMatch": {
+        "kind": "lichess-prefix",
+        "commonPrefixPly": 3,
+        "eco": "A30",
+        "name": "English Opening: Symmetrical Variation",
+        "pgn": "1. c4 c5 2. Nf3"
+      }
+    },
+    {
+      "id": "english_reversed_sicilian",
+      "name": "King’s English — Reversed Sicilian",
+      "eco": "A20-A29",
+      "legalSan": true,
+      "appliedSan": [
+        "c4",
+        "e5",
+        "Nc3",
+        "Nf6",
+        "g3",
+        "d5",
+        "cxd5",
+        "Nxd5",
+        "Bg2"
+      ],
+      "finalFen": "rnbqkb1r/ppp2ppp/8/3np3/8/2N3P1/PP1PPPBP/R1BQK1NR b KQkq - 1 5",
+      "sourceMoveCount": 9,
+      "lichessMatch": {
+        "kind": "lichess-prefix",
+        "commonPrefixPly": 6,
+        "eco": "A22",
+        "name": "English Opening: King's English Variation, Two Knights Variation, Reversed Dragon",
+        "pgn": "1. c4 e5 2. Nc3 Nf6 3. g3 d5"
+      }
+    },
+    {
+      "id": "english_four_knights",
+      "name": "English Four Knights",
+      "eco": "A28-A29",
+      "legalSan": true,
+      "appliedSan": [
+        "c4",
+        "e5",
+        "Nc3",
+        "Nf6",
+        "Nf3",
+        "Nc6",
+        "g3"
+      ],
+      "finalFen": "r1bqkb1r/pppp1ppp/2n2n2/4p3/2P5/2N2NP1/PP1PPP1P/R1BQKB1R b KQkq - 0 4",
+      "sourceMoveCount": 7,
+      "lichessMatch": {
+        "kind": "pgn-exact",
+        "commonPrefixPly": 7,
+        "eco": "A29",
+        "name": "English Opening: King's English Variation, Four Knights Variation, Fianchetto Line",
+        "pgn": "1. c4 e5 2. Nc3 Nf6 3. Nf3 Nc6 4. g3"
+      }
+    },
+    {
+      "id": "english_botvinnik",
+      "name": "English — Botvinnik System",
+      "eco": "A20-A29",
+      "legalSan": true,
+      "appliedSan": [
+        "c4",
+        "e5",
+        "g3",
+        "d6",
+        "Bg2",
+        "g6",
+        "Nc3",
+        "Bg7",
+        "e4"
+      ],
+      "finalFen": "rnbqk1nr/ppp2pbp/3p2p1/4p3/2P1P3/2N3P1/PP1P1PBP/R1BQK1NR b KQkq - 0 5",
+      "sourceMoveCount": 9,
+      "lichessMatch": {
+        "kind": "lichess-prefix",
+        "commonPrefixPly": 2,
+        "eco": "A20",
+        "name": "English Opening: King's English Variation",
+        "pgn": "1. c4 e5"
+      }
+    },
+    {
+      "id": "english_mikenas",
+      "name": "Mikenas-Carls Variation",
+      "eco": "A18-A19",
+      "legalSan": true,
+      "appliedSan": [
+        "c4",
+        "Nf6",
+        "Nc3",
+        "e6",
+        "e4",
+        "d5",
+        "e5"
+      ],
+      "finalFen": "rnbqkb1r/ppp2ppp/4pn2/3pP3/2P5/2N5/PP1P1PPP/R1BQKBNR b KQkq - 0 4",
+      "sourceMoveCount": 7,
+      "lichessMatch": {
+        "kind": "lichess-prefix",
+        "commonPrefixPly": 4,
+        "eco": "A17",
+        "name": "English Opening: Anglo-Indian Defense, Hedgehog System",
+        "pgn": "1. c4 Nf6 2. Nc3 e6"
+      }
+    },
+    {
+      "id": "reti_opening",
+      "name": "Réti Opening",
+      "eco": "A09",
+      "legalSan": true,
+      "appliedSan": [
+        "Nf3",
+        "d5",
+        "c4",
+        "d4",
+        "b4"
+      ],
+      "finalFen": "rnbqkbnr/ppp1pppp/8/8/1PPp4/5N2/P2PPPPP/RNBQKB1R b KQkq - 0 3",
+      "sourceMoveCount": 5,
+      "lichessMatch": {
+        "kind": "lichess-prefix",
+        "commonPrefixPly": 4,
+        "eco": "A09",
+        "name": "Réti Opening: Advance Variation",
+        "pgn": "1. Nf3 d5 2. c4 d4"
+      }
+    },
+    {
+      "id": "kings_indian_attack",
+      "name": "King’s Indian Attack",
+      "eco": "A05-A08",
+      "legalSan": true,
+      "appliedSan": [
+        "Nf3",
+        "Nf6",
+        "g3",
+        "d5",
+        "Bg2",
+        "c6",
+        "O-O",
+        "Bf5",
+        "d3"
+      ],
+      "finalFen": "rn1qkb1r/pp2pppp/2p2n2/3p1b2/8/3P1NP1/PPP1PPBP/RNBQ1RK1 b kq - 0 5",
+      "sourceMoveCount": 9,
+      "lichessMatch": {
+        "kind": "lichess-prefix",
+        "commonPrefixPly": 8,
+        "eco": "A07",
+        "name": "King's Indian Attack, with Bf5",
+        "pgn": "1. Nf3 Nf6 2. g3 d5 3. Bg2 c6 4. O-O Bf5"
+      }
+    },
+    {
+      "id": "nimzo_larsen",
+      "name": "Nimzo-Larsen Attack",
+      "eco": "A01",
+      "legalSan": true,
+      "appliedSan": [
+        "b3",
+        "d5",
+        "Bb2",
+        "Nf6",
+        "e3",
+        "e6",
+        "Nf3"
+      ],
+      "finalFen": "rnbqkb1r/ppp2ppp/4pn2/3p4/8/1P2PN2/PBPP1PPP/RN1QKB1R b KQkq - 1 4",
+      "sourceMoveCount": 7,
+      "lichessMatch": {
+        "kind": "lichess-prefix",
+        "commonPrefixPly": 2,
+        "eco": "A01",
+        "name": "Nimzo-Larsen Attack: Classical Variation",
+        "pgn": "1. b3 d5"
+      }
+    },
+    {
+      "id": "bird_opening",
+      "name": "Bird Opening",
+      "eco": "A02-A03",
+      "legalSan": true,
+      "appliedSan": [
+        "f4",
+        "d5",
+        "Nf3",
+        "Nf6",
+        "e3",
+        "g6",
+        "b3"
+      ],
+      "finalFen": "rnbqkb1r/ppp1pp1p/5np1/3p4/5P2/1P2PN2/P1PP2PP/RNBQKB1R b KQkq - 0 4",
+      "sourceMoveCount": 7,
+      "lichessMatch": {
+        "kind": "lichess-prefix",
+        "commonPrefixPly": 2,
+        "eco": "A03",
+        "name": "Bird Opening: Dutch Variation",
+        "pgn": "1. f4 d5"
+      }
+    },
+    {
+      "id": "hippopotamus_setup",
+      "name": "Hippopotamus / Double Fianchetto Setup",
+      "eco": "A00/B06",
+      "legalSan": true,
+      "appliedSan": [
+        "g3",
+        "g6",
+        "Bg2",
+        "Bg7",
+        "d3",
+        "d6",
+        "e4",
+        "e6",
+        "Nf3",
+        "Ne7"
+      ],
+      "finalFen": "rnbqk2r/ppp1npbp/3pp1p1/8/4P3/3P1NP1/PPP2PBP/RNBQK2R w KQkq - 2 6",
+      "sourceMoveCount": 10,
+      "lichessMatch": {
+        "kind": "lichess-prefix",
+        "commonPrefixPly": 2,
+        "eco": "A00",
+        "name": "Hungarian Opening: Symmetrical Variation",
+        "pgn": "1. g3 g6"
+      }
+    }
+  ]
+}
