@@ -74,6 +74,7 @@
 - Большая база дебютов, import adapter and full UI behavior remain blocked until each expansion has source/manual verification and deterministic QA.
 - Vercel deploy profile approved only as lightweight personal web access via GitHub `main`; auth, sync, analytics, personal data storage and deploy protection model remain separate approvals.
 - Большая база дебютов допустима только как checked study layer: каждая линия должна иметь source/manual verification, deterministic legal-move QA и visible source status; prefix-only imported continuations нельзя показывать как exact source fact or engine-best.
+- After `worktree-finish` / `task:merge:main` touching the GitHub/Vercel profile, report deploy evidence explicitly: `publishStatus`, source branch/SHA, target branch, provider/deployment URL/status if available, and smoke result. A push to `main` confirms the deployment trigger, not completed Vercel deployment by itself.
 
 ## Project Notes
 
