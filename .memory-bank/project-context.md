@@ -6,8 +6,8 @@
 - Product Charter согласован owner'ом 2026-05-09.
 - Проект проверяет личную гипотезу: поможет ли компактный интерактивный тренажер лучше понимать и помнить основные шахматные дебюты.
 - Canonical transfer выполнен, baseline QA прошел, корневой chess echo-test прошел.
-- Feature/refactor/behavior-change implementation можно начинать в следующей managed task, не расширяя шахматные данные за пределы проверенного source/manual-verification contract.
 - GitHub repository `Const-Iv/Chess` подключен к Vercel project `chess-prilozhenie`; production branch `main`, production URL `https://chess-prilozhenie.vercel.app`.
+- Deep-research app-ready v1 импортирован как checked study catalog: 98 SAN-легальных линий с планами, табиями и подсказками; источник и степень проверки фиксируются явно.
 
 ## Канонические источники
 
@@ -38,13 +38,16 @@
 - Нужны подсказки для каждого хода, варианты развития, названия вариантов, дебютные правила, принципы и цели.
 - Нужна учебная цель: понимать и помнить минимум 80% типовых случаев от выбранного дебюта до миттельшпиля.
 - In-app AI не утвержден; Codex может помогать с планированием и content QA, но не должен выдавать неподтвержденные шахматные факты.
+- Источник первого расширенного каталога: copied `research/chess-openings-app-ready-v1/` + локальная проверка `lichess_prefix_validation_2026-05-09.json`.
+- Imported catalog scope: 98 учебных линий, 52 priority A, 37 priority B, 9 priority C; все SAN-линии проходят `chess.js` strict mode.
 
 ## Отложенные решения
 
-- Полный список дебютов первого релиза.
-- Глубина линий и точный критерий "80% случаев".
-- Источник шахматных данных и licensing model.
-- Формат opening-map.
+- Финальный список дебютов первого релиза за пределами imported study catalog.
+- Точный критерий "80% случаев" по статистике реальных партий.
+- Lichess Explorer статистика по рейтингу и master database.
+- Stockfish sanity layer для превращения учебных линий в рекомендации.
+- Positions/FEN tree для longest prefix match и транспозиций.
 - Конкретные версии Next.js / React и chess tooling.
 - Дизайн, публичные аккаунты, синхронизация прогресса, аналитика и коммерческая модель.
 - Защита доступа к Vercel production/preview, если появятся личные заметки, прогресс, приватные партии или другие user data.
@@ -69,4 +72,5 @@ Evidence path: `Docs/echo-tests/chess-opening-root-capability.md`.
 - `.vercel/`, `.env`, runtime artifacts and local state должны оставаться ignored.
 - Для code-changing work обязателен `npm run qa:agent`.
 - После появления UI нужен browser smoke: выбор дебюта, ввод линии, показ подсказки, названия варианта, принципа, цели позиции и следующих ходов.
+- Для imported research-карточек source label обязан различать `Lichess exact`, `Lichess prefix` и `SAN legal`; нельзя писать, что prefix-only продолжение является engine-best.
 - Repo-managed skills подключаются через `npm run skills:link`; `--adopt` требует отдельного owner approval.

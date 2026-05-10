@@ -11,6 +11,7 @@
 - Production URL: `https://chess-prilozhenie.vercel.app`.
 - Основной work path: managed task conveyor.
 - Root echo-test passed: legal move parsing + manually verified Ruy Lopez opening-map.
+- Deep-research app-ready v1 импортирован как checked study catalog: 98 SAN-легальных линий, 52 priority A, 37 priority B, 9 priority C.
 
 ## Канонические источники
 
@@ -51,6 +52,18 @@
 - неподтвержденные названия и "лучшие ходы" не выдаются как факт.
 
 Evidence path: `Docs/echo-tests/chess-opening-root-capability.md`.
+
+## Дебютная база
+
+Тренажер сейчас показывает:
+
+- curated core-карточки с типовыми продолжениями и плохими ходами;
+- imported research-каталог на 98 линий с PGN, планами белых и черных, табиями, ключевыми идеями и подсказками на каждый полуход;
+- source-check labels: `Lichess exact`, `Lichess prefix`, `SAN legal`.
+
+Исходники импорта лежат в `research/chess-openings-app-ready-v1/`.
+Проверка импорта описана в `Docs/deep-research-opening-import-2026-05-09.md`.
+Imported lines нельзя показывать как engine-best без отдельного Lichess Explorer / Stockfish sanity layer.
 
 ## Быстрый старт
 

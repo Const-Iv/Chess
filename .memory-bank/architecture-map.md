@@ -11,6 +11,7 @@
 - managed task conveyor как основной integration path;
 - local-first MVP без аккаунтов, платежей, аналитики, API, фоновых jobs и хранения личного прогресса в Vercel;
 - root echo-test passed for legal move parsing + manually verified Ruy Lopez opening-map.
+- checked study catalog imported from `research/chess-openings-app-ready-v1/`: 98 legal SAN lines with source validation labels.
 
 ## Product Runtime
 
@@ -32,13 +33,14 @@
 1. Project Intake фиксирует approved product/governance choices.
 2. Product Charter фиксирует миссию, видение, цель, аудиторию, `JTBD`, ограничения и критерии успеха.
 3. Echo-test проверил минимальную корневую связку: legal move parsing + manually verified opening-map.
-4. UI and product logic can now be built on top of the verified seam without expanding unverified opening data.
+4. Imported research JSON feeds the study catalog only after deterministic SAN validation and Lichess prefix validation.
+5. UI separates curated core examples from imported research cards through status/source labels.
 
 ## Planned Layout
 
 - Future Next.js UI: `app/` or `src/app/`, exact scaffold decided after official docs check.
 - Chess domain logic: `src/domain/chess/`.
-- Opening data and manually verified maps: `src/data/openings/`.
+- Opening data and manually verified maps: `src/domain/chess/` plus copied source evidence in `research/chess-openings-app-ready-v1/`.
 - Tests: `tests/` plus browser smoke after UI exists.
 - Governance-root files stay at repo root: `AGENTS.md`, `.memory-bank/*`, `CODEX_MEMORY.md`, `README.md`, `plans/*`.
 
@@ -47,7 +49,7 @@
 - Превратить приложение в список ходов без объяснения дебютных принципов и целей.
 - Выдать неподтвержденное название варианта или "лучший ход" как факт.
 - Подключить большую внешнюю базу без licensing/source check.
-- Расширить UI/product feature work за пределы echo-tested legal move parsing + manually verified opening-map.
+- Перепутать `lichess-prefix` imported continuation with exact Lichess opening-name assertion or engine-best recommendation.
 - Потерять личный прогресс или заметки, если эта capability появится позже.
 - Добавить аккаунты, sync, аналитику, API, private data storage или deploy protection model без отдельного capability approval.
 - Обновить Vercel production через direct/manual deploy, обходя GitHub `main`, task conveyor and QA gates.
@@ -62,6 +64,7 @@
 - проверить licensing/source boundary;
 - зафиксировать adapter/profile boundary;
 - добавить deterministic check, что known line maps to expected opening name and continuations.
+- для imported research фиксировать exact/prefix status and never hide source limitations from UI.
 
 Когда появляется UI:
 - обновить QA playbook with browser smoke;

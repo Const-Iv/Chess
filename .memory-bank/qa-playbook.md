@@ -7,6 +7,7 @@
 - Product-specific runtime QA появляется после echo-test and UI implementation.
 - Root echo-test for legal move parsing + manually verified Ruy Lopez opening-map passed on 2026-05-09.
 - GitHub `main` подключен к Vercel production; push в другие ветки может создать Vercel preview deployment.
+- Imported deep-research catalog QA requires 98/98 legal SAN lines and visible source status for exact/prefix validation.
 
 ## Agent QA Gate (Mandatory)
 
@@ -75,6 +76,7 @@ Evidence фиксирует:
 - legal move sequence;
 - expected opening name;
 - source or manual verification note;
+- source status for imported lines: `pgn-exact`, `lichess-prefix`, or blocked from confirmed display;
 - typical continuations;
 - principle / goal / middlegame plan;
 - behavior for unknown, off-book or ambiguous lines.
@@ -84,6 +86,7 @@ Evidence фиксирует:
 - редкая линия смешана с основной без приоритета;
 - ход показан без объяснения идеи;
 - одна позиция может возникнуть разным порядком ходов, а data model это не учитывает.
+- imported `lichess-prefix` line shown as exact Lichess name or engine-best recommendation.
 
 ## Eval Gate For Agent Behavior
 

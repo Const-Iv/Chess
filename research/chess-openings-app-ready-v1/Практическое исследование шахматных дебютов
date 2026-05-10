@@ -1,0 +1,389 @@
+# Практическое исследование шахматных дебютов для учебного мини-приложения
+
+## Executive summary
+
+Цель приложения должна быть не в том, чтобы «знать все варианты», а в том, чтобы в каждой основной дебютной семье уметь:
+1) распознавать позицию по 3–5 якорным ходам;
+2) выбирать следующий ход по смыслу, а не по памяти;
+3) понимать типовой план до устойчивой табии миттельшпиля;
+4) узнавать 2–4 повторяющиеся тактические идеи и 2–3 типичные ошибки. Такой подход особенно хорошо подходит для уровня 1000–1800, где выигрывает не «самый модный engine-line», а понимание структур, темпов и типовых планов. citeturn7search12turn18search3turn25search14turn8view6
+
+Для версии v1 приложения я бы заложил ядро из десяти семейств: Итальянская, Испанская, Сицилианская, Французская, Каро-Канн, Ферзевый гамбит, Славянская/Полуславянская, Английское начало, Защита Петрова, Королевская индийская. Следом — Грюнфельд и Голландская. Королевский гамбит и Нимцович-Ларсен полезно добавлять как «surprise modules», а не как базовое ядро: они практичны, но не дают той же универсальной стратегической школы, что Итальянская/Испанская/QG/Slav/Caro/Petroff. Это согласуется с тем, что источники описывают Каро-Канн, Петрова и Славянскую как особенно прочные и учебные, а Najdorf, Grünfeld, KID и English — как более теоретические, острые или трансформационные. citeturn8view3turn8view5turn8view7turn8view8turn8view9turn8view6turn8view1
+
+Если нужен один практический вывод:
+белыми начинай от **Итальянской + Ферзевого гамбита**,
+чёрными против 1.e4 — от **Каро-Канн** или **Петрова**,
+чёрными против 1.d4/c4 — от **Славянской/QGD**,
+а затем добавляй **Сицилианскую**, **KID** и **Грюнфельд** как отдельные тактические пакеты. citeturn8view3turn8view5turn10search3turn8view1turn8view8turn26view4
+
+## Модель покрытия и структура контента для приложения
+
+Для задачи «закрыть 80% типичных случаев» дебют в приложении нужно хранить не как бесконечное дерево всех продолжений, а как набор **семейств позиций**. Практически это означает: для каждой стартовой развилки выбрать 3–5 наиболее повторяющихся ветвей, остановиться в точке первой устойчивой табии, а дальше переключить ученика из режима «дебют» в режим «план позиции». Именно так работают самые полезные opening-инструменты: у них есть дерево, частоты, master games и training by pattern, а не просто длинный список ходов. Для технической базы это особенно удобно, потому что официальный экспорт базы игр у urlLichess open databaseturn7search12 имеет лицензию CC0, а у urlChess.com Openingsturn18search3 и url365Chess opening explorerturn24search7 уже есть готовое ветвление по позициям и названиям линий. citeturn7search12turn18search3turn24search7
+
+Рабочее определение «80%» для твоего приложения:
+**покрыть основные семейства, которые реально повторяются в клубной практике, и для каждого семейства дать не больше 5–10 якорных ходов плюс план.** Для e4-e5 это обычно 8–12 полуходов; для d4/c4/Nf3-систем — 10–15 полуходов; для трансформационных дебютов вроде Английского — до определения пешечной структуры. citeturn8view6turn28view0turn8view0turn14view0
+
+Ниже — образец того, как такое дерево лучше рендерить на фронте на примере Итальянской партии; деление на семейства совпадает с крупными opening explorers и учебными страницами. citeturn14view0turn14view1turn14view2turn20search8
+
+```mermaid
+flowchart TD
+    A["Итальянская партия"] --> B["3...Bc5 — Giuoco Piano"]
+    A --> C["3...Nf6 — Two Knights Defense"]
+
+    B --> D["4.d3 — Giuoco Pianissimo"]
+    B --> E["4.c3 — Classical / Center Attack"]
+    B --> F["4.b4 — Evans Gambit"]
+
+    C --> G["4.Ng5 — Polerio / Fried Liver family"]
+    C --> H["4.d3 — Modern Bishop's Opening"]
+    C --> I["4.d4 — Open Variation"]
+```
+
+Минимальная единица контента — **карточка хода**. У неё должно быть шесть обязательных полей:
+ход; цель хода; типовой план на 3–5 следующих ходов; тактические мотивы; типовые ошибки; структура миттельшпиля/эндшпиля, к которой ветвь переходит. Если открыть дебюты именно через карточки и структуры, пользователь перестанет «забывать вариант на 8-м ходу» и начнёт играть позицию. Это особенно критично для Ruy Lopez, English, KID и Grünfeld, где план важнее памяти на конкретную ветку. citeturn8view0turn8view6turn8view8turn26view4
+
+## Матрица выбора дебютов и порядок внедрения
+
+Ниже шкала 1–5: чем выше «агрессивность», тем чаще игра идёт в острые перекосы; чем выше «теория», тем больше критических ветвей; «надёжность» — насколько легко держать позицию на клубном уровне при неполном знании точных линий.
+
+| Дебют | Агрессивность | Теория | Надёжность для 1000–1800 | Типовые структуры | Рекомендация | Приоритет |
+|---|---:|---:|---:|---|---|---|
+| Итальянская | 3 | 2 | 5 | открытый центр, slow Italian | белым — база | P0 |
+| Испанская | 3 | 5 | 5 | closed Spanish, Berlin endgame | белым/чёрным — база | P1 |
+| Защита Петрова | 2 | 3 | 5 | симметрия, открытый e-file | чёрным — база | P0 |
+| Сицилианская | 5 | 5 | 3 | asymmetrical open Sicilian | чёрным — advanced core | P1 |
+| Французская | 3 | 3 | 4 | chain e5-d4 vs d5-e6, IQP | чёрным — контригра | P1 |
+| Каро-Канн | 2 | 3 | 5 | прочная структура, Panov IQP | чёрным — база | P0 |
+| Ферзевый гамбит/QGD-QGA | 3 | 3 | 5 | Carlsbad, IQP, hanging pawns | белым — база | P0 |
+| Славянская/Полуславянская | 3/4 | 3/4 | 5/4 | Slav main line, Meran | чёрным — база/advanced | P0/P1 |
+| Английское начало | 2 | 4 | 4 | reversed Sicilian, Hedgehog, Botvinnik | белым — после базы | P1 |
+| Голландская | 4 | 3 | 3 | Stonewall, Leningrad, Classical Dutch | чёрным — must-win pack | P2 |
+| Королевская индийская | 5 | 4 | 3 | locked center, race attacks | чёрным — tactical pack | P1 |
+| Грюнфельд | 4 | 5 | 3 | big center vs pressure | чёрным — advanced | P2 |
+| Королевский гамбит | 5 | 3 | 3 | open king, f-file attack | белым — surprise pack | P2 |
+| Нимцович-Ларсен | 3 | 2 | 3 | queenside fianchetto, flexible center | белым — surprise pack | P2 |
+
+Практический порядок внедрения в приложение такой: сначала позиции, где ученик получает понятные структуры и повторяющиеся планы; потом — острые системы с высокой зависимостью от move-order. Поэтому P0 — Итальянская, Каро-Канн, Петров, Ферзевый гамбит, Славянская; P1 — Испанская, Французская, Английское, Сицилианская, KID; P2 — полноценный Грюнфельд, Голландская, Королевский гамбит, Нимцович-Ларсен. Такой порядок следует из характера линий: Najdorf/Dragon/KID/Grünfeld источники прямо описывают как sharp/theoretical, а Caro-Kann, Petroff, Slav и QGD — как sound/solid. citeturn8view1turn14view8turn8view8turn26view4turn8view3turn8view7turn8view5turn10search3
+
+## Открытые игры и гамбитные системы
+
+**Итальянская партия (C50–C54).** Для любителя это лучший дебют «понимание > зубрёжка»: быстрый выход фигур, ясные поля f7/f2, понятный момент для d4, много типовых идей и мало обязательной теории в тихих линиях. Главный смысл — научиться различать три мира: спокойный Pianissimo, центр через c3/d4 и тактическую ветвь Two Knights. citeturn0search1turn14view0turn14view1turn14view2turn20search8
+
+Ниже — тренировочное дерево для app; названия ветвей и якорные последовательности сверены по материалам urlItalian Game on Chess.comturn0search1, urlItalian on ChessBase Learnturn0search2, urlItalian on 365Chessturn20search4 и urlItalian opening page on Lichessturn0search8. citeturn14view0turn14view1turn14view2turn20search8
+
+| Ветвь | Якорь для дерева | Карточка подсказки | Типичные мотивы и ошибки | Переход в миттельшпиль | UI-мета |
+|---|---|---|---|---|---|
+| Giuoco Pianissimo | `1.e4 e5 2.Nf3 Nc6 3.Bc4 Bc5 4.d3` | **Ход 4.d3**: не раскрывать центр раньше времени; план `c3, Re1, h3, Nbd2-f1-g3`, потом `d4` в удобный момент | Мотивы `Bxf7+`, `Ng5`, давление по e-файлу; ошибка — ранний `d4` без рокировки и без контроля над `e4` | медленный манёвр, kingside squeeze, поздний центральный размен | difficulty 2/5, ETA 25 мин, P0 |
+| Classical Giuoco Piano / Center Attack | `...3...Bc5 4.c3 Nf6 5.d4` | **Ход 4.c3**: подготовить `d4`; у белых идея захватить темпами центр, у чёрных — `...Bb4+` и контрудар `...d5` | Мёллер-подобные удары, связки по e-файлу; ошибка — взять пешку e4/держать центр без развития | открытый центр, ранняя борьба за темп | difficulty 3/5, ETA 35 мин, P1 |
+| Two Knights / Polerio family | `...3...Nf6 4.Ng5 d5 5.exd5 Na5` | **За чёрных ход 5...Na5**: не пускать Fried Liver; **за белых ход 6.Bb5+** — сохранить инициативу и мешать развитию | Ошибка чёрных — `5...Nxd5? 6.Nxf7`; ошибка белых — жадность без завершения развития | открытая тактическая игра, часто с королём в центре | difficulty 4/5, ETA 40 мин, P0 |
+| Evans Gambit | `...3...Bc5 4.b4` | **Ход 4.b4**: пожертвовать фланговую пешку ради темпа, `c3/d4/Qb3` и быстрых угроз по f7 | Ошибка чёрных — удерживать лишнюю пешку любой ценой; ошибка белых — не открыть центр вовремя | инициатива за пешку, быстрый штурм | difficulty 3/5, ETA 30 мин, P2 |
+
+Учебный репертуар для приложения:
+белыми — `e4 e5 Nf3 Nc6 Bc4 Bc5 d3` как базовый safe-line, плюс модуль `4.c3` и модуль `4.Ng5`;
+чёрными — против `3.Bc4` держать два пакета: `...Bc5` как позиционную базу и `...Nf6` как тактический модуль с обязательным `...Na5` против `4.Ng5`. Модельные партии для раздела «смотреть»: entity["athlete","Max Euwe","Dutch chess world champion"]–entity["athlete","Richard Réti","Czechoslovak chess grandmaster"], 1920; entity["athlete","Magnus Carlsen","Norwegian chess grandmaster"]–entity["athlete","Bu Xiangzhi","Chinese chess grandmaster"], 2017. citeturn14view2
+
+**Испанская партия, Ruy Lopez (C60–C99).** Это лучший дебют для приложения, если задача — учить планы, а не только конкретику. Испанская моментально показывает темы: давление на e5, ценность поля d5, манёвр `Nbd2-f1-g3`, борьбу `c3/d4` против `...d5/...c5`, а также отдельный класс эндшпилей — Берлин. Но теории много, поэтому в учебном режиме надо строить не «всю Испанку», а три опорных продукта: Closed Spanish, Berlin, Exchange. citeturn8view0turn16search2turn16search1turn16search3turn19search8
+
+Ниже — практическое дерево для v1. Для deep-study удобно держать рядом urlRuy Lopez on Chess.comturn1search0, urlThe Ruy Lopez on ChessBase Learnturn25search0, urlRuy Lopez ECO on 365Chessturn19search8, urlOpening Repertoire: The Ruy Lopezturn23search1 и urlCaruana's Ruy Lopezturn23search2. citeturn8view0turn16search2turn16search1turn16search3turn23search1turn23search2
+
+| Ветвь | Якорь для дерева | Карточка подсказки | Типичные мотивы и ошибки | Переход в миттельшпиль | UI-мета |
+|---|---|---|---|---|---|
+| Closed Spanish | `1.e4 e5 2.Nf3 Nc6 3.Bb5 a6 4.Ba4 Nf6 5.O-O Be7 6.Re1 b5 7.Bb3 O-O 8.c3` | **Белыми 6.Re1 и 8.c3**: держать давление на e5, готовить `d4`; **чёрными** в v1 проще `...d6`, а не сразу Marshall | `Noah's Ark`, тактика на `e5/e4`, манёвр `Nf1-g3`; ошибка — ставить `d4` без подготовки или забывать про `...Na5`/`...Bg4` | закрытая испанская структура, долгий манёвр и поздний прорыв | difficulty 4/5, ETA 60 мин, P1 |
+| Berlin | `...3...Nf6` | Для белых в v1 выгодно иметь **упрощённый anti-Berlin** через `4.d3`; для ядра теории нужен и **Берлинский эндшпиль** после `4.O-O Nxe4 5.d4 Nd6 6.Bxc6 dxc6 7.dxe5 Nf5 8.Qxd8+` | Ошибка белых — играть «на авось» в queenless middlegame; ошибка чёрных — недооценивать активность белых короля и ладей | безферзевый миттельшпиль/эндшпиль, план важнее тактики | difficulty 4/5, ETA 45 мин, P1 |
+| Exchange Variation | `...3...a6 4.Bxc6` | **Ход 4.Bxc6**: учить не атаку, а переход к лучшему эндшпилю, игре на kingside-majority и структуре чёрных | Ошибка белых — менять слона без последующего `d4`; ошибка чёрных — пассивно защищать сдвоенные пешки | разменная испанская, эндшпильный уклон | difficulty 2/5, ETA 20 мин, P1 |
+| Marshall / Anti-Marshall | `...8...d5` | Как чёрным — отдельный sharp-module; как белым для v1 проще anti-Marshall (`8.a4`/`8.h3`) | Ошибка — влезать в Marshall без памяти на ключевые такты | форсированная атака чёрных, attack/defend pattern | difficulty 5/5, ETA 60+ мин, P2 |
+
+Учебный репертуар для приложения:
+белыми — `e4 e5 Nf3 Nc6 Bb5 a6 Ba4 Nf6 O-O Be7 Re1 b5 Bb3 O-O c3 d6`;
+чёрными — `e4 e5 Nf3 Nc6 Bb5 a6 Ba4 Nf6 O-O Be7 Re1 b5 Bb3 O-O d6`, а Берлин и Marshall — как отдельные модули. Модельные партии: entity["athlete","Emanuel Lasker","German chess world champion"]–entity["athlete","José Raúl Capablanca","Cuban chess world champion"], 1914; entity["athlete","Anatoly Karpov","Russian chess world champion"]–entity["athlete","Wolfgang Unzicker","German chess grandmaster"], 1974; entity["athlete","Garry Kasparov","Russian chess world champion"]–entity["athlete","Anatoly Karpov","Russian chess world champion"], 1990. citeturn8view0
+
+**Защита Петрова, Русская партия (C42–C43).** Это идеальная «чёрная база» для приложения: очень здравая, форсированная настолько, чтобы её можно было реально выучить, но не настолько, чтобы она превращалась в одну длинную forced draw. Для клуба важнее не «как уравнять», а «как не попасть в ловушки и когда играть на инициативу». citeturn8view7turn27view0turn24search0turn24search12
+
+Ниже — компактная тренировочная карта; ветви и названия согласованы с urlPetrov's Defense on Chess.comturn2search3, urlPetrov guide on 365Chessturn24search4 и urlChess.com Petroff lessonturn2search19. citeturn27view0turn24search4turn2search19
+
+| Ветвь | Якорь | Карточка подсказки | Типичные мотивы и ошибки | Переход | UI |
+|---|---|---|---|---|---|
+| Classical Attack | `1.e4 e5 2.Nf3 Nf6 3.Nxe5 d6 4.Nf3 Nxe4 5.d4 d5 6.Bd3` | **Ход 6.Bd3**: белые развиваются с темпом, чёрные быстро уравнивают и решают, куда ставить слона/коня | Ошибка чёрных — путать активность с жадностью; ошибка белых — бездумно менять фигуры и терять давление | симметрия с небольшим плюсом в развитии у белых | difficulty 2/5, ETA 25 мин, P0 |
+| Nimzowitsch Attack | `...5.Nc3` | **Ход 5.Nc3**: белые допускают сдвоение, но получают быстрый выпуск фигур и нередко длинную рокировку | Тактика на `Qe2`, атака на e4 и по d-файлу; ошибка чёрных — неточности против быстрого развития белых | динамика, иногда opposite-side castling | difficulty 3/5, ETA 25 мин, P1 |
+| Stafford awareness | `...3...Nc6` | Для белых это модуль «не умереть в 12 ходов»; для чёрных — blitz-sideline, а не main weapon | Главное правило: не ловить материал/не игнорировать развитие; у чёрных ошибка — переоценка атаки после отражения угроз | острый блиц-миттельшпиль | difficulty 2/5, ETA 15 мин, P1 |
+
+Учебный репертуар:
+белыми — всегда знать скелет `Nxe5–Nf3–d4–Bd3`;
+чёрными — всегда знать `...d6`, затем `...Nxe4`, затем один из пакетов `...Be7` / `...Bd6`; Stafford держать как side-package, не как главный репертуар. Исторический пакет для раздела «контекст»: линия названа в честь Александра Петрова; в современной практике её заново оживлял entity["athlete","Fabiano Caruana","American chess grandmaster"]. citeturn27view0
+
+**Королевский гамбит (C30–C39).** Это не базовый дебют для ядра v1, но отличный high-motivation module: он учит, что инициативу, развитие и открытые линии иногда важнее пешки. Для любителя это хороший «тактический зал», но не лучшая основа всего белого репертуара. citeturn8view11turn4search7turn4search13turn4search8
+
+| Ветвь | Якорь | Карточка подсказки | Мотивы/ошибки | Переход | UI |
+|---|---|---|---|---|---|
+| King's Gambit Accepted, Knight Gambit | `1.e4 e5 2.f4 exf4 3.Nf3` | Развиваться, не вернуть пешку любой ценой; цель — быстрый O-O, d4, Bc4 | Типичны ловушки по h5/f7; ошибка белых — играть ради красивой жертвы без развития | открытая игра, незащищённые короли | difficulty 3/5, ETA 30 мин, P2 |
+| Bishop's Gambit | `...2...exf4 3.Bc4` | Немедленное давление на f7, запасная идея ухода короля на f1 при шахе по h4 | Ошибка чёрных — отставание в развитии; ошибка белых — не открыть центр | романтическая атака | difficulty 3/5, ETA 20 мин, P2 |
+
+Учебный совет: если включать дебют в приложение, то как white-only aggressive pack с коротким репертуаром `e4 e5 f4 exf4 Nf3`, а за чёрных — safe-response `...exf4` с быстрым развитием, без попытки удержать всё лишнее. Для расширения подойдут urlKing's Gambit on Chess.comturn4search0, urlKing's Gambit Accepted on Chess.comturn4search7 и urlKing's Gambit on ChessBase Learnturn4search8. citeturn8view11turn4search7turn4search8
+
+## Сицилианский комплекс
+
+Сицилианская — не один дебют, а целая платформа. Для приложения это важно: сначала надо разрезать её не по ECO-кодам, а по **семействам решений**. Ошибка большинства opening-apps — сразу прыгать в Najdorf main line и упускать антисицилианские ветви, которые на клубном уровне встречаются постоянно: Alapin, Closed/Grand Prix, Smith-Morra, Rossolimo. Только потом имеет смысл учить Open Sicilian и уже внутри неё — Najdorf, Dragon, Scheveningen. citeturn8view1turn15search0turn15search1turn15search2turn15search7turn19search9
+
+Для провайдера-ресурса лучше всего работают четыре слоя: urlChess.com Sicilian opening treeturn9search4, urlNajdorf on Lichessturn7search3, urlNajdorf ECO on 365Chessturn19search1 и современные онлайн-репертуары вроде urlGiri's Najdorf Sicilian on Chessableturn5search2. citeturn9search4turn7search3turn19search1turn5search2
+
+**Антисицилианский пакет, который обязательно нужен в приложении.**
+
+| Семейство | Якорь | Что должен помнить пользователь | Типовые мотивы | UI |
+|---|---|---|---|---|
+| Alapin | `1.e4 c5 2.c3` | За белых — центр `d4/e4`; за чёрных — `...Nf6` или `...d5`, немедленно бить по центру | борьба за d4, развитие vs пространственный центр | difficulty 2/5, ETA 20 мин, P0 |
+| Closed Sicilian / Grand Prix | `1.e4 c5 2.Nc3` и часто `3.f4` | Белые идут в kingside plan, чёрные — спокойно `...Nc6`, `...g6` или `...e6`, контра по центру и ферзевому флангу | `f4-f5`, давление по b- и c-линиям | difficulty 2/5, ETA 20 мин, P0 |
+| Smith-Morra | `1.e4 c5 2.d4 cxd4 3.c3` | Белые жертвуют пешку ради файлов c/d; чёрным нужна схема приёма: `...dxc3 Nxc3 Nc6 d6 e6` | быстрая рокировка, жертвы на e6/b5, атака по c/d | difficulty 3/5, ETA 20 мин, P0 |
+| Rossolimo | `1.e4 c5 2.Nf3 Nc6 3.Bb5` | Белые избегают Open Sicilian, меняют структуру; чёрным нужен один стабильный ответ — `...g6` или `...e6` пакетно | игра на сдвоенные пешки, давление по тёмным полям | difficulty 3/5, ETA 20 мин, P0 |
+
+**Najdorf (B90–B99).** Для чёрных это главный sharp-module: гибкость `...a6`, контроль `b5`, профилактика прыжков фигуры на `b5`, подготовка разных центровых схем. Для клуба это не лучший старт против 1.e4, но отличный второй чёрный дебют после Caro/Petroff. citeturn8view1turn7search3turn19search1
+
+| Ветвь | Якорь | Карточка подсказки | Тактика/ошибки | Структура | UI |
+|---|---|---|---|---|---|
+| English Attack / Byrne | `1.e4 c5 2.Nf3 d6 3.d4 cxd4 4.Nxd4 Nf6 5.Nc3 a6 6.Be3` | Белые строят `f3, Qd2, O-O-O, g4`; чёрные выбирают пакет `...e5` или `...e6`, затем counterplay `...b5` | opposite-side castling; ошибка чёрных — медлить с контригрой | асимметрия, race attack | difficulty 5/5, ETA 50 мин, P1 |
+| Bg5 main line | `...6.Bg5` | Белые давят на e7/f6, возможны идеи Poisoned Pawn; чёрные должны знать хотя бы безопасный костяк `...e6 Be7 Nbd7` | яд на b2, тактика по e6/f5; ошибка — играть Najdorf без минимальной памяти | острая теория | difficulty 5/5, ETA 50 мин, P2 |
+| Fischer-Sozin / Lipnitsky | `...6.Bc4` | Белые быстро нацеливаются на f7 и `f4-f5`; чёрные — `...e6`, `...Be7`, затем `...b5` | атака на f7 vs ферзевый контрудар | атакующая асимметрия | difficulty 4/5, ETA 35 мин, P1 |
+
+**Dragon (B70–B79).** Дракон проще распознать по структуре, чем Najdorf: фианкетто, диагональ g7-a1, частый opposite-side castling. Для white-facing app это очень удобно: почти всегда можно закрепить пользователя на идее Yugoslav Attack. citeturn14view8turn9search0turn9search7turn9search15
+
+| Ветвь | Якорь | Карточка подсказки | Тактика/ошибки | Структура | UI |
+|---|---|---|---|---|---|
+| Yugoslav Attack | `...5...g6 6.Be3` | Белые: `f3, Qd2, O-O-O, h4-h5`; чёрные: `...Bg7, ...Nc6, ...Rc8, ...Ne5 / ...Qa5` | классический race; ошибка чёрных — опаздывать с `...Rc8/ ...Qa5` | opposite-side castling | difficulty 5/5, ETA 45 мин, P1 |
+| Classical / Levenfish family | `...6.Be2` или `...6.f4` | Белые избегают ультраострой теории; чёрные получают более «человеческий» Dragon | типичны жертвы на c3/e4; ошибка белых — недооценить диагональ g7 | атакующая фианкетто-структура | difficulty 4/5, ETA 30 мин, P1 |
+
+**Scheveningen (B80–B89).** В приложении её надо подавать не как «ещё один Sicilian», а как структуру `...d6 + ...e6`, то есть «малый центр плюс готовность к ...b5 или ...d5». Практический инсайт: для клуба часто выгоднее приходить к scheveningen-структурам через Najdorf move order `...a6`, чтобы уменьшить часть неприятных анти-планов белых. Это уже не encyclopedic truth, а именно практический дизайн репертуара. Опорные идеи самой схемы — из официальных opening-pages. citeturn14view9turn9search1turn9search8
+
+| Ветвь | Якорь | Карточка подсказки | Тактика/ошибки | Структура | UI |
+|---|---|---|---|---|---|
+| English Attack vs Scheveningen | `...5...e6 6.Be3` | Белые разворачивают attack-shell, чёрные заканчивают развитие и бьют по центру/ферзевому флангу | атакующий пакет белых vs сильная контригра чёрных | "small center" with dynamic breaks | difficulty 4/5, ETA 35 мин, P1 |
+| Keres-type pressure | `...6.g4` или быстрый kingside push | Для чёрных важно не «искать тактику», а не потерять темп развития | ошибка чёрных — не завершить короткую рокировку/не выбрать контрплан | острая структура с ранним фланговым штурмом | difficulty 5/5, ETA 30 мин, P2 |
+| Classical setup | `...6.Be2` | Удобная учебная ветвь: у белых нормальное развитие, у чёрных — типовые идеи `...Be7 O-O ...Qc7 ...a6/...b5` | мотивы на e4/d4, типовые размены коней | стратегическая асимметрия | difficulty 3/5, ETA 20 мин, P1 |
+
+Репертуарный совет для приложения:
+если пользователь чёрными хочет **один** модуль Сицилианской, то в v1 логичнее дать **anti-Sicilian pack + один core Open Sicilian**, а не все сразу; для тактически ориентированных — Najdorf, для любителей узнаваемой структуры — Dragon, для более позиционного ощущения — Scheveningen. Белыми как «антисистема против всего» отлично подходит Alapin, а как sharp-choice — English Attack versus Najdorf/Dragon. citeturn15search0turn15search1turn15search2turn8view1turn14view8turn14view9
+
+## Французская защита и Каро-Канн
+
+**Французская защита (C00–C19).** Французская — один из лучших дебютов для обучения **пешечным цепям**. Пользователь должен очень рано выучить главную идею: где у цепи база, туда и бьют. В Advance белые играют на королевском фланге, чёрные — на ферзевом и по центру; в Tarrasch часто возникают IQP/полуоткрытые центры; в Winawer — структурный перекос «сдвоенные пешки vs два слона/контригра». citeturn8view2turn17search0turn17search1turn17search2turn17search3turn19search10
+
+Ниже — учебная карта. Для deep layer удобно привязать urlFrench Defense on Chess.comturn1search2, urlFrench Defense on 365Chessturn19search10, urlFundamental Chess Openingsturn6search0, urlThe Exchange French Comes to Lifeturn23search4 и urlTactics in the Chess Opening 3turn23search12. citeturn8view2turn19search10turn6search0turn23search4turn23search12
+
+| Ветвь | Якорь | Карточка подсказки | Тактика/ошибки | Структура | UI |
+|---|---|---|---|---|---|
+| Tarrasch | `1.e4 e6 2.d4 d5 3.Nd2` | Белые избегают pin по c3, играют против `...c5`; чёрные должны сразу выбирать, как вскрывать центр | мотивы `c3`, `exd5`, IQP; ошибка чёрных — медлить с контригрой по базе цепи | полуоткрытый центр, IQP/hanging pawns | difficulty 3/5, ETA 25 мин, P1 |
+| Winawer | `...3.Nc3 Bb4` | Чёрные играют на дисбалансах и давят на e4/c3; белые — на пространство и иногда на короля | `Qg4`, удар по g7, игры на тёмных полях; ошибка чёрных — недооценка атаки белых | сдвоенные пешки у белых, структурная компенсация у чёрных | difficulty 4/5, ETA 40 мин, P1 |
+| Advance | `...3.e5 c5 4.c3` | Белые строят space wedge, чёрные бьют по `d4` и готовят `...f6` | ошибка белых — защищать цепь пассивно; ошибка чёрных — не атаковать базу `d4` | locked center, kingside vs queenside plans | difficulty 3/5, ETA 25 мин, P0 |
+| Exchange | `...3.exd5 exd5` | Симметрия не значит «ничего нет»: у белых темп, у чёрных — свободный слон c8 | `Bd3/Qc2/Bg5` планы, IQP-переходы; ошибка — механическая ничейность без борьбы за инициативу | симметричная структура, часто minor-piece play | difficulty 1/5, ETA 15 мин, P0 |
+
+Учебный репертуар:
+белыми проще всего ввести два режима — **Tarrasch** как «чистое понимание» и **Advance** как «пешечная цепь»;
+чёрными самый учебный пакет — `...c5` против Tarrasch/Advance и один из двух ответов против 3.Nc3: либо **Classical** через `...Nf6`, либо **Winawer** через `...Bb4`. Для просмотра подойдут партии entity["athlete","Bobby Fischer","American chess world champion"]–entity["athlete","Wolfgang Uhlmann","German chess grandmaster"] и entity["athlete","Viktor Korchnoi","Soviet and Swiss chess grandmaster"]–Милан Удовчич. citeturn8view2
+
+**Каро-Канн (B10–B19).** Каро — лучший «solid-but-not-boring» ответ на 1.e4 для приложения. Он учит здоровой структуре, своевременным пешечным прорывам `...c5`/`...e5` и типовым переходам в IQP через Panov. Главная ценность для app: у дебюта очень ясные модули — Classical, Advance, Exchange, Panov. citeturn8view3turn14view10turn14view11turn20search1turn20search5turn26view6
+
+Используй как базовые источники urlCaro-Kann on Chess.comturn1search3, urlCaro-Kann guide on 365Chessturn20search5, urlLearn the Caro-Kann on Chess.comturn1search11 и urlTactics in the Chess Opening 3turn23search12. citeturn8view3turn20search5turn1search11turn23search12
+
+| Ветвь | Якорь | Карточка подсказки | Тактика/ошибки | Структура | UI |
+|---|---|---|---|---|---|
+| Classical | `1.e4 c6 2.d4 d5 3.Nc3 dxe4 4.Nxe4 Bf5` | Чёрные сначала выводят «хорошего» слона, потом дочищают развитие; белые бьют по kingside и центру | мотивы `h4-h5`, размены на e4/f5; ошибка чёрных — пассивный отход слона и потеря темпов | очень здоровая структура, учебная | difficulty 2/5, ETA 25 мин, P0 |
+| Advance | `...3.e5` | Белые получают space, чёрные должны немедленно выбрать план давления на `d4` и игру `...c5` | ошибка белых — держать центр без динамики; ошибка чёрных — оставить ферзевый фланг без counterplay | locked center, почти «французская цепь», но со свободным слоном c8 | difficulty 3/5, ETA 25 мин, P0 |
+| Exchange | `...3.exd5 cxd5` | Учебная линия на симметрии и инициативе темпа; за чёрных важно быстро активизировать фигуры | возможность minority-style play и ранних фигурных разменов | симметрия, часто манёвренный миддл | difficulty 1/5, ETA 15 мин, P0 |
+| Panov-Botvinnik | `...3.exd5 cxd5 4.c4` | Белые создают IQP-сценарий; чёрные либо принимают IQP, либо упрощают в изоляторные/висячие пешки | тактика по c- и d-файлу, давление на d5/d4 | IQP central training | difficulty 3/5, ETA 25 мин, P1 |
+
+Учебный репертуар:
+чёрными — ядро `c6 d5`, дальше обязательно знать `...Bf5` против Classical/Advance и `...cxd5` против Exchange/Panov;
+белыми — для учебного репертуара очень хороша связка **Advance + Panov**: первая учит цепям, вторая — изолятору. Для раздела «модельные партии» стоит дать хотя бы одну партию entity["athlete","José Raúl Capablanca","Cuban chess world champion"] против entity["athlete","Aron Nimzowitsch","Latvian-Danish chess grandmaster"] и одну из пары entity["athlete","David Bronstein","Soviet chess grandmaster"]/entity["athlete","Tigran Petrosian","Soviet chess world champion"]. citeturn26view6
+
+## Ферзевые пешечные и фланговые системы
+
+**Ферзевый гамбит: QGD/QGA (D20–D69).** Для учебного приложения это центральный белый дебют: он почти всегда приводит к понятным стратегическим схемам — Carlsbad, IQP, висячие пешки, minority attack. При этом у чёрных есть два здоровых ответа: QGD и QGA. citeturn8view4turn14view5turn10search3turn19search3turn26view0
+
+Опорные источники: urlQueen's Gambit on Chess.comturn2search0, urlQueen's Gambit Accepted on Chess.comturn12search1, urlQGD Orthodox on Chess.comturn10search3, urlQGA on 365Chessturn19search3 и urlQueen's Gambit on ChessBase Learnturn25search7. citeturn8view4turn14view5turn10search3turn19search3turn25search7
+
+| Ветвь | Якорь | Карточка подсказки | Тактика/ошибки | Структура | UI |
+|---|---|---|---|---|---|
+| QGD Orthodox | `1.d4 d5 2.c4 e6 3.Nc3 Nf6 4.Bg5 Be7 5.e3 O-O 6.Nf3` | Белые удерживают напряжение и готовят развитие; чёрные — максимально корректная схема | типична борьба за e4/c5, `Bxh7+` иногда, но не шаблонно | closed center, переход в Carlsbad/изолятор | difficulty 2/5, ETA 25 мин, P0 |
+| QGD Exchange | `...cxd5 exd5` | Белые учат minority attack `b4-b5`; чёрные — игру по центру и kingside activity | ошибка белых — путать minority attack с автоматизмом | Carlsbad | difficulty 2/5, ETA 20 мин, P0 |
+| Queen's Gambit Accepted | `1.d4 d5 2.c4 dxc4` | Чёрным не нужно «держать пешку»; надо развиваться и бить по центру белых | ошибка чёрных — лишний раз защищать c4; ошибка белых — слишком долго возвращать пешку | IQP / hanging pawns / open c-file | difficulty 2/5, ETA 20 мин, P1 |
+
+Учебный репертуар:
+белыми в v1 отлично работает связка **QGD Exchange + main QGD**;
+чёрными — один модуль **QGD Orthodox**, а QGA — как отдельная practical alternative. Для model-games section: entity["athlete","Alexander Alekhine","Russian and French chess world champion"]–entity["athlete","Emanuel Lasker","German chess world champion"], 1934; entity["athlete","Ossip Bernstein","Russian chess master"]–entity["athlete","José Raúl Capablanca","Cuban chess world champion"], 1914; entity["athlete","Anatoly Karpov","Russian chess world champion"]–entity["athlete","Garry Kasparov","Russian chess world champion"], 1984. citeturn26view0
+
+**Славянская и Полуславянская (D10–D49).** Славянская — одна из лучших чёрных систем против 1.d4 именно для любителя: прочная, логичная, без вечной проблемы слона c8. Полуславянская — это уже «следующий этаж»: выше теоретическая цена, но богаче контригра. Для app надо держать их как два разных пакета: Solid Slav и Sharp Meran/Anti-Meran. citeturn8view5turn12search0turn21search0turn21search1turn21search12turn26view1
+
+Стабильная связка источников: urlSlav Defense on Chess.comturn2search1, urlSlav guide on 365Chessturn21search0, urlSemi-Slav on ChessBase Learnturn25search3 и urlMeran on 365Chessturn21search1. citeturn8view5turn21search0turn25search3turn21search1
+
+| Ветвь | Якорь | Карточка подсказки | Тактика/ошибки | Структура | UI |
+|---|---|---|---|---|---|
+| Slav Main Line | `1.d4 d5 2.c4 c6 3.Nf3 Nf6 4.Nc3 dxc4 5.a4 Bf5 6.e3 e6 7.Bxc4` | Чёрные временно берут c4, чтобы закончить развитие без ущерба; белые возвращают пешку и получают нормальный центр | ошибка чёрных — пытаться держать c4 слишком долго | main Slav structure | difficulty 2/5, ETA 25 мин, P0 |
+| Exchange Slav | `...3.cxd5 cxd5` | Белые учат симметрию и игру через Bf4/e3; чёрные — активный выпуск фигур и равенство без скуки | ошибка — считать позицию «мертвой» | симметрия, positional grind | difficulty 1/5, ETA 15 мин, P0 |
+| Semi-Slav Meran | `1.d4 d5 2.c4 e6 3.Nc3 Nf6 4.Nf3 c6 5.e3 Nbd7 6.Bd3 dxc4 7.Bxc4 b5` | Чёрные создают крепкий центр и space на ферзевом фланге; белые решают: `e4`, `a4`, позиционная или sharp-игра | тактика на `e4/e5`, линия b-file, pressure on c4/b5 | Meran with central tension | difficulty 4/5, ETA 40 мин, P1 |
+| Anti-Meran / Moscow family | `...5.Bg5` | Отдельный модуль для теоретиков; в v1 достаточно распознавать и знать safe-path | ошибка чёрных — входить без подготовки в sharp line | highly tactical Semi-Slav | difficulty 5/5, ETA 45 мин, P2 |
+
+Учебный репертуар:
+чёрными — начать со **Славянской Main Line** и **Exchange Slav**;
+если пользователь хочет больше борьбы на победу — добавить **Meran** как Advanced Pack. Для раздела «смотреть»: партии entity["athlete","Max Euwe","Dutch chess world champion"]–entity["athlete","Alexander Alekhine","Russian and French chess world champion"], 1937, и entity["athlete","Veselin Topalov","Bulgarian chess grandmaster"]–entity["athlete","Vladimir Kramnik","Russian chess world champion"], 2006. citeturn26view1
+
+**Английское начало (A10–A39).** Английское нельзя хранить в приложении как обычный дебют «одна ветка — одно имя». Это **движок трансформаций**: reversed Sicilian, Symmetrical English, Botvinnik setup, Hedgehog, Anglo-Indian/Anglo-Grünfeld. Поэтому здесь особенно важны теги `transposition`, `structure_id` и `move-order warning`. citeturn8view6turn28view0turn18search0turn13search2turn21search2turn21search6
+
+Практически держи рядом urlEnglish Opening on Chess.comturn2search2, urlEnglish Opening on 365Chessturn21search6, urlEnglish Opening lesson on Chess.comturn2search14 и urlEnglish Botvinnik System articleturn18search5. citeturn28view0turn21search6turn2search14turn18search5
+
+| Семейство | Якорь | Карточка подсказки | Тактика/ошибки | Структура | UI |
+|---|---|---|---|---|---|
+| King's English / Reversed Sicilian | `1.c4 e5` | Белые получают «сицилианку лишним темпом»; идея — Nc3/g3/Bg2 и давление по ферзевому флангу | ошибка белых — играть как в обычной Сицилианской, забывая про extra tempo | reversed Sicilian | difficulty 3/5, ETA 25 мин, P1 |
+| Symmetrical English | `1.c4 c5` | Борьба за `d4`; один из игроков рано или поздно ломает симметрию через `d4`/`b4` | ошибка — автоматическая симметрия без плана сломать её | symmetrical / Hedgehog entrances | difficulty 3/5, ETA 25 мин, P1 |
+| Botvinnik System | `1.c4 e5 2.Nc3 Nc6 3.g3 g6 4.Bg2 Bg7 5.d3 d6 6.e4` | Белые строят прочную shell-структуру и могут готовить `f4` | ошибка чёрных — недооценка готового флангового штурма белых | closed Botvinnik | difficulty 3/5, ETA 20 мин, P1 |
+| Anglo-Indian / Anglo-Grünfeld | `1.c4 Nf6` | Здесь app обязан помечать трансформации: в Indian-системы, Grünfeld-type и normal English | ошибка — не распознавать, что дебют сменился | transpositional hub | difficulty 4/5, ETA 20 мин, P1 |
+
+Учебный репертуар:
+белыми — для v1 лучший набор это **Reversed Sicilian + Symmetrical + один Botvinnik setup**, а всё после `...Nf6` сразу метить как transposition-module. По историческим примерам полезны партии entity["athlete","Mikhail Botvinnik","Soviet chess world champion"], entity["athlete","Garry Kasparov","Russian chess world champion"] и даже entity["athlete","Bobby Fischer","American chess world champion"], которые источники прямо называют крупными практиками Английского. citeturn28view0
+
+**Голландская защита (A80–A99).** Голландская — отличный fight-for-win пакет за чёрных, но плохая идея как самый первый чёрный дебют против 1.d4. В приложении её лучше показывать через три узнаваемые структуры: Stonewall, Leningrad, Classical Dutch, плюс узнавание white-side антидотов — Hopton и Staunton. citeturn8view10turn14view7turn28view1turn24search9turn24search1
+
+Полезный набор ссылок: urlDutch Defense on Chess.comturn3search2, urlDutch guide on 365Chessturn24search5, urlStonewall on Chess.comturn13search4 и urlDutch Stonewall ECO on 365Chessturn21search3. citeturn28view1turn24search5turn13search4turn21search3
+
+| Ветвь | Якорь | Карточка подсказки | Тактика/ошибки | Структура | UI |
+|---|---|---|---|---|---|
+| Stonewall | `1.d4 f5 2.c4 Nf6 3.g3 e6 4.Bg2 Be7 5.Nf3 O-O 6.O-O d5` | Чёрные строят зубчатую решётку `f5-e6-d5-c6`, закрепляют e4 и часто ищут атаку по королевскому флангу | ловушки после `Bg5`, план `...Ne4`; ошибка — игнорировать слабые тёмные поля и идею `Ba3` | Stonewall | difficulty 3/5, ETA 25 мин, P2 |
+| Leningrad | `...g6 ...Bg7 ...d6` | Более динамичный Dutch: KID-подобный фианкетто с другим пешечным рисунком | белые часто давят по e6 и ставят d5; ошибка чёрных — путать структуру с KID и терять время | Leningrad fianchetto | difficulty 4/5, ETA 30 мин, P2 |
+| Classical Dutch | `...d6 e6 f5` без `...c6-d5` | Чёрные ведут более гибкую фигурантную игру, но структура менее автоматична | ошибка — ослабить короля без контригры | classical Dutch | difficulty 3/5, ETA 20 мин, P2 |
+
+Учебный репертуар:
+если включать Голландскую, то сначала как **Stonewall-only module**; Leningrad — как следующий уровень. Белыми против Stonewall полезен готовый план `g3 Bg2 O-O b3 Ba3`, а против Dutch вообще — отдельный alert на `2.Bg5` и `2.e4`. Практический исторический пример Stonewall-игры — entity["athlete","Savielly Tartakower","Polish and French chess grandmaster"] против entity["athlete","Géza Maróczy","Hungarian chess grandmaster"], 1922. citeturn28view1
+
+## Индийские защиты, дополнительные пакеты и архитектура данных
+
+**Королевская индийская защита (E60–E99).** KID — это дебют, в котором приложение обязано объяснять не ходы, а логику: чёрные позволяют белым центр, чтобы потом подорвать его фигурами и пешками. Для 1000–1800 особенно важна грань «когда уже можно атаковать» и «когда ещё надо развиваться». Источники прямо отмечают её как sharp opening и не лучшую отправную точку для начинающих. citeturn8view8turn10search0turn10search1turn10search12turn20search2turn26view3
+
+В качестве опорных материалов лучше всего держать urlKing's Indian Defense on Chess.comturn3search0, urlKID lesson on Chess.comturn3search4, urlKID ECO on 365Chessturn20search2 и urlKID training on 365Chessturn20search10. citeturn8view8turn3search4turn20search2turn20search10
+
+| Ветвь | Якорь | Карточка подсказки | Тактика/ошибки | Структура | UI |
+|---|---|---|---|---|---|
+| Classical / Mar del Plata family | `1.d4 Nf6 2.c4 g6 3.Nc3 Bg7 4.e4 d6 5.Nf3 O-O 6.Be2 e5 7.O-O` | Белые держат центр, чёрные готовят `...Nc6`, затем `...f5`; ключ — понимать закрытый центр и race attacks | ошибка чёрных — начинать kingside attack без закреплённого центра; ошибка белых — не начинать queenside play | locked center, opposite-wing attacks | difficulty 5/5, ETA 45 мин, P1 |
+| Fianchetto | `...5.g3` | Белые гасят часть атаки чёрных и играют позиционно; чёрным надо смещать фокус на центр и c-file | ошибка чёрных — играть «автоматический штурм» как в Classical | сдержанный KID, больше стратегической борьбы | difficulty 3/5, ETA 30 мин, P1 |
+| Sämisch | `...5.f3` | Белые цементируют e4 и нередко готовят длинную рокировку; чёрные отвечают расширением и подрывом центра | opposite-side castling, давление по c/e линиям | Saemisch central build | difficulty 4/5, ETA 35 мин, P1 |
+| Makogonov / Averbakh family | `...5.h3` или ранний `Bg5` | Отличный white-side practical pack: меньше чистой форсировки, больше позиционного контроля | ошибка чёрных — не адаптировать план к сдерживающей расстановке белых | anti-KID positional structures | difficulty 3/5, ETA 25 мин, P1 |
+
+Учебный репертуар:
+чёрными — если брать KID, то **только Classical core + один anti-system plan**;
+белыми — для контроля над теорией удобнее **Fianchetto** или **Makogonov**. Для model-games section нужны партии entity["athlete","Viktor Korchnoi","Soviet and Swiss chess grandmaster"]–entity["athlete","Bobby Fischer","American chess world champion"] и entity["athlete","Anatoly Karpov","Russian chess world champion"]–entity["athlete","Garry Kasparov","Russian chess world champion"]. citeturn26view3
+
+**Защита Грюнфельда (D70–D99).** Для приложения это advanced module на тему «большой центр против давления по нему». Если KID учит гонке атак, то Grünfeld учит: центр надо не просто занять, его надо удержать от подрыва `...c5`/фигурным давлением. Источники прямо помечают его как very theoretical. citeturn8view9turn10search2turn20search7turn24search6turn26view4
+
+Полезная связка: urlGrünfeld Defense on Chess.comturn3search1, urlRussian Variation on Chess.comturn10search2, urlGrünfeld guide on 365Chessturn24search2 и urlGrünfeld ECO on 365Chessturn24search6. citeturn8view9turn10search2turn24search2turn24search6
+
+| Ветвь | Якорь | Карточка подсказки | Тактика/ошибки | Структура | UI |
+|---|---|---|---|---|---|
+| Exchange Variation | `1.d4 Nf6 2.c4 g6 3.Nc3 d5 4.cxd5 Nxd5 5.e4 Nxc3 6.bxc3` | Белые строят broad center; чёрные обязаны немедленно начать pressure package по центру | ошибка белых — просто «стоять с центром» без развития; ошибка чёрных — запаздывать с `...c5` и давлением | big center vs dynamic pressure | difficulty 5/5, ETA 40 мин, P2 |
+| Russian Variation | `...4.Nf3 Bg7 5.Qb3` | Белые бьют по d5/b7, избегают части стандартных обменов; чёрным нужен отдельный модуль точности | тактика на `Qb3`, pressure on d5/c4; ошибка чёрных — терять пешку/темп | Russian-Qb3 structures | difficulty 5/5, ETA 35 мин, P2 |
+| Fianchetto / Neo-Grünfeld family | `g3/Bg2` setups | Белые переводят игру в более «позиционную» форму; чёрным важно распознавать, когда дебют уже не чистый Grünfeld | ошибка — применять одинаковый план против всех g3 setups | positional Indian/Grünfeld hybrids | difficulty 4/5, ETA 25 мин, P2 |
+
+Учебный репертуар:
+чёрными — сначала **Exchange Variation module**, потом **Russian Variation**;
+белыми — если нужна практичность, проще использовать Fianchetto package и только потом Normal Exchange. Для историко-мотивационного блока идеально подходят: entity["athlete","Bobby Fischer","American chess world champion"]–entity["athlete","Donald Byrne","American chess master"], 1956; entity["athlete","Alexei Shirov","Latvian and Spanish chess grandmaster"]–entity["athlete","Veselin Topalov","Bulgarian chess grandmaster"], 1998; entity["athlete","Garry Kasparov","Russian chess world champion"]–entity["athlete","Alexander Beliavsky","Ukrainian and Slovenian chess grandmaster"], 1988. citeturn26view4
+
+**Нимцович-Ларсен (A01/A06).** Это полезный white-side surprise module, особенно если хочется избежать главного теоретического трафика и учить фианкетто-логики. В базовое ядро его включать не нужно, но как дополнительный пакет — да. citeturn3search3turn13search3turn24search3
+
+| Ветвь | Якорь | Карточка подсказки | Тактика/ошибки | Структура | UI |
+|---|---|---|---|---|---|
+| Classical vs ...d5 | `1.b3 d5 2.Bb2` | Белые быстро фианкеттируют слона и держат центр гибким через `e3/Nf3` или `f4` | ошибка — запереть слона b2 своими пешками без плана на центр | queenside fianchetto | difficulty 2/5, ETA 15 мин, P2 |
+| Modern vs ...e5/...Nf6 | `1.b3 e5` или `1...Nf6` | Основная идея та же: не «развлекаться редкостью», а быстро вывести фигуры и решить, нужен ли d4/e4 | ошибка — думать, что редкий ход сам по себе даёт перевес | flexible minor-piece game | difficulty 2/5, ETA 15 мин, P2 |
+
+Для исторического файла можно дать партию entity["athlete","Aron Nimzowitsch","Latvian-Danish chess grandmaster"]–Walter Michel, 1926, и набор ссылок: urlNimzowitsch-Larsen on Chess.comturn3search3, urlNimzowitsch-Larsen ECO on 365Chessturn24search3. citeturn24search15turn24search3
+
+**Структура данных и UI для приложения.** Здесь критично три решения:
+во‑первых, хранить не просто линии, а ещё и `structure_id`;
+во‑вторых, хранить `transpositions`, особенно для English/KID/Grünfeld/Slav family;
+в‑третьих, у каждой карточки иметь поле `why_this_move`, иначе приложение превращается в тупой flashcard. Для источников данных лучше использовать связку: частоты и свои выборки — из urlLichess open databaseturn7search12; имена ветвей и базовые деревья — из urlChess.com Openingsturn18search3 и url365Chess opening explorerturn24search7; объясняющие материалы и книги — из urlChessBase Learnturn25search8, urlNew In Chess catalogturn5search1 и urlGambit Booksturn6search0; русскоязычный слой — из urlChessBase.ru дебютыturn22search13 и urle3e5.com материалы по дебютамturn22search11. citeturn7search12turn18search3turn24search7turn25search8turn5search1turn6search0turn22search13turn22search11
+
+Ниже — образец JSON-карточки, достаточный для разработки. Схема не копирует конкретный внешний сервис; это прикладной формат для твоего mini-app, собранный из того, как tree/explorer/training обычно устроены у крупных chess-инструментов. citeturn18search3turn24search7turn7search12
+
+```json
+{
+  "opening_id": "italian_game",
+  "eco": ["C50", "C54"],
+  "side": "white",
+  "family": "open_games",
+  "branch_name": "Giuoco Pianissimo",
+  "trigger_moves_san": ["e4", "e5", "Nf3", "Nc6", "Bc4", "Bc5"],
+  "anchor_line_san": ["e4", "e5", "Nf3", "Nc6", "Bc4", "Bc5", "d3", "Nf6", "O-O", "d6"],
+  "recommended_move": "d3",
+  "why_this_move": "Сохраняет гибкий центр, ускоряет рокировку и удерживает идею c3+d4 на лучших условиях.",
+  "typical_plan": [
+    "O-O",
+    "c3",
+    "Re1",
+    "h3",
+    "Nbd2-f1-g3",
+    "d4 в подходящий момент"
+  ],
+  "tactical_motifs": [
+    "Bxf7+",
+    "Ng5",
+    "d4 central break",
+    "pressure on e5"
+  ],
+  "common_mistakes": [
+    {
+      "mistake": "Слишком ранний d4",
+      "why_bad": "Центр раскрывается до завершения развития."
+    },
+    {
+      "mistake": "Игнорирование ...Na5",
+      "why_bad": "Чёрные выигрывают темп на слоне c4."
+    }
+  ],
+  "middlegame_structures": [
+    "slow_italian_closed_center",
+    "kingside_maneuvering"
+  ],
+  "endgame_tendencies": [
+    "хорошие поля для коня g3/e3",
+    "борьба за e4/e5"
+  ],
+  "transpositions": [
+    "giuoco_piano_classical",
+    "two_knights_modern_bishops_opening"
+  ],
+  "study_refs": [
+    {"label": "Italian Game on Chess.com", "ref": "turn0search1"},
+    {"label": "Italian on ChessBase Learn", "ref": "turn0search2"},
+    {"label": "Italian on 365Chess", "ref": "turn20search4"}
+  ],
+  "ui": {
+    "difficulty": 2,
+    "study_eta_min": 25,
+    "priority": "P0",
+    "tags": ["white", "positional", "open_game", "structure_first"]
+  },
+  "children": [
+    {
+      "move": "d3",
+      "branch_name": "Giuoco Pianissimo"
+    },
+    {
+      "move": "c3",
+      "branch_name": "Classical Giuoco Piano"
+    },
+    {
+      "move": "b4",
+      "branch_name": "Evans Gambit"
+    }
+  ]
+}
+```
+
+Минимальный UI-набор я бы делал такой.
+**Карточка хода**: вкладки «Зачем ход», «План», «Тактика», «Ошибки», «Структуры».
+**Дерево**: раскрывающиеся ветви с цветовой маркировкой по сложности и вероятности.
+**Поиск/фильтры**: `white/black`, `solid`, `sharp`, `IQP`, `opposite-side castling`, `fianchetto`, `endgame-heavy`, `transpositional`.
+**Тренажёр**: два режима — «найди ход» и «объясни ход». Второй важнее первого.
+**Визуализации**: heatmap частот ходов, branching graph по семействам, библиотека пешечных структур, граф переходов «дебют → типичный миттельшпиль». Такой набор напрямую следует из природы транcпозиционных дебютов и из того, как explorer-ориентированные обучающие продукты подают openings. citeturn8view6turn28view0turn7search12turn18search3turn24search7
+
+Базовая библиотека источников для контентного слоя приложения:
+urlFundamental Chess Openingsturn6search0 — лучший единый обзор по семействам;
+urlChess Structures: A Grandmaster Guideturn5search0 — обязательная книга, если хочешь учить не ходы, а пешечные структуры;
+urlOpening Repertoire: The Ruy Lopezturn23search1 и urlCaruana's Ruy Lopezturn23search2 — для испанских модулей;
+urlThe Exchange French Comes to Lifeturn23search4 — чтобы не превращать Exchange French в скуку;
+urlTactics in the Chess Opening 3turn23search12 — для ловушек и early tactical motifs во Французской и Каро-Канн;
+urlChess.com Openingsturn18search3, url365Chess opening explorerturn24search7, urlLichess open databaseturn7search12 и urlChessBase Learnturn25search8 — как ежедневный production-stack для базы вариантов, названий, частот и обучающих материалов. citeturn6search0turn5search0turn23search1turn23search2turn23search4turn23search12turn18search3turn24search7turn7search12turn25search8
