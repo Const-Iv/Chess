@@ -125,6 +125,7 @@
 - Production deploy через Vercel должен идти из GitHub `main` после обычного task/merge flow. Ручной `vercel --prod`, Vercel promote или API production deploy допустимы только по явному owner request как emergency/one-off path с зафиксированной причиной и SHA.
 - Preview deployments из `codex/*` веток допустимы для проверки owner'ом, но они не заменяют QA gate, source/manual verification дебютных данных и task finish/merge gate.
 - Коммит должен сохранять принятый формат `Ver. <version> <type> <description> | <qa-result>`; если QA не прошел, такой коммит нельзя пушить как production-ready изменение.
+- После finish/merge, который затрагивает GitHub/Vercel deploy profile, нужно явно зафиксировать deploy evidence: source branch/SHA, `publishStatus`, production или preview URL/status если доступен, и результат smoke/check. Если подтвержден только push в `main`, нельзя говорить "деплой прошел"; нужно писать, что deployment trigger подтвержден, а completion требует Vercel confirmation.
 - Перед push нужно проверить, что diff не содержит secrets, credentials, личные заметки, прогресс, приватные партии или неподтвержденные шахматные факты, которые будут доступны через GitHub/Vercel.
 - `.vercel/`, `.env`, runtime artifacts and local state должны оставаться ignored и не попадать в git.
 - Vercel/GitHub deploy path не заменяет `release:local` как core baseline release command; это product-specific lightweight deploy profile поверх managed task conveyor.

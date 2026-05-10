@@ -68,6 +68,7 @@ Evidence path: `Docs/echo-tests/chess-opening-root-capability.md`.
 - `main` защищен от прямых изменений без явного разрешения owner'а.
 - `main` является Vercel production branch; попадание изменений в GitHub `main` может обновить production URL.
 - Ручной `vercel --prod`, Vercel promote или API production deploy не использовать как обычный release path; только по явному owner request с причиной и SHA.
+- После finish/merge фиксировать deploy evidence: `publishStatus`, source branch/SHA, deployment URL/status если доступен и smoke result; push в `main` сам по себе подтверждает trigger, но не доказывает completed Vercel deployment.
 - Перед push проверять, что diff не содержит secrets, credentials, личные заметки, прогресс, приватные партии или неподтвержденные шахматные факты.
 - `.vercel/`, `.env`, runtime artifacts and local state должны оставаться ignored.
 - Для code-changing work обязателен `npm run qa:agent`.

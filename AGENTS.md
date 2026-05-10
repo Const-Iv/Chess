@@ -50,6 +50,7 @@ Product Charter Gate:
 - Любой push в GitHub может создать Vercel deployment: push в `main` обновляет production, push в другие ветки может создать preview. Перед merge/push в `main` обязателен PASS `npm run qa:agent`; для UI/user-visible changes нужен browser smoke, если интерфейс можно запустить; для внешней публикации нужен `npm run qa:security`.
 - Production deploy через Vercel должен идти из GitHub `main` после обычного task/merge flow. Ручной `vercel --prod`, Vercel promote или API production deploy допустимы только по явному owner request как emergency/one-off path с зафиксированной причиной и exact SHA.
 - Preview deployments из `codex/*` веток допустимы для owner review, но не заменяют QA gate, source/manual verification дебютных данных и task finish/merge gate.
+- После finish/merge, затрагивающего Vercel deploy profile, нужно явно проверить и сообщить deploy evidence: `publishStatus`, source branch/SHA, target branch, provider/deployment URL/status если доступен, production URL smoke when appropriate. Если подтвержден только push в `main`, формулировать это как deployment trigger, а не как доказанный completed deploy.
 - Перед push нужно проверить, что diff не содержит secrets, credentials, личные заметки, прогресс, приватные партии или неподтвержденные шахматные факты; `.vercel/`, `.env`, runtime artifacts and local state должны оставаться ignored.
 - External libraries, integrations and package setup require official documentation check before installation/configuration/update/debugging.
 - Reusable shared skills можно versioned хранить в `skills/` и публиковать в `$CODEX_HOME/skills` через repo scripts; downstream проекты могут подключать starter как git submodule и линковать skills через `skills-manage.mjs --source vendor/new-project-starter/skills`; `.system`, plugin-managed, product-specific skills и generated skill trees (`.agents/skills`, `.claude/skills`, `.cursor/skills`) не являются частью starter core и не импортируются bulk-copy.
@@ -256,6 +257,7 @@ Eval Gate для AI/agent behavior:
 - single-writer operational docs синхронизируются только на publish/release stage.
 - для этого продукта `main` является Vercel production branch, поэтому merge/push в `main` может обновить `https://chess-prilozhenie.vercel.app`;
 - перед merge/push в `main` также нужен `npm run qa:security`, а UI/user-visible changes требуют browser smoke, если интерфейс можно запустить;
+- после publish stage проверять deploy evidence: `publishStatus`, source branch/SHA, deployment URL/status если доступен, production URL smoke when appropriate; push в `main` означает trigger, но не сам по себе completed Vercel deploy;
 - перед push нужно проверить отсутствие secrets, credentials, личных заметок, прогресса, приватных партий и неподтвержденных шахматных фактов.
 
 ### Release Semantic Command

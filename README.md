@@ -106,6 +106,7 @@ npm run skills:link -- --adopt
 - GitHub `main` является Vercel production branch; перед merge/push в `main` нужен PASS `npm run qa:agent`, `npm run qa:security`, а для UI changes - browser smoke, если интерфейс можно запустить.
 - Push в рабочую ветку может создать Vercel preview; preview URL не заменяет QA, task finish/merge gate и source/manual verification шахматного контента.
 - Ручной `vercel --prod`, Vercel promote или API production deploy использовать только по явному owner request с причиной и exact SHA.
+- После finish/merge проверять deploy evidence: `publishStatus`, source branch/SHA, URL/status если доступен и smoke result; push в `main` подтверждает deployment trigger, но не completed Vercel deploy без дополнительного подтверждения.
 - Перед push проверять, что diff не содержит secrets, credentials, личные заметки, прогресс, приватные партии или неподтвержденные шахматные факты; `.vercel/`, `.env`, runtime artifacts and local state должны оставаться ignored.
 - UI changes требуют browser smoke, если интерфейс можно запустить.
 - External libraries, integrations and package setup require official documentation check before installation/configuration/update/debugging.
