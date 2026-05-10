@@ -171,7 +171,8 @@ node vendor/new-project-starter/scripts/skills-manage.mjs link --source vendor/n
 - синхронизирует operational docs;
 - пересобирает `Docs/task-history.md` только на publish stage;
 - auto-commit'ит tracked sync/history changes и generated `Docs/archive/*.md.gz` перед push, если они появились;
-- пушит `main`, если remote существует.
+- пушит `main`, если remote существует;
+- для product deploy profile после push нужен отдельный deploy evidence report: `publishStatus`, source branch/SHA, provider URL/status if available and smoke result; push confirms trigger only.
 
 ### `task:history`
 

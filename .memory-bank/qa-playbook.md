@@ -41,6 +41,13 @@ Preview deployment из `codex/*` ветки допустим для owner revie
 
 Ручной `vercel --prod`, Vercel promote или API production deploy требует явный owner request, exact SHA, причину bypass and post-deploy verification.
 
+После `worktree-finish` / `task:merge:main` для GitHub/Vercel profile фиксировать:
+- `publishStatus`, source branch, target branch and SHA;
+- был ли push в deployment branch или только local-only/skipped state;
+- provider deployment URL/status if available;
+- production URL smoke and browser smoke for UI/user-visible changes when the UI can run;
+- explicit caveat when only the Git push trigger is confirmed and Vercel completion still needs dashboard/API confirmation.
+
 ## Echo-test Gate
 
 До feature/refactor/behavior-change work по шахматной логике нужно подтвердить:

@@ -13,7 +13,8 @@ Use this skill to close a task worktree consistently across projects while still
 2. Read `CODEX_MEMORY.md` if it exists.
 3. Read `.memory-bank/index.md` if it exists, then only the relevant linked memory files.
 4. Inspect `package.json`, `scripts/README.md`, and relevant scripts for canonical finish, merge, and release commands.
-5. Prefer explicit repo entrypoints such as `task:finish:core`, `task:merge:main`, or `release:local` over manual git flows.
+5. Inspect repo deploy/release rules if the repository declares an external deployment profile, such as GitHub `main` triggering Vercel production.
+6. Prefer explicit repo entrypoints such as `task:finish:core`, `task:merge:main`, or `release:local` over manual git flows.
 
 ## Finish Workflow
 
@@ -22,8 +23,27 @@ Use this skill to close a task worktree consistently across projects while still
 3. If the canonical flow is blocked by a dirty `main` or source tree, do read-only blocker triage before asking the user to choose: list exact paths, change types, tracked/untracked state, likely source from history/diff/name-status, relationship to the current task branch, risk, and the recommended next action.
 4. Execute the canonical repo finish flow.
 5. Run the repo's required deterministic QA gates before merge or push when the contract requires them.
-6. Ask for cleanup explicitly before deleting any local branch or worktree.
-7. Verify the final state from task state/history and filesystem, not just from exit code: merged or not, pushed or not, and `cleanupStatus` passed, kept, or failed.
+6. If the repo declares that publish/merge triggers an external deployment, run the deployment verification checklist before claiming the task is deployed.
+7. Ask for cleanup explicitly before deleting any local branch or worktree.
+8. Verify the final state from task state/history and filesystem, not just from exit code: merged or not, pushed or not, deploy verified or not, and `cleanupStatus` passed, kept, or failed.
+
+## Deployment Verification
+
+Use this section only when the repository's own docs declare a deploy profile. Keep the repo docs and scripts as the source of truth; do not hardcode one provider into a project that did not choose it.
+
+After the publish/merge stage:
+
+1. Read the task state/history and identify `publishStatus`, source branch, target branch, and commit SHA.
+2. If `publishStatus = "pushed"` and the target branch is documented as a deployment source, record that the deployment trigger is confirmed for that SHA.
+3. If the deploy provider status is available through the repo's approved tools, dashboard, API, or CLI, check and report the deployment URL and status.
+4. If only the production/preview URL can be checked, run the repo-required smoke check and label it accurately as URL/runtime evidence, not provider build-status proof.
+5. If provider status cannot be checked, say that the Git push trigger is confirmed but deployment completion still needs provider/dashboard confirmation. Do not call it deployed.
+6. If `publishStatus = "local-only"`, no remote deployment was triggered.
+7. If `publishStatus = "skipped_already_merged"`, do not imply a new deployment was triggered; report that the branch SHA was already contained in the deployment branch and verify the existing deployment if the user needs proof.
+
+For GitHub/Vercel profiles, a normal production deploy must come from the documented production branch through the Git integration. Do not use `vercel --prod`, manual promote, deploy hooks, or API production deploy as the normal finish path. Those are emergency or one-off paths only when the repo contract and owner explicitly allow them with an exact SHA and reason.
+
+Preview deployments can help the owner review a branch, but they do not replace production QA, source/content verification, merge gates, or production deployment evidence.
 
 ## Cleanup Choice
 
@@ -80,5 +100,12 @@ Then confirm the recorded cleanup result:
 - `cleanupStatus = "passed"` means the exact worktree path, git worktree registration, branch, managed task root, and task-scoped leftovers were removed.
 - `cleanupStatus = "kept"` means the user intentionally kept the local worktree/branch.
 - `cleanupStatus = "failed"` means finish is not complete yet; resume from `main` with `--task-id` when available.
+
+If the starter-derived repository adds a product deploy profile, also confirm the deployment result from task history and provider/runtime evidence:
+
+- `publishStatus = "pushed"` means a remote push happened; in a GitHub/Vercel profile this confirms the deployment trigger only when the pushed branch is the documented production or preview source.
+- `publishStatus = "local-only"` means no remote deployment was triggered.
+- `publishStatus = "skipped_already_merged"` means no new push/deployment happened during this finish run.
+- Provider deployment status, deployment URL, production URL smoke, and browser smoke are separate evidence; report which ones were actually checked.
 
 If the repo exposes separate publish or merge stages, continue with the documented commands rather than inventing a new flow. If the repo defines `task:finish:cleanup`, let that hook handle repo-specific leftovers instead of hand-written shell cleanup.
