@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-05-08T11:57:31.246Z",
+  "updatedAt": "2026-05-11T08:52:00.000Z",
   "rules": [
     {
       "id": "starter.project-intake.mission-vision-project-level",
@@ -708,6 +708,29 @@
           "rs-bcb8dbbb28"
         ],
         "importedAt": "2026-05-08T10:58:56.000Z"
+      },
+      "sharePolicy": "required"
+    },
+    {
+      "id": "starter.rule-import.chat-summary-before-choice",
+      "title": "Rule import shows full chat summary before owner choice",
+      "text": "`starter-rule-import` перед каждым owner choice сначала выводит в чат полную сводку в порядке `Статус сейчас`, `Проект-источник`, `Суть`, `Job Story`, `Точный текст для starter`; только после этой сводки можно показывать choice или вызывать `request_user_input`. Candidate ids и source details остаются только traceability ниже человеческого объяснения.",
+      "targetFiles": [
+        "AGENTS.md",
+        ".memory-bank/code-rules.md",
+        "CODEX_MEMORY.md",
+        ".cursorrules",
+        "CLAUDE.md",
+        "skills/starter-rule-import/SKILL.md"
+      ],
+      "requiredFragments": [
+        "`starter-rule-import` перед каждым owner choice сначала выводит в чат полную сводку",
+        "`Статус сейчас`, `Проект-источник`, `Суть`, `Job Story`, `Точный текст для starter`",
+        "только после этой сводки можно показывать choice"
+      ],
+      "source": {
+        "type": "owner-directive",
+        "note": "Owner requested chat-first starter-rule-import question format on 2026-05-11."
       },
       "sharePolicy": "required"
     },
