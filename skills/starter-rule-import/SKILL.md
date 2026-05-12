@@ -26,11 +26,14 @@ If no report exists, stop and run `$starter-rule-report` first.
    - `Кандидаты на импорт`
    - `Требует ручной проверки`
 3. Collapse duplicates by source project and rule topic. One reusable starter rule should produce one owner question, even if several candidate ids support it.
-4. Ask owner decisions sequentially and make every question self-contained. Each question must follow the Owner Question Standard below and show:
-   - `Проект: <source project>`
-   - `Суть: <plain-language rule topic>`
-   - `**Точный текст для starter:** <proposed exact text>`
-   - source ids only as traceability below the decision content
+4. Ask owner decisions sequentially and make every question self-contained. Before any choice, first send a normal chat message with the full owner-facing summary. Do not call `request_user_input` or present any structured choice until the owner has seen the summary in this order:
+   - `Статус сейчас: <missing | partially covered | already present but unregistered | source-specific>`
+   - `Проект-источник: <source project>`
+   - `Суть: <plain-language rule topic and portable lesson>`
+   - `Job Story: <when / I want / so that>`
+   - `Точный текст для starter:`
+   - `<proposed exact starter text>`
+   Source ids may appear only as traceability below the human-readable decision content.
 5. Use exactly these decision meanings:
    - `Согласовать в starter как написано`: import the exact starter text.
    - `Согласовать с правкой`: ask for or propose the exact replacement text before approval.
@@ -54,22 +57,41 @@ Before asking, do a self-check and state:
 - `Статус сейчас:` whether the rule is missing, already present but unregistered, partially covered, or source-specific.
 - `Проект-источник:` where the lesson came from.
 - `Суть:` what behavior changes in plain language.
+- `Job Story:` the owner-facing situation/value sentence in the format `Когда <ситуация>, я хочу <действие>, чтобы <результат>`.
 - `Что меняется в starter:` exact canonical surface, registry-only change, Project Intake template change, or no import.
-- `**Точный текст для starter:**` the portable text, rewritten away from source-project details.
+- `Точный текст для starter:` the portable text, rewritten away from source-project details. Put the exact text in the chat summary before any decision control.
 - `**Моё предложение:**` the charter-safe recommendation and why.
 - `Traceability:` candidate/source ids after the human decision content.
+
+Required chat-first format:
+
+```text
+Статус сейчас: <plain-language coverage status and current starter gap>.
+
+Проект-источник: <source project>.
+
+Суть: <what happened in the source project and which portable lesson should move to starter>.
+
+Job Story: когда <ситуация>, я хочу <действие>, чтобы <результат>.
+
+Точный текст для starter:
+<exact portable rule text>
+```
+
+Only after this chat summary may you ask the owner to choose `Согласовать в starter как написано`, `Согласовать с правкой`, or `Не согласовываю / нужен ответ`. If using a structured question tool, send the full summary as normal chat first and use the tool only for the final choice.
 
 Successful patterns to repeat:
 - Explain existing coverage before the choice: `правило уже есть, упущение только registry` or `правила ещё нет в starter`.
 - Group duplicates into one decision when they support the same reusable starter rule.
 - For source-specific lessons, preserve the invariant and remove local wording, project names, local commands, channels, private notes, and raw logs.
 - When adapting workflow choices, make them explicit owner/team decisions, not new starter defaults.
-- If the owner says the question is unclear, stop that sequence, restate the candidate using this full standard, and continue only after the owner can see the exact proposed rule and effect.
+- If the owner says the question is unclear, stop that sequence, restate the candidate using the required chat-first format, and continue only after the owner can see the exact proposed rule and effect. Do not ask the same bare choice again.
 
 Anti-patterns to avoid:
 - Do not ask terse technical choices such as `registry-only / править текст / пропустить` without explaining the actual rule and current starter gap.
 - Do not lead with internal ids, report numbers, registry mechanics, or candidate labels before the human meaning.
 - Do not ask the owner to approve a rule without exact starter text and a recommendation.
+- Do not call `request_user_input` before the full chat summary is visible.
 - Do not bundle unrelated decisions into one question.
 - Do not import source-specific wording such as a solo-owner PR policy as if it were portable starter text.
 - Do not treat `Требует ручной проверки` as owner homework when Codex can inspect the source itself.
