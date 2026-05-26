@@ -163,6 +163,13 @@ button {
   width: 36px;
 }
 
+.toolbar-piece {
+  display: block;
+  font-size: 23px;
+  pointer-events: none;
+  transform: none;
+}
+
 .toolbar-priority {
   display: grid;
   gap: 2px;
