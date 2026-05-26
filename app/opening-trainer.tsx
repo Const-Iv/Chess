@@ -4,6 +4,8 @@ import { Chess, type Move, type Square } from "chess.js";
 import { useMemo, useState } from "react";
 
 import { buildOpeningLessons } from "../src/domain/chess/opening-database.mjs";
+import { getMoveQualityHint } from "../src/domain/chess/move-quality-hints.mjs";
+import { createFreeMoveRecordsFromSteps } from "../src/domain/chess/trainer-session.mjs";
 
 type StudySide = "white" | "black";
 type ChessColor = "w" | "b";
@@ -236,12 +238,23 @@ type TheoryMoveCard = Readonly<{
   label: string;
   idea: string;
   source: string;
+  qualityHint: MoveQualityHint;
+  isActionable: boolean;
 }>;
 
 type LessonLine = Readonly<{
   key: string;
   label: string;
   sanLine: readonly string[];
+  steps: readonly MoveStep[];
+}>;
+
+type StudyMovePlan = Readonly<{
+  lessonName: string;
+  lineLabel: string;
+  step: MoveStep;
+  nextSameActorStep: MoveStep | null;
+  plan: string;
 }>;
 
 type FreeMoveRecord = Readonly<{
@@ -273,6 +286,8 @@ type FreeLineMoveCard = Readonly<{
   idea: string;
   source: string;
 }>;
+
+type MoveQualityHint = ReturnType<typeof getMoveQualityHint>;
 
 const FILES = ["a", "b", "c", "d", "e", "f", "g", "h"] as const;
 const RANKS = ["1", "2", "3", "4", "5", "6", "7", "8"] as const;
@@ -456,10 +471,6 @@ function getBoardMoveArrow(board: readonly BoardSquare[], fromSquare: string, to
   };
 }
 
-function getMoveArrow(step: MoveStep): BoardArrow {
-  return getBoardMoveArrow(step.board, step.from, step.to);
-}
-
 function getPriorityLabel(priority: OpeningPriority | undefined) {
   if (!priority) {
     return "ядро";
@@ -556,21 +567,239 @@ function getTheoryMoveSource(move: TheoryBroadcastMove, totalGames: number, stud
   return `Lichess Broadcast DB 2026: ${move.games} партий, ${share}${scoreText}`;
 }
 
+function getTheoryMoveQualityStats(
+  evidence: PositionTheoryEvidence | null,
+  san: string,
+  studySide: StudySide
+) {
+  const move = getTheoryMoveStat(evidence, san);
+  const totalGames = evidence?.lichessBroadcast.moves.reduce((total, candidate) => total + candidate.games, 0) ?? 0;
+
+  if (!move || totalGames <= 0) {
+    return null;
+  }
+
+  return {
+    games: move.games,
+    totalGames,
+    source: getTheoryMoveSource(move, totalGames, studySide)
+  };
+}
+
+function getBadMoveAtPosition(lessons: readonly OpeningLesson[], fen: string, san: string) {
+  return (
+    lessons
+      .flatMap((candidate) => candidate.opening.badMoves)
+      .find((badMove) => badMove.anchorFen === fen && badMove.san === san && badMove.source.status === "verified") ??
+    null
+  );
+}
+
+function stripPlanPrefix(text: string) {
+  return text
+    .replace(/^Связь с твоим планом:\s*/i, "")
+    .replace(/^Смысл:\s*/i, "")
+    .trim();
+}
+
+function getStudyMovePlans(
+  lessons: readonly OpeningLesson[],
+  previousSanLine: readonly string[],
+  san: string
+): readonly StudyMovePlan[] {
+  const nextSanLine = [...previousSanLine, san];
+  const moveIndex = previousSanLine.length;
+
+  return lessons.flatMap((lesson) =>
+    getLessonLines(lesson)
+      .filter((line) => lineMatchesPrefix(line.sanLine, nextSanLine))
+      .flatMap((line) => {
+        const step = line.steps[moveIndex];
+
+        if (!step || step.san !== san) {
+          return [];
+        }
+
+        return [
+          {
+            lessonName: lesson.opening.name,
+            lineLabel: line.label,
+            step,
+            nextSameActorStep: line.steps.slice(moveIndex + 1).find((candidate) => candidate.actor === step.actor) ?? null,
+            plan: stripPlanPrefix(step.purpose)
+          }
+        ];
+      })
+  );
+}
+
+function getStudyMovePlanMap(
+  lessons: readonly OpeningLesson[],
+  previousSanLine: readonly string[]
+): ReadonlyMap<string, readonly StudyMovePlan[]> {
+  const plansBySan = new Map<string, StudyMovePlan[]>();
+
+  for (const lesson of lessons) {
+    for (const line of getLessonLines(lesson)) {
+      if (!lineMatchesPrefix(line.sanLine, previousSanLine)) {
+        continue;
+      }
+
+      const nextSan = line.sanLine[previousSanLine.length];
+      if (!nextSan) {
+        continue;
+      }
+
+      plansBySan.set(nextSan, [
+        ...(plansBySan.get(nextSan) ?? []),
+        ...getStudyMovePlans([lesson], previousSanLine, nextSan)
+      ]);
+    }
+  }
+
+  return plansBySan;
+}
+
+function formatStudyMoveSummary(plans: readonly StudyMovePlan[]) {
+  const primary = plans[0];
+
+  if (!primary) {
+    return "";
+  }
+
+  return [primary.step.explanation, primary.plan ? `План: ${primary.plan}` : ""].filter(Boolean).join(" ");
+}
+
+function formatStudyMoveRecommendation(plans: readonly StudyMovePlan[]) {
+  const primary = plans[0];
+
+  if (!primary) {
+    return "";
+  }
+
+  const nextMove = primary.nextSameActorStep
+    ? `Дальше за ${getStudySidePlayName(primary.step.actor)} в этой карте: ${primary.nextSameActorStep.san} - ${primary.nextSameActorStep.explanation}`
+    : "";
+  const lineNames = [...new Set(plans.map((plan) => plan.lineLabel))]
+    .slice(0, 2)
+    .join("; ");
+
+  return [
+    `Ориентир базы: ${lineNames || primary.lessonName}.`,
+    nextMove,
+    primary.plan ? `Когда использовать: ${primary.plan}` : ""
+  ]
+    .filter(Boolean)
+    .join(" ");
+}
+
+function getMoveQualitySource(planCount: number, theoryStats: ReturnType<typeof getTheoryMoveQualityStats>) {
+  const planSource = planCount > 0 ? `Источник: ${planCount} ${formatStudyLineCount(planCount)} текущей базы.` : "";
+  const theorySource = theoryStats?.source;
+
+  return [planSource, theorySource].filter(Boolean).join(" ");
+}
+
+function formatStudyLineCount(count: number) {
+  const remainder = count % 10;
+  const teenRemainder = count % 100;
+
+  if (remainder === 1 && teenRemainder !== 11) {
+    return "учебная линия";
+  }
+
+  if (remainder >= 2 && remainder <= 4 && (teenRemainder < 12 || teenRemainder > 14)) {
+    return "учебные линии";
+  }
+
+  return "учебных линий";
+}
+
+function getFreeMoveQualityHint(
+  allLessons: readonly OpeningLesson[],
+  move: FreeMoveRecord,
+  previousSanLine: readonly string[]
+) {
+  const previousMatchingLessons = getLessonsMatchingLine(allLessons, previousSanLine);
+  const nextMatchingLessons = getLessonsMatchingLine(allLessons, [...previousSanLine, move.san]);
+  const knownAlternatives = getFreeLineMoveCards(previousMatchingLessons, previousSanLine).filter(
+    (alternative) => alternative.san !== move.san
+  );
+  const evidence = getBestTheoryEvidenceForFen(allLessons, move.before);
+  const theoryStats = getTheoryMoveQualityStats(evidence, move.san, move.actor);
+  const badMove = getBadMoveAtPosition(allLessons, move.before, move.san);
+  const studyMovePlans = getStudyMovePlans(allLessons, previousSanLine, move.san);
+
+  return getMoveQualityHint({
+    san: move.san,
+    badMove: badMove
+      ? {
+          sourceKind: badMove.source.kind,
+          label: badMove.label,
+          betterPlan: badMove.betterPlan
+        }
+      : null,
+    theoryGames: theoryStats?.games,
+    theoryTotalGames: theoryStats?.totalGames,
+    matchingLineCount: nextMatchingLessons.length,
+    hasKnownAlternative: knownAlternatives.length > 0,
+    educationalSummary: formatStudyMoveSummary(studyMovePlans),
+    educationalRecommendation: formatStudyMoveRecommendation(studyMovePlans),
+    alternativeMoves: knownAlternatives,
+    source:
+      getMoveQualitySource(studyMovePlans.length, theoryStats) ||
+      (nextMatchingLessons.length > 0 ? "Источник: проверенные линии текущей базы." : undefined)
+  });
+}
+
 function getTheoryMoveCards(
   evidence: PositionTheoryEvidence | null,
   studySide: StudySide,
-  expectedSan: string
+  expectedSan: string,
+  studyMovePlansBySan: ReadonlyMap<string, readonly StudyMovePlan[]> = new Map()
 ): readonly TheoryMoveCard[] {
   const moves = evidence?.lichessBroadcast.moves ?? [];
   const totalGames = moves.reduce((total, move) => total + move.games, 0);
 
-  return moves.slice(0, 4).map((move, index) => ({
-    key: `${evidence?.positionKey ?? "theory"}-${move.san}-${index}`,
-    san: move.san,
-    label: move.san === expectedSan ? "Ход текущей линии" : "Реальная альтернатива",
-    idea: [getTheoryMoveSource(move, totalGames, studySide), getTheoryExampleLabel(move)].filter(Boolean).join(". "),
-    source: "Источник: реальные broadcast-партии Lichess"
-  }));
+  return moves.slice(0, 4).map((move, index) => {
+    const studyMovePlans = studyMovePlansBySan.get(move.san) ?? [];
+    const source = getMoveQualitySource(studyMovePlans.length, {
+      games: move.games,
+      totalGames,
+      source: getTheoryMoveSource(move, totalGames, studySide)
+    });
+    const educationalSummary = formatStudyMoveSummary(studyMovePlans);
+    const educationalRecommendation = formatStudyMoveRecommendation(studyMovePlans);
+
+    return {
+      key: `${evidence?.positionKey ?? "theory"}-${move.san}-${index}`,
+      san: move.san,
+      label:
+        move.san === expectedSan
+          ? "Ход текущей линии"
+          : studyMovePlans.length > 0
+            ? "План из базы"
+            : "Статистика без плана",
+      idea: [
+        educationalSummary || "В текущей базе пока нет учебного продолжения для этого хода.",
+        getTheoryMoveSource(move, totalGames, studySide),
+        getTheoryExampleLabel(move)
+      ]
+        .filter(Boolean)
+        .join(" "),
+      source: studyMovePlans.length > 0 ? "Источник: учебная база и реальные broadcast-партии Lichess" : "Источник: реальные broadcast-партии Lichess",
+      qualityHint: getMoveQualityHint({
+        san: move.san,
+        isKnownContinuation: move.san === expectedSan && studyMovePlans.length > 0,
+        theoryGames: move.games,
+        theoryTotalGames: totalGames,
+        educationalSummary,
+        educationalRecommendation,
+        source
+      }),
+      isActionable: studyMovePlans.length > 0
+    };
+  });
 }
 
 function getLessonLines(lesson: OpeningLesson): readonly LessonLine[] {
@@ -578,12 +807,14 @@ function getLessonLines(lesson: OpeningLesson): readonly LessonLine[] {
     {
       key: `${lesson.opening.key}-base`,
       label: lesson.opening.name,
-      sanLine: lesson.appliedSan
+      sanLine: lesson.appliedSan,
+      steps: lesson.baseLine.steps
     },
     ...lesson.opening.continuations.map((continuation) => ({
       key: continuation.key,
       label: `${lesson.opening.name}: ${continuation.label}`,
-      sanLine: [...lesson.appliedSan, ...continuation.lineSan]
+      sanLine: [...lesson.appliedSan, ...continuation.lineSan],
+      steps: continuation.steps
     }))
   ];
 }
@@ -663,7 +894,8 @@ function getFreeLineMoveCards(
 function getFreeCoach(
   lastMove: FreeMoveRecord | null,
   matchingLessons: readonly OpeningLesson[],
-  allLessons: readonly OpeningLesson[]
+  allLessons: readonly OpeningLesson[],
+  previousSanLine: readonly string[]
 ): FreeCoach {
   if (!lastMove) {
     return {
@@ -674,19 +906,32 @@ function getFreeCoach(
     };
   }
 
+  const studyMovePlans = getStudyMovePlans(allLessons, previousSanLine, lastMove.san);
+  const educationalSummary = formatStudyMoveSummary(studyMovePlans);
+  const educationalRecommendation = formatStudyMoveRecommendation(studyMovePlans);
+
+  if (educationalSummary) {
+    return {
+      label: "Есть план в базе",
+      copy: `${educationalSummary} ${educationalRecommendation}`,
+      source: getMoveQualitySource(
+        studyMovePlans.length,
+        getTheoryMoveQualityStats(getBestTheoryEvidenceForFen(allLessons, lastMove.before), lastMove.san, lastMove.actor)
+      ) || "Источник: проверенные учебные линии текущей базы.",
+      tone: "known"
+    };
+  }
+
   const evidence = getBestTheoryEvidenceForFen(allLessons, lastMove.before);
   const moveStat = getTheoryMoveStat(evidence, lastMove.san);
   const totalGames = evidence?.lichessBroadcast.moves.reduce((total, move) => total + move.games, 0) ?? 0;
-  const topMove = evidence?.lichessBroadcast.moves[0]?.san;
 
   if (moveStat && totalGames > 0) {
-    const label = lastMove.san === topMove ? "Сильный теоретический ход" : "Теоретически встречается";
-    const share = formatPercent(moveStat.games, totalGames);
     return {
-      label,
-      copy: `${lastMove.explanation} В реальных broadcast-партиях этот ход встречался ${moveStat.games} раз (${share} из позиции).`,
+      label: "Есть только статистика",
+      copy: `${lastMove.explanation} В текущей базе пока нет учебного плана для этого хода, поэтому не считаю его рекомендацией.`,
       source: getTheoryMoveSource(moveStat, totalGames, lastMove.actor),
-      tone: "good"
+      tone: "unknown"
     };
   }
 
@@ -833,6 +1078,51 @@ function NotationHelp({ explanations }: Readonly<{ explanations: readonly Notati
         </span>
       ))}
     </span>
+  );
+}
+
+function MoveQualityBadge({
+  hint,
+  compact = false
+}: Readonly<{
+  hint: MoveQualityHint | null;
+  compact?: boolean;
+}>) {
+  if (!hint) {
+    return null;
+  }
+
+  return (
+    <span
+      aria-label={`${hint.label}: ${hint.summary} ${hint.source}`}
+      className={["move-quality-badge", `move-quality-${hint.tone}`, compact ? "move-quality-compact" : ""]
+        .filter(Boolean)
+        .join(" ")}
+      title={`${hint.label}. ${hint.summary} ${hint.source}`}
+    >
+      <span className="move-quality-symbol">{hint.symbol}</span>
+      <span className="move-quality-label">{hint.label}</span>
+    </span>
+  );
+}
+
+function MoveQualityDetails({ hint }: Readonly<{ hint: MoveQualityHint | null }>) {
+  if (!hint) {
+    return null;
+  }
+
+  return (
+    <div className={`move-quality-details move-quality-details-${hint.tone}`}>
+      <p>
+        <strong>Почему:</strong> {hint.summary}
+      </p>
+      <p>
+        <strong>Как лучше:</strong> {hint.recommendation}
+      </p>
+      <p>
+        <strong>Проверка:</strong> {hint.source}
+      </p>
+    </div>
   );
 }
 
@@ -1042,15 +1332,11 @@ export default function OpeningTrainer() {
   const freeChess = useMemo(() => replayFreeChess(freeMoves), [freeMoves]);
   const freeLastMove = freeMoves[freeMoves.length - 1] ?? null;
   const freeMatchingLessons = useMemo(() => getLessonsMatchingLine(lessons, freeSanLine), [lessons, freeSanLine]);
-  const freeSideLessons = useMemo(
-    () => freeMatchingLessons.filter((candidate) => candidate.opening.studySide === freeSide),
-    [freeMatchingLessons, freeSide]
-  );
   const sideLessons = useMemo(
     () => lessons.filter((candidate) => candidate.opening.studySide === studySideFilter),
     [lessons, studySideFilter]
   );
-  const activeCatalogLessons = trainerMode === "free" ? freeSideLessons : sideLessons;
+  const activeCatalogLessons = trainerMode === "free" ? freeMatchingLessons : sideLessons;
   const catalogStats = useMemo(() => {
     const researchLessons = activeCatalogLessons.filter((candidate) => candidate.opening.priority);
     return {
@@ -1113,15 +1399,32 @@ export default function OpeningTrainer() {
   const selectedLineSteps = selectedLine?.steps ?? lesson.baseLine.steps;
   const safeStepIndex = Math.min(Math.max(stepIndex, 0), Math.max(selectedLineSteps.length - 1, 0));
   const activeStep = selectedLineSteps[safeStepIndex] ?? lesson.baseLine.steps[baseStepIndex];
-  const arrow = useMemo(() => getMoveArrow(activeStep), [activeStep]);
+  const catalogSeedMoves = useMemo(
+    () => createFreeMoveRecordsFromSteps(selectedLineSteps, safeStepIndex) as readonly FreeMoveRecord[],
+    [selectedLineSteps, safeStepIndex]
+  );
+  const boardMoves = trainerMode === "free" ? freeMoves : catalogSeedMoves;
+  const boardChess = useMemo(() => replayFreeChess(boardMoves), [boardMoves]);
+  const boardLastMove = boardMoves[boardMoves.length - 1] ?? null;
   const interactiveContinuationCards = getInteractiveContinuationCards(lesson);
   const selectedLearningCard = interactiveContinuationCards.find(
     (card) => card.key === selectedLearningCardKey
   );
   const studyStepContext = getStudyStepContext(selectedLineSteps, safeStepIndex, lesson.opening.studySide);
+  const studyStepPreviousSanLine = studyStepContext
+    ? selectedLineSteps.slice(0, studyStepContext.stepIndex).map((step) => step.san)
+    : [];
+  const studyMovePlansBySanForStep = studyStepContext
+    ? getStudyMovePlanMap([lesson], studyStepPreviousSanLine)
+    : new Map<string, readonly StudyMovePlan[]>();
   const theoryEvidenceForStep = studyStepContext ? getTheoryEvidenceForStep(lesson, studyStepContext.step) : null;
   const theoryMoveCards = studyStepContext
-    ? getTheoryMoveCards(theoryEvidenceForStep, lesson.opening.studySide, studyStepContext.step.san)
+    ? getTheoryMoveCards(
+        theoryEvidenceForStep,
+        lesson.opening.studySide,
+        studyStepContext.step.san,
+        studyMovePlansBySanForStep
+      )
     : [];
   const knownContinuationsForStep =
     studyStepContext && studyStepContext.step.fenBefore === lesson.fen ? lesson.opening.continuations : [];
@@ -1132,17 +1435,9 @@ export default function OpeningTrainer() {
   const stepContinuationCards = studyStepContext
     ? getStepContinuationCards(selectedLineSteps, studyStepContext, lesson.opening.studySide)
     : [];
-  const freeBoard = useMemo(
-    () => buildInteractiveBoard(freeChess, freeSide, freeLastMove, freeSelectedSquare),
-    [freeChess, freeLastMove, freeSelectedSquare, freeSide]
-  );
-  const freeArrow = useMemo(
-    () => (freeLastMove ? getBoardMoveArrow(freeBoard, freeLastMove.from, freeLastMove.to) : null),
-    [freeBoard, freeLastMove]
-  );
   const freeCoach = useMemo(
-    () => getFreeCoach(freeLastMove, freeMatchingLessons, lessons),
-    [freeLastMove, freeMatchingLessons, lessons]
+    () => getFreeCoach(freeLastMove, freeMatchingLessons, lessons, freeSanLine.slice(0, -1)),
+    [freeLastMove, freeMatchingLessons, freeSanLine, lessons]
   );
   const freeLineMoveCards = useMemo(
     () => getFreeLineMoveCards(freeMatchingLessons, freeSanLine),
@@ -1152,17 +1447,65 @@ export default function OpeningTrainer() {
     () => getBestTheoryEvidenceForFen(lessons, freeChess.fen()),
     [lessons, freeChess]
   );
+  const freeStudyMovePlansBySan = useMemo(
+    () => getStudyMovePlanMap(freeMatchingLessons, freeSanLine),
+    [freeMatchingLessons, freeSanLine]
+  );
   const freeTheoryMoveCards = useMemo(
-    () => getTheoryMoveCards(freeTheoryEvidence, freeSide, freeLineMoveCards[0]?.san ?? ""),
-    [freeTheoryEvidence, freeLineMoveCards, freeSide]
+    () => getTheoryMoveCards(freeTheoryEvidence, freeSide, freeLineMoveCards[0]?.san ?? "", freeStudyMovePlansBySan),
+    [freeTheoryEvidence, freeLineMoveCards, freeSide, freeStudyMovePlansBySan]
+  );
+  const freeQualityHint = useMemo(
+    () => (freeLastMove ? getFreeMoveQualityHint(lessons, freeLastMove, freeSanLine.slice(0, -1)) : null),
+    [freeLastMove, freeSanLine, lessons]
   );
   const freeLineMoveCardsWithoutTheory = useMemo(
     () => freeLineMoveCards.filter((card) => !freeTheoryMoveCards.some((theoryCard) => theoryCard.san === card.san)),
     [freeLineMoveCards, freeTheoryMoveCards]
   );
-  const displayedBoard = trainerMode === "free" ? freeBoard : activeStep.board;
-  const displayedArrow = trainerMode === "free" ? freeArrow : arrow;
+  const activeBadMoveForStep =
+    selectedBadMove && selectedBadMove.anchorFen === activeStep.fenBefore && selectedBadMove.san === activeStep.san
+      ? selectedBadMove
+      : null;
+  const activeStepTheoryStats = getTheoryMoveQualityStats(
+    getTheoryEvidenceForStep(lesson, activeStep),
+    activeStep.san,
+    activeStep.actor
+  );
+  const activeIsStudyMove = activeStep.actor === lesson.opening.studySide;
+  const activeStudyMovePlans = getStudyMovePlans(
+    [lesson],
+    selectedLineSteps.slice(0, safeStepIndex).map((step) => step.san),
+    activeStep.san
+  );
+  const activeMoveQualityHint = getMoveQualityHint({
+    san: activeStep.san,
+    badMove: activeBadMoveForStep
+      ? {
+          sourceKind: activeBadMoveForStep.source.kind,
+          label: activeBadMoveForStep.label,
+          betterPlan: activeBadMoveForStep.betterPlan
+        }
+      : null,
+    isKnownContinuation: !activeBadMoveForStep && !activeIsStudyMove,
+    isExpectedStep: !activeBadMoveForStep && activeIsStudyMove,
+    theoryGames: activeStepTheoryStats?.games,
+    theoryTotalGames: activeStepTheoryStats?.totalGames,
+    hasKnownAlternative:
+      theoryMoveCards.length > 0 || knownContinuationsForStep.length > 0 || stepContinuationCards.length > 0,
+    educationalSummary: formatStudyMoveSummary(activeStudyMovePlans),
+    educationalRecommendation: formatStudyMoveRecommendation(activeStudyMovePlans),
+    source: getMoveQualitySource(activeStudyMovePlans.length, activeStepTheoryStats) || "Источник: проверенная линия текущей базы."
+  });
   const boardPerspective = trainerMode === "free" ? freeSide : lesson.opening.studySide;
+  const displayedBoard = useMemo(
+    () => buildInteractiveBoard(boardChess, boardPerspective, boardLastMove, freeSelectedSquare),
+    [boardChess, boardLastMove, boardPerspective, freeSelectedSquare]
+  );
+  const displayedArrow = useMemo(
+    () => (boardLastMove ? getBoardMoveArrow(displayedBoard, boardLastMove.from, boardLastMove.to) : null),
+    [boardLastMove, displayedBoard]
+  );
   const boardLabel =
     trainerMode === "free"
       ? `Свободная тренировка: ${freeLastMove ? freeLastMove.title : "стартовая позиция"}`
@@ -1206,22 +1549,39 @@ export default function OpeningTrainer() {
     }
   }
 
-  function handleFreeSquareClick(squareName: string) {
-    if (trainerMode !== "free") {
+  function enterFreeAnalysisFromPosition(moves: readonly FreeMoveRecord[]) {
+    if (trainerMode === "free") {
       return;
     }
 
+    setTrainerMode("free");
+    setFreeSide(boardPerspective);
+    setStudySideFilter(boardPerspective);
+    setFreeMoves(moves);
+    setQuery("");
+    setPriorityFilter("all");
+  }
+
+  function handleFreeSquareClick(squareName: string) {
     const square = squareName as Square;
-    const turn = freeChess.turn() as ChessColor;
-    const piece = freeChess.get(square);
+    const currentMoves = trainerMode === "free" ? freeMoves : catalogSeedMoves;
+    const currentChess = replayFreeChess(currentMoves);
+    const turn = currentChess.turn() as ChessColor;
+    const piece = currentChess.get(square);
 
     if (!freeSelectedSquare) {
       if (piece?.color === turn) {
+        enterFreeAnalysisFromPosition(currentMoves);
         setFreeSelectedSquare(square);
         setFreeMoveError("");
         return;
       }
 
+      if (!piece && trainerMode !== "free") {
+        return;
+      }
+
+      enterFreeAnalysisFromPosition(currentMoves);
       setFreeMoveError(`Сейчас ходят ${getStudySideName(colorToStudySide(turn))}.`);
       return;
     }
@@ -1233,13 +1593,15 @@ export default function OpeningTrainer() {
     }
 
     try {
-      const chess = replayFreeChess(freeMoves);
+      const chess = replayFreeChess(currentMoves);
       const move = chess.move({ from: freeSelectedSquare, to: square, promotion: "q" });
-      setFreeMoves([...freeMoves, getFreeMoveRecord(move)]);
+      enterFreeAnalysisFromPosition(currentMoves);
+      setFreeMoves([...currentMoves, getFreeMoveRecord(move)]);
       setFreeSelectedSquare("");
       setFreeMoveError("");
     } catch {
       if (piece?.color === turn) {
+        enterFreeAnalysisFromPosition(currentMoves);
         setFreeSelectedSquare(square);
         setFreeMoveError("");
         return;
@@ -1258,37 +1620,57 @@ export default function OpeningTrainer() {
   function goToStep(nextStepIndex: number) {
     setSelectedLearningCardKey("");
     setStepIndex(nextStepIndex);
+    setFreeMoves(createFreeMoveRecordsFromSteps(selectedLineSteps, nextStepIndex) as readonly FreeMoveRecord[]);
+    setFreeSelectedSquare("");
+    setFreeMoveError("");
   }
 
   function selectContinuation(continuation: OpeningContinuation) {
+    const nextStepIndex = Math.min(firstContinuationStepIndex, continuation.steps.length - 1);
     setSelectedLearningCardKey("");
     setSelectedTarget({ kind: "continuation", key: continuation.key });
-    setStepIndex(Math.min(firstContinuationStepIndex, continuation.steps.length - 1));
+    setStepIndex(nextStepIndex);
+    setFreeMoves(createFreeMoveRecordsFromSteps(continuation.steps, nextStepIndex) as readonly FreeMoveRecord[]);
+    setFreeSelectedSquare("");
+    setFreeMoveError("");
   }
 
   function selectBadMove(badMove: BadMove) {
+    const nextStepIndex = Math.min(firstContinuationStepIndex, badMove.steps.length - 1);
     setSelectedLearningCardKey("");
     setSelectedTarget({ kind: "badMove", key: badMove.key });
-    setStepIndex(Math.min(firstContinuationStepIndex, badMove.steps.length - 1));
+    setStepIndex(nextStepIndex);
+    setFreeMoves(createFreeMoveRecordsFromSteps(badMove.steps, nextStepIndex) as readonly FreeMoveRecord[]);
+    setFreeSelectedSquare("");
+    setFreeMoveError("");
   }
 
   function selectLearningCard(card: InteractiveLearningCard) {
     setSelectedTarget({ kind: "learning", key: card.key });
     setSelectedLearningCardKey(card.key);
     setStepIndex(card.focusStepIndex);
+    setFreeMoves(createFreeMoveRecordsFromSteps(lesson.baseLine.steps, card.focusStepIndex) as readonly FreeMoveRecord[]);
+    setFreeSelectedSquare("");
+    setFreeMoveError("");
   }
 
   function selectOpening(nextLesson: OpeningLesson) {
     const nextFirstContinuation = nextLesson.opening.continuations[0];
     const nextFirstBadMove = nextLesson.opening.badMoves[0];
     const nextLineSteps = nextFirstContinuation?.steps ?? nextFirstBadMove?.steps ?? nextLesson.baseLine.steps;
+    const nextStepIndex = Math.min(nextLesson.baseLine.steps.length, Math.max(nextLineSteps.length - 1, 0));
     setSelectedOpeningKey(nextLesson.opening.key);
+    setStudySideFilter(nextLesson.opening.studySide);
+    setFreeSide(nextLesson.opening.studySide);
     setSelectedTarget({
       kind: nextFirstContinuation ? "continuation" : nextFirstBadMove ? "badMove" : "learning",
       key: nextFirstContinuation?.key ?? nextFirstBadMove?.key ?? ""
     });
     setSelectedLearningCardKey("");
-    setStepIndex(Math.min(nextLesson.baseLine.steps.length, Math.max(nextLineSteps.length - 1, 0)));
+    setFreeMoves(createFreeMoveRecordsFromSteps(nextLineSteps, nextStepIndex) as readonly FreeMoveRecord[]);
+    setFreeSelectedSquare("");
+    setFreeMoveError("");
+    setStepIndex(nextStepIndex);
   }
 
   function selectStudySide(nextSide: StudySide) {
@@ -1413,7 +1795,12 @@ export default function OpeningTrainer() {
           </section>
 
           <div
-            className={["board", `perspective-${boardPerspective}`, trainerMode === "free" ? "board-free" : ""]
+            className={[
+              "board",
+              "board-interactive",
+              `perspective-${boardPerspective}`,
+              trainerMode === "free" ? "board-free" : ""
+            ]
               .filter(Boolean)
               .join(" ")}
             aria-label={boardLabel}
@@ -1431,7 +1818,6 @@ export default function OpeningTrainer() {
                     .filter(Boolean)
                     .join(" ")}
                   data-square={square.square}
-                  disabled={trainerMode !== "free"}
                   key={square.square}
                   onClick={() => handleFreeSquareClick(square.square)}
                   title={square.square}
@@ -1496,10 +1882,12 @@ export default function OpeningTrainer() {
                 <article className="board-step-card free-step-card">
                   <div>
                     <span>{freeLastMove ? formatFreeMove(freeLastMove) : "0"}</span>
+                    <MoveQualityBadge hint={freeQualityHint} />
                     <strong>{`${freeMoves.length} ходов`}</strong>
                   </div>
                   <h2 id="board-explorer-title">{freeCoach.label}</h2>
                   <p>{freeCoach.copy}</p>
+                  <MoveQualityDetails hint={freeQualityHint} />
                   <p>{freeMoveError || freeCoach.source}</p>
                 </article>
                 <button
@@ -1514,16 +1902,25 @@ export default function OpeningTrainer() {
               </section>
               {freeMoves.length ? (
                 <div className="free-move-line" aria-label="Сыгранная линия">
-                  {freeMoves.map((move, index) => (
-                    <button
-                      aria-label={`Вернуться к ходу ${formatFreeMove(move)}`}
-                      key={`${move.san}-${index}`}
-                      onClick={() => setFreeMoves(freeMoves.slice(0, index + 1))}
-                      type="button"
-                    >
-                      {formatFreeMove(move)}
-                    </button>
-                  ))}
+                  {freeMoves.map((move, index) => {
+                    const moveQuality = getFreeMoveQualityHint(
+                      lessons,
+                      move,
+                      freeMoves.slice(0, index).map((playedMove) => playedMove.san)
+                    );
+
+                    return (
+                      <button
+                        aria-label={`Вернуться к ходу ${formatFreeMove(move)}`}
+                        key={`${move.san}-${index}`}
+                        onClick={() => setFreeMoves(freeMoves.slice(0, index + 1))}
+                        type="button"
+                      >
+                        {formatFreeMove(move)}
+                        <MoveQualityBadge hint={moveQuality} compact />
+                      </button>
+                    );
+                  })}
                 </div>
               ) : null}
             </>
@@ -1542,6 +1939,7 @@ export default function OpeningTrainer() {
                 <article className="board-step-card">
                   <div>
                     <span>{formatMove(activeStep)}</span>
+                    <MoveQualityBadge hint={activeMoveQualityHint} />
                     <strong>{`${safeStepIndex + 1} / ${selectedLineSteps.length}`}</strong>
                   </div>
                   <h2 id="board-explorer-title">
@@ -1554,6 +1952,7 @@ export default function OpeningTrainer() {
                   ) : (
                     <p>{activeStep.explanation}</p>
                   )}
+                  <MoveQualityDetails hint={activeMoveQualityHint} />
                   <p>
                     {selectedLearningCard
                       ? `На доске показан связанный момент: ${formatMove(activeStep)}.`
@@ -1609,7 +2008,13 @@ export default function OpeningTrainer() {
                 </article>
                 <article className={`free-coach-tone-${freeCoach.tone}`}>
                   <h2>Оценка</h2>
-                  <p>{freeCoach.label}</p>
+                  <p>
+                    {freeQualityHint ? (
+                      <MoveQualityBadge hint={freeQualityHint} compact />
+                    ) : (
+                      freeCoach.label
+                    )}
+                  </p>
                 </article>
               </div>
 
@@ -1619,40 +2024,70 @@ export default function OpeningTrainer() {
                   Показаны только ходы, которые есть в реальных broadcast-партиях Lichess или в проверенных линиях базы.
                 </p>
                 <div className="continuation-list">
-                  {freeTheoryMoveCards.map((card) => (
-                    <button
-                      className="continuation continuation-theory"
-                      key={card.key}
-                      onClick={() => applyFreeSanMove(card.san)}
-                      type="button"
-                    >
-                      <span className="continuation-title">
-                        <strong>{card.san}</strong>
-                        <span>{card.label}</span>
-                      </span>
-                      <span className="continuation-idea">
-                        {card.idea}
-                        <span className="continuation-source">{card.source}</span>
-                      </span>
-                    </button>
-                  ))}
-                  {freeLineMoveCardsWithoutTheory.map((card) => (
-                    <button
-                      className="continuation continuation-step"
-                      key={card.key}
-                      onClick={() => applyFreeSanMove(card.san)}
-                      type="button"
-                    >
-                      <span className="continuation-title">
-                        <strong>{card.san}</strong>
-                        <span>{card.label}</span>
-                      </span>
-                      <span className="continuation-idea">
-                        {card.idea}
-                        <span className="continuation-source">{card.source}</span>
-                      </span>
-                    </button>
-                  ))}
+                  {freeTheoryMoveCards.map((card) =>
+                    card.isActionable ? (
+                      <button
+                        className="continuation continuation-theory"
+                        key={card.key}
+                        onClick={() => applyFreeSanMove(card.san)}
+                        type="button"
+                      >
+                        <span className="continuation-title">
+                          <span className="move-card-heading">
+                            <strong>{card.san}</strong>
+                            <MoveQualityBadge hint={card.qualityHint} compact />
+                          </span>
+                          <span>{card.label}</span>
+                        </span>
+                        <span className="continuation-idea">
+                          {card.idea}
+                          <span className="continuation-source">{card.source}</span>
+                        </span>
+                      </button>
+                    ) : (
+                      <article className="continuation continuation-theory continuation-reference" key={card.key}>
+                        <span className="continuation-title">
+                          <span className="move-card-heading">
+                            <strong>{card.san}</strong>
+                            <MoveQualityBadge hint={card.qualityHint} compact />
+                          </span>
+                          <span>{card.label}</span>
+                        </span>
+                        <span className="continuation-idea">
+                          {card.idea}
+                          <span className="continuation-source">{card.source}</span>
+                        </span>
+                      </article>
+                    )
+                  )}
+                  {freeLineMoveCardsWithoutTheory.map((card) => {
+                    const qualityHint = getMoveQualityHint({
+                      san: card.san,
+                      isKnownContinuation: true,
+                      source: card.source
+                    });
+
+                    return (
+                      <button
+                        className="continuation continuation-step"
+                        key={card.key}
+                        onClick={() => applyFreeSanMove(card.san)}
+                        type="button"
+                      >
+                        <span className="continuation-title">
+                          <span className="move-card-heading">
+                            <strong>{card.san}</strong>
+                            <MoveQualityBadge hint={qualityHint} compact />
+                          </span>
+                          <span>{card.label}</span>
+                        </span>
+                        <span className="continuation-idea">
+                          {card.idea}
+                          <span className="continuation-source">{card.source}</span>
+                        </span>
+                      </button>
+                    );
+                  })}
                   {freeTheoryMoveCards.length === 0 && freeLineMoveCardsWithoutTheory.length === 0 ? (
                     <article className="empty-filter free-empty-theory">
                       Для этой позиции в текущей базе нет подтвержденных продолжений.
@@ -1664,11 +2099,11 @@ export default function OpeningTrainer() {
               <section className="continuations free-matches" aria-labelledby="free-matches-title">
                 <h2 id="free-matches-title">Подходящие дебюты</h2>
                 <p className="section-note">
-                  Список слева уже отфильтрован по сыгранным ходам и выбранному цвету.
+                  Список слева отфильтрован по сыгранным ходам и показывает учебные карты за обе стороны.
                 </p>
                 <div className="free-match-line">
-                  <strong>{freeSideLessons.length}</strong>
-                  <span>{`карточек за ${getStudySidePlayName(freeSide)}`}</span>
+                  <strong>{freeMatchingLessons.length}</strong>
+                  <span>карточек с планом</span>
                 </div>
               </section>
             </>
@@ -1736,6 +2171,11 @@ export default function OpeningTrainer() {
                         continuation.san,
                         lesson.opening.studySide
                       );
+                      const qualityHint = getMoveQualityHint({
+                        san: continuation.san,
+                        isKnownContinuation: true,
+                        source: sourceCopy || "Источник: проверенное продолжение текущей базы."
+                      });
 
                       return (
                         <button
@@ -1746,7 +2186,10 @@ export default function OpeningTrainer() {
                           type="button"
                         >
                           <span className="continuation-title">
-                            <strong>{continuation.san}</strong>
+                            <span className="move-card-heading">
+                              <strong>{continuation.san}</strong>
+                              <MoveQualityBadge hint={qualityHint} compact />
+                            </span>
                             <span>{continuation.label}</span>
                           </span>
                           <span className="continuation-idea">
@@ -1760,7 +2203,10 @@ export default function OpeningTrainer() {
                     theoryMoveCards.map((card) => (
                       <article className="continuation continuation-theory" key={card.key}>
                         <span className="continuation-title">
-                          <strong>{card.san}</strong>
+                          <span className="move-card-heading">
+                            <strong>{card.san}</strong>
+                            <MoveQualityBadge hint={card.qualityHint} compact />
+                          </span>
                           <span>{card.label}</span>
                         </span>
                         <span className="continuation-idea">
@@ -1770,20 +2216,31 @@ export default function OpeningTrainer() {
                       </article>
                     ))
                   ) : stepContinuationCards.length ? (
-                    stepContinuationCards.map((card) => (
-                      <button
-                        aria-pressed={card.stepIndex === safeStepIndex}
-                        className="continuation continuation-step"
-                        key={card.key}
-                        onClick={() => goToStep(card.stepIndex)}
-                        type="button"
-                      >
-                        <span className="continuation-title">
-                          <strong>{card.san}</strong>
-                        </span>
-                        <span className="continuation-idea">{card.idea}</span>
-                      </button>
-                    ))
+                    stepContinuationCards.map((card) => {
+                      const qualityHint = getMoveQualityHint({
+                        san: card.san,
+                        isExpectedStep: true,
+                        source: "Источник: текущая проверенная линия."
+                      });
+
+                      return (
+                        <button
+                          aria-pressed={card.stepIndex === safeStepIndex}
+                          className="continuation continuation-step"
+                          key={card.key}
+                          onClick={() => goToStep(card.stepIndex)}
+                          type="button"
+                        >
+                          <span className="continuation-title">
+                            <span className="move-card-heading">
+                              <strong>{card.san}</strong>
+                              <MoveQualityBadge hint={qualityHint} compact />
+                            </span>
+                          </span>
+                          <span className="continuation-idea">{card.idea}</span>
+                        </button>
+                      );
+                    })
                   ) : (
                     interactiveContinuationCards.map((card) => (
                       <button
@@ -1816,25 +2273,39 @@ export default function OpeningTrainer() {
                       : "Это не список всех плохих ходов, а конкретные проверенные ошибки для позиции."}
                   </p>
                   <div className="bad-move-list">
-                    {knownBadMovesForStep.map((badMove) => (
-                      <button
-                        aria-pressed={selectedTarget.kind === "badMove" && badMove.key === selectedLine?.key}
-                        className="bad-move"
-                        key={badMove.key}
-                        onClick={() => selectBadMove(badMove)}
-                        type="button"
-                      >
-                        <span className="bad-move-title">
-                          <strong>{badMove.san}</strong>
-                          <span>{badMove.label}</span>
-                        </span>
-                        <span className="bad-move-copy">
-                          <span>{badMove.whyBad}</span>
-                          <span className="bad-move-better-plan">{badMove.betterPlan}</span>
-                          <span className="bad-move-source">{getBadMoveSourceLabel(badMove.source)}</span>
-                        </span>
-                      </button>
-                    ))}
+                    {knownBadMovesForStep.map((badMove) => {
+                      const qualityHint = getMoveQualityHint({
+                        san: badMove.san,
+                        badMove: {
+                          sourceKind: badMove.source.kind,
+                          label: badMove.label,
+                          betterPlan: badMove.betterPlan
+                        }
+                      });
+
+                      return (
+                        <button
+                          aria-pressed={selectedTarget.kind === "badMove" && badMove.key === selectedLine?.key}
+                          className="bad-move"
+                          key={badMove.key}
+                          onClick={() => selectBadMove(badMove)}
+                          type="button"
+                        >
+                          <span className="bad-move-title">
+                            <span className="move-card-heading">
+                              <strong>{badMove.san}</strong>
+                              <MoveQualityBadge hint={qualityHint} compact />
+                            </span>
+                            <span>{badMove.label}</span>
+                          </span>
+                          <span className="bad-move-copy">
+                            <span>{badMove.whyBad}</span>
+                            <span className="bad-move-better-plan">{badMove.betterPlan}</span>
+                            <span className="bad-move-source">{getBadMoveSourceLabel(badMove.source)}</span>
+                          </span>
+                        </button>
+                      );
+                    })}
                   </div>
                 </section>
               ) : null}

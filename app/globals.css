@@ -304,11 +304,11 @@ button {
   opacity: 1;
 }
 
-.board-free .square {
+.board-interactive .square {
   cursor: pointer;
 }
 
-.board-free .square:focus-visible {
+.board-interactive .square:focus-visible {
   outline: 3px solid rgb(47 111 94 / 70%);
   outline-offset: -3px;
 }
@@ -446,10 +446,157 @@ button {
   margin-bottom: 8px;
 }
 
+.move-quality-badge {
+  align-items: center;
+  border: 1px solid #cdd9d1;
+  border-radius: 999px;
+  display: inline-flex;
+  flex: 0 0 auto;
+  gap: 5px;
+  line-height: 1;
+  min-height: 28px;
+  min-width: 0;
+  padding: 4px 9px 4px 5px;
+  vertical-align: middle;
+  white-space: nowrap;
+}
+
+.move-quality-symbol {
+  align-items: center;
+  border-radius: 999px;
+  display: inline-flex;
+  font-size: 13px;
+  font-weight: 900;
+  height: 20px;
+  justify-content: center;
+  min-width: 20px;
+}
+
+.move-quality-label {
+  font-size: 11px;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.move-quality-compact {
+  gap: 3px;
+  min-height: 22px;
+  padding: 2px 7px 2px 3px;
+}
+
+.move-quality-compact .move-quality-symbol {
+  font-size: 11px;
+  height: 17px;
+  min-width: 17px;
+}
+
+.move-quality-compact .move-quality-label {
+  font-size: 9px;
+}
+
+.move-quality-book {
+  background: #f1f6f2;
+  border-color: #c6d9cc;
+  color: var(--accent-strong);
+}
+
+.move-quality-book .move-quality-symbol {
+  background: #dcece4;
+}
+
+.move-quality-good {
+  background: #eff8f1;
+  border-color: #b9d7c2;
+  color: #235c43;
+}
+
+.move-quality-good .move-quality-symbol {
+  background: #cae8d1;
+}
+
+.move-quality-warn {
+  background: #fff8e7;
+  border-color: #ead39b;
+  color: #80601c;
+}
+
+.move-quality-warn .move-quality-symbol {
+  background: #f4df9c;
+}
+
+.move-quality-bad {
+  background: #fff0eb;
+  border-color: #e0ad99;
+  color: #8a3b25;
+}
+
+.move-quality-bad .move-quality-symbol {
+  background: #f0c5b4;
+}
+
+.move-quality-details {
+  border: 1px solid #dce5dd;
+  border-radius: 8px;
+  display: grid;
+  gap: 6px;
+  margin: 10px 0;
+  padding: 10px 12px;
+}
+
+.move-quality-details p {
+  color: var(--ink);
+  font-size: 13px;
+  line-height: 1.45;
+  margin: 0;
+}
+
+.move-quality-details strong {
+  color: var(--accent-strong);
+  font-size: 11px;
+  text-transform: uppercase;
+}
+
+.move-quality-details-book,
+.move-quality-details-good {
+  background: #f4faf6;
+  border-color: #c9dece;
+}
+
+.move-quality-details-warn {
+  background: #fff9ea;
+  border-color: #ead39b;
+}
+
+.move-quality-details-bad {
+  background: #fff3ee;
+  border-color: #e0ad99;
+}
+
 .board-step-card span {
   color: var(--warm);
   font-size: 14px;
   font-weight: 800;
+}
+
+.board-step-card .move-quality-badge,
+.continuation .move-quality-badge,
+.bad-move .move-quality-badge,
+.free-move-line .move-quality-badge,
+.insight-grid .move-quality-badge {
+  color: inherit;
+}
+
+.board-step-card .move-quality-symbol,
+.board-step-card .move-quality-label,
+.continuation .move-quality-symbol,
+.continuation .move-quality-label,
+.bad-move .move-quality-symbol,
+.bad-move .move-quality-label,
+.free-move-line .move-quality-symbol,
+.free-move-line .move-quality-label,
+.insight-grid .move-quality-symbol,
+.insight-grid .move-quality-label {
+  color: inherit;
 }
 
 .board-step-card strong {
@@ -487,13 +634,16 @@ button {
 }
 
 .free-move-line button {
+  align-items: center;
   background: #eef3ef;
   border: 1px solid #d7e4da;
   border-radius: 999px;
   color: var(--accent-strong);
   cursor: pointer;
+  display: inline-flex;
   font-size: 12px;
   font-weight: 800;
+  gap: 5px;
   padding: 4px 8px;
 }
 
@@ -750,6 +900,18 @@ button.continuation-theory {
   margin-bottom: 6px;
 }
 
+.move-card-heading {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 6px;
+}
+
+.move-card-heading strong {
+  margin-bottom: 0;
+}
+
 .continuation-title span {
   color: var(--ink);
   display: block;
@@ -833,6 +995,14 @@ button.continuation-theory {
   color: var(--ink);
   display: block;
   font-weight: 800;
+}
+
+.continuation-title .move-card-heading,
+.bad-move-title .move-card-heading {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
 }
 
 .bad-move-copy p,
