@@ -12,6 +12,7 @@
 - Основной work path: managed task conveyor.
 - Root echo-test passed: legal move parsing + manually verified Ruy Lopez opening-map.
 - Deep-research app-ready v1 импортирован как checked study catalog: 98 SAN-легальных линий, 52 priority A, 37 priority B, 9 priority C.
+- В свободную тренировку добавлен локальный Stockfish.js lite single-threaded evaluation layer для оценки текущей позиции.
 
 ## Канонические источники
 
@@ -53,6 +54,15 @@
 
 Evidence path: `Docs/echo-tests/chess-opening-root-capability.md`.
 
+Для компьютерной оценки позиции зафиксирован отдельный root capability:
+
+- движок: Stockfish.js 18 lite single-threaded WebAssembly;
+- runtime: browser Web Worker, без внешнего API и без server-side анализа;
+- source/license: `public/vendor/stockfish/Copying.txt`, GPLv3;
+- UI показывает результат как короткий engine estimate, а не как подтвержденную дебютную теорию.
+
+Evidence path: `Docs/echo-tests/stockfish-evaluation-root-capability.md`.
+
 ## Дебютная база
 
 Тренажер сейчас показывает:
@@ -64,6 +74,17 @@ Evidence path: `Docs/echo-tests/chess-opening-root-capability.md`.
 Исходники импорта лежат в `research/chess-openings-app-ready-v1/`.
 Проверка импорта описана в `Docs/deep-research-opening-import-2026-05-09.md`.
 Imported lines нельзя показывать как engine-best без отдельного Lichess Explorer / Stockfish sanity layer.
+
+## Компьютерная оценка
+
+Свободная тренировка запускает локальный Stockfish.js worker после каждого хода и показывает:
+
+- вертикальную черно-белую evaluation bar рядом с доской;
+- численную оценку `+0.4`, `-1.2` или `M3`;
+- сторону преимущества;
+- candidate move с пометкой Stockfish/source/depth.
+
+Оценка движка не является подтвержденной дебютной теорией. Названия вариантов, учебные планы и объяснения по-прежнему должны идти из проверенной базы и источников.
 
 ## Быстрый старт
 

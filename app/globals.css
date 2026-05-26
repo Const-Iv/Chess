@@ -276,6 +276,75 @@ button {
   display: flex;
 }
 
+.board-stage {
+  align-items: stretch;
+  display: grid;
+  gap: 8px;
+  grid-template-columns: 1fr;
+}
+
+.board-stage-free {
+  grid-template-columns: 34px minmax(0, 1fr);
+}
+
+.engine-eval-bar {
+  background: #161616;
+  border: 2px solid #5c442d;
+  border-radius: 5px;
+  color: #ffffff;
+  min-height: 0;
+  overflow: hidden;
+  position: relative;
+}
+
+.engine-eval-fill {
+  background: #f5f0e3;
+  bottom: 0;
+  height: var(--engine-white-percent);
+  left: 0;
+  position: absolute;
+  right: 0;
+  transition: height 180ms ease;
+}
+
+.engine-eval-score,
+.engine-eval-side {
+  left: 50%;
+  position: absolute;
+  text-align: center;
+  transform: translateX(-50%);
+  width: 100%;
+  z-index: 2;
+}
+
+.engine-eval-score {
+  background: rgb(0 0 0 / 74%);
+  border-bottom: 1px solid rgb(255 255 255 / 16%);
+  font-size: 10px;
+  font-weight: 900;
+  line-height: 1;
+  padding: 6px 2px;
+  top: 0;
+}
+
+.engine-eval-side {
+  font-size: 9px;
+  font-weight: 900;
+  text-transform: uppercase;
+  writing-mode: vertical-rl;
+}
+
+.engine-eval-side.engine-eval-black {
+  color: #ffffff;
+  top: 34px;
+}
+
+.engine-eval-side.engine-eval-white {
+  bottom: 8px;
+  color: #1c1f24;
+  text-shadow: 0 1px 0 rgb(255 255 255 / 54%);
+}
+
 .board {
   aspect-ratio: 1;
   border: 2px solid #5c442d;
@@ -1045,6 +1114,40 @@ button.continuation-theory {
 .free-coach-tone-unknown {
   background: #fffaf7;
   border-color: #e7d7cf !important;
+}
+
+.engine-evaluation-card {
+  background: #f8faf8;
+  border-color: #d9e2d8 !important;
+}
+
+.engine-evaluation-ready {
+  background: #f4fbf7;
+}
+
+.engine-evaluation-unavailable {
+  background: #fffaf7;
+  border-color: #e7d7cf !important;
+}
+
+.engine-evaluation-card span,
+.engine-evaluation-card small {
+  display: block;
+  line-height: 1.45;
+}
+
+.engine-evaluation-card span {
+  color: var(--accent-strong);
+  font-size: 13px;
+  font-weight: 800;
+  margin-top: 8px;
+}
+
+.engine-evaluation-card small {
+  color: #6f7b75;
+  font-size: 11px;
+  font-weight: 800;
+  margin-top: 8px;
 }
 
 .free-match-line {

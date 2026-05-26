@@ -1,11 +1,17 @@
 "use client";
 
 import { Chess, type Move, type Square } from "chess.js";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
 
 import { buildOpeningLessons } from "../src/domain/chess/opening-database.mjs";
 import { getMoveQualityHint } from "../src/domain/chess/move-quality-hints.mjs";
 import { createFreeMoveRecordsFromSteps } from "../src/domain/chess/trainer-session.mjs";
+import {
+  buildPendingEngineEvaluationView,
+  buildUnavailableEngineEvaluationView,
+  markEngineEvaluationRefreshing
+} from "../src/domain/chess/engine-evaluation.mjs";
+import { BrowserStockfishEvaluator } from "./stockfish-evaluator.js";
 
 type StudySide = "white" | "black";
 type ChessColor = "w" | "b";
@@ -288,6 +294,7 @@ type FreeLineMoveCard = Readonly<{
 }>;
 
 type MoveQualityHint = ReturnType<typeof getMoveQualityHint>;
+type EngineEvaluationView = ReturnType<typeof buildPendingEngineEvaluationView>;
 
 const FILES = ["a", "b", "c", "d", "e", "f", "g", "h"] as const;
 const RANKS = ["1", "2", "3", "4", "5", "6", "7", "8"] as const;
@@ -1319,17 +1326,22 @@ function getStepContinuationCards(
 export default function OpeningTrainer() {
   const lessons = useMemo(() => buildOpeningLessons() as readonly OpeningLesson[], []);
   const initialLesson = lessons.find((candidate) => candidate.opening.studySide === "white") ?? lessons[0];
+  const stockfishEvaluator = useRef<BrowserStockfishEvaluator | null>(null);
   const [trainerMode, setTrainerMode] = useState<TrainerMode>("catalog");
   const [studySideFilter, setStudySideFilter] = useState<StudySide>(initialLesson?.opening.studySide ?? "white");
   const [freeSide, setFreeSide] = useState<StudySide>(initialLesson?.opening.studySide ?? "white");
   const [freeMoves, setFreeMoves] = useState<readonly FreeMoveRecord[]>([]);
   const [freeSelectedSquare, setFreeSelectedSquare] = useState("");
   const [freeMoveError, setFreeMoveError] = useState("");
+  const [engineEvaluation, setEngineEvaluation] = useState<EngineEvaluationView>(() =>
+    buildPendingEngineEvaluationView(new Chess().fen())
+  );
   const [query, setQuery] = useState("");
   const [priorityFilter, setPriorityFilter] = useState<"all" | OpeningPriority>("all");
   const [selectedOpeningKey, setSelectedOpeningKey] = useState(initialLesson?.opening.key ?? "");
   const freeSanLine = useMemo(() => freeMoves.map((move) => move.san), [freeMoves]);
   const freeChess = useMemo(() => replayFreeChess(freeMoves), [freeMoves]);
+  const freeFen = freeChess.fen();
   const freeLastMove = freeMoves[freeMoves.length - 1] ?? null;
   const freeMatchingLessons = useMemo(() => getLessonsMatchingLine(lessons, freeSanLine), [lessons, freeSanLine]);
   const sideLessons = useMemo(
@@ -1444,8 +1456,8 @@ export default function OpeningTrainer() {
     [freeMatchingLessons, freeSanLine]
   );
   const freeTheoryEvidence = useMemo(
-    () => getBestTheoryEvidenceForFen(lessons, freeChess.fen()),
-    [lessons, freeChess]
+    () => getBestTheoryEvidenceForFen(lessons, freeFen),
+    [lessons, freeFen]
   );
   const freeStudyMovePlansBySan = useMemo(
     () => getStudyMovePlanMap(freeMatchingLessons, freeSanLine),
@@ -1506,10 +1518,54 @@ export default function OpeningTrainer() {
     () => (boardLastMove ? getBoardMoveArrow(displayedBoard, boardLastMove.from, boardLastMove.to) : null),
     [boardLastMove, displayedBoard]
   );
+  const engineBarStyle = {
+    "--engine-white-percent": `${engineEvaluation.barWhitePercent}%`
+  } as CSSProperties;
   const boardLabel =
     trainerMode === "free"
       ? `Свободная тренировка: ${freeLastMove ? freeLastMove.title : "стартовая позиция"}`
       : `Позиция после ${formatMove(activeStep)}`;
+
+  useEffect(() => {
+    return () => {
+      stockfishEvaluator.current?.dispose();
+      stockfishEvaluator.current = null;
+    };
+  }, []);
+
+  useEffect(() => {
+    if (trainerMode !== "free") {
+      return;
+    }
+
+    let isCurrentPosition = true;
+    setEngineEvaluation((previous) => markEngineEvaluationRefreshing(previous, freeFen));
+
+    const evaluator = stockfishEvaluator.current ?? new BrowserStockfishEvaluator();
+    stockfishEvaluator.current = evaluator;
+
+    evaluator
+      .evaluateFen(freeFen)
+      .then((view) => {
+        if (isCurrentPosition) {
+          setEngineEvaluation(view);
+        }
+      })
+      .catch(() => {
+        if (isCurrentPosition) {
+          setEngineEvaluation(
+            buildUnavailableEngineEvaluationView(
+              freeFen,
+              "Stockfish сейчас недоступен; учебные подсказки продолжают работать по проверенной базе."
+            )
+          );
+        }
+      });
+
+    return () => {
+      isCurrentPosition = false;
+    };
+  }, [freeFen, trainerMode]);
 
   function enterFreeTraining() {
     const nextSide = trainerMode === "free" ? freeSide : studySideFilter;
@@ -1798,77 +1854,91 @@ export default function OpeningTrainer() {
             </div>
           </section>
 
-          <div
-            className={[
-              "board",
-              "board-interactive",
-              `perspective-${boardPerspective}`,
-              trainerMode === "free" ? "board-free" : ""
-            ]
-              .filter(Boolean)
-              .join(" ")}
-            aria-label={boardLabel}
-          >
-            <div className="board-grid">
-              {displayedBoard.map((square) => (
-                <button
-                  aria-label={`${square.square}${square.piece ? `, ${square.piece.color === "white" ? "белая" : "черная"} ${square.piece.name}` : ""}`}
-                  className={[
-                    "square",
-                    square.shade,
-                    square.isMoveFrom ? "is-from" : "",
-                    square.isMoveTo ? "is-to" : ""
-                  ]
-                    .filter(Boolean)
-                    .join(" ")}
-                  data-square={square.square}
-                  key={square.square}
-                  onClick={() => handleFreeSquareClick(square.square)}
-                  title={square.square}
-                  type="button"
-                >
-                  {square.showRank ? <span className="coord coord-rank">{square.rank}</span> : null}
-                  {square.showFile ? <span className="coord coord-file">{square.file}</span> : null}
-                  {square.piece ? (
-                    <span
-                      aria-label={`${square.piece.color === "white" ? "белая" : "черная"} ${square.piece.name} ${square.square}`}
-                      className={[
-                        "piece",
-                        `piece-${square.piece.color}`,
-                        square.piece.name === "пешка" ? "piece-pawn" : ""
-                      ]
-                        .filter(Boolean)
-                        .join(" ")}
-                    >
-                      {square.piece.symbol}
-                    </span>
-                  ) : null}
-                </button>
-              ))}
-            </div>
-            {displayedArrow ? (
-              <svg aria-hidden="true" className="move-arrow" viewBox="0 0 100 100">
-                <defs>
-                  <marker
-                    id="arrow-head"
-                    markerHeight="2.4"
-                    markerWidth="2.4"
-                    orient="auto-start-reverse"
-                    refX="1.92"
-                    refY="1.2"
-                  >
-                    <path d="M0,0 L2.4,1.2 L0,2.4 Z" />
-                  </marker>
-                </defs>
-                <line
-                  markerEnd="url(#arrow-head)"
-                  x1={displayedArrow.x1}
-                  x2={displayedArrow.x2}
-                  y1={displayedArrow.y1}
-                  y2={displayedArrow.y2}
-                />
-              </svg>
+          <div className={["board-stage", trainerMode === "free" ? "board-stage-free" : ""].filter(Boolean).join(" ")}>
+            {trainerMode === "free" ? (
+              <aside
+                aria-label={`Оценка Stockfish: ${engineEvaluation.scoreText}, ${engineEvaluation.summary}`}
+                className={`engine-eval-bar engine-advantage-${engineEvaluation.advantage}`}
+                style={engineBarStyle}
+              >
+                <span className="engine-eval-score">{engineEvaluation.scoreText}</span>
+                <span className="engine-eval-side engine-eval-black">черн.</span>
+                <span className="engine-eval-side engine-eval-white">бел.</span>
+                <span aria-hidden="true" className="engine-eval-fill" />
+              </aside>
             ) : null}
+            <div
+              className={[
+                "board",
+                "board-interactive",
+                `perspective-${boardPerspective}`,
+                trainerMode === "free" ? "board-free" : ""
+              ]
+                .filter(Boolean)
+                .join(" ")}
+              aria-label={boardLabel}
+            >
+              <div className="board-grid">
+                {displayedBoard.map((square) => (
+                  <button
+                    aria-label={`${square.square}${square.piece ? `, ${square.piece.color === "white" ? "белая" : "черная"} ${square.piece.name}` : ""}`}
+                    className={[
+                      "square",
+                      square.shade,
+                      square.isMoveFrom ? "is-from" : "",
+                      square.isMoveTo ? "is-to" : ""
+                    ]
+                      .filter(Boolean)
+                      .join(" ")}
+                    data-square={square.square}
+                    key={square.square}
+                    onClick={() => handleFreeSquareClick(square.square)}
+                    title={square.square}
+                    type="button"
+                  >
+                    {square.showRank ? <span className="coord coord-rank">{square.rank}</span> : null}
+                    {square.showFile ? <span className="coord coord-file">{square.file}</span> : null}
+                    {square.piece ? (
+                      <span
+                        aria-label={`${square.piece.color === "white" ? "белая" : "черная"} ${square.piece.name} ${square.square}`}
+                        className={[
+                          "piece",
+                          `piece-${square.piece.color}`,
+                          square.piece.name === "пешка" ? "piece-pawn" : ""
+                        ]
+                          .filter(Boolean)
+                          .join(" ")}
+                      >
+                        {square.piece.symbol}
+                      </span>
+                    ) : null}
+                  </button>
+                ))}
+              </div>
+              {displayedArrow ? (
+                <svg aria-hidden="true" className="move-arrow" viewBox="0 0 100 100">
+                  <defs>
+                    <marker
+                      id="arrow-head"
+                      markerHeight="2.4"
+                      markerWidth="2.4"
+                      orient="auto-start-reverse"
+                      refX="1.92"
+                      refY="1.2"
+                    >
+                      <path d="M0,0 L2.4,1.2 L0,2.4 Z" />
+                    </marker>
+                  </defs>
+                  <line
+                    markerEnd="url(#arrow-head)"
+                    x1={displayedArrow.x1}
+                    x2={displayedArrow.x2}
+                    y1={displayedArrow.y1}
+                    y2={displayedArrow.y2}
+                  />
+                </svg>
+              ) : null}
+            </div>
           </div>
 
           {trainerMode === "free" ? (
@@ -1998,7 +2068,7 @@ export default function OpeningTrainer() {
                   <p className="eyebrow">С нуля</p>
                   <h1 id="opening-title">Свободная тренировка</h1>
                 </div>
-                <span className="status-pill">0</span>
+                <span className="status-pill">{engineEvaluation.scoreText}</span>
               </div>
 
               <div className="insight-grid">
@@ -2019,6 +2089,16 @@ export default function OpeningTrainer() {
                       freeCoach.label
                     )}
                   </p>
+                </article>
+                <article className={`engine-evaluation-card engine-evaluation-${engineEvaluation.status}`}>
+                  <h2>Stockfish</h2>
+                  <p>{engineEvaluation.summary}</p>
+                  <span>
+                    {engineEvaluation.bestMoveSan
+                      ? `Кандидат: ${engineEvaluation.bestMoveSan}`
+                      : "Кандидат появится после расчета."}
+                  </span>
+                  <small>{engineEvaluation.source}</small>
                 </article>
               </div>
 
