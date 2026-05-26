@@ -12,6 +12,7 @@ const RUNTIME_PIECE_FILES = Object.freeze([
 ]);
 
 const OLD_WHITE_PIECE_GLYPHS = /[♙♘♗♖♕♔]/u;
+const CSS_PATH = "app/globals.css";
 
 test("runtime chess pieces use one solid glyph set for both colors", async () => {
   for (const filePath of RUNTIME_PIECE_FILES) {
@@ -19,4 +20,14 @@ test("runtime chess pieces use one solid glyph set for both colors", async () =>
 
     assert.doesNotMatch(source, OLD_WHITE_PIECE_GLYPHS, `${filePath} still renders old outline-only white pieces`);
   }
+});
+
+test("toolbar piece icons keep compact controls instead of board-piece sizing", async () => {
+  const css = await readFile(path.resolve(CSS_PATH), "utf8");
+
+  assert.match(
+    css,
+    /\.toolbar-side\s+\.toolbar-piece\s*{[^}]*font-size:\s*23px;[^}]*transform:\s*none;/s,
+    "toolbar piece icons must override the later board .piece sizing with a toolbar-specific selector"
+  );
 });

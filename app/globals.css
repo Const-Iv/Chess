@@ -163,7 +163,7 @@ button {
   width: 36px;
 }
 
-.toolbar-piece {
+.toolbar-side .toolbar-piece {
   display: block;
   font-size: 23px;
   pointer-events: none;
