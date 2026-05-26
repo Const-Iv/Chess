@@ -287,12 +287,12 @@ const PIECE_SYMBOLS: Readonly<Record<ChessColor, Readonly<Record<string, string>
     r: "♜"
   }),
   w: Object.freeze({
-    b: "♗",
-    k: "♔",
-    n: "♘",
-    p: "♙",
-    q: "♕",
-    r: "♖"
+    b: "♝",
+    k: "♚",
+    n: "♞",
+    p: "♟",
+    q: "♛",
+    r: "♜"
   })
 });
 
@@ -1351,7 +1351,9 @@ export default function OpeningTrainer() {
                     onClick={() => selectToolbarSide("white")}
                     type="button"
                   >
-                    ♕
+                    <span className="piece piece-white toolbar-piece" aria-hidden="true">
+                      ♛
+                    </span>
                   </button>
                   <button
                     aria-label="Играть за черных"
@@ -1359,7 +1361,9 @@ export default function OpeningTrainer() {
                     onClick={() => selectToolbarSide("black")}
                     type="button"
                   >
-                    ♛
+                    <span className="piece piece-black toolbar-piece" aria-hidden="true">
+                      ♛
+                    </span>
                   </button>
                 </div>
                 <div className="training-toolbar-group toolbar-priority" aria-label="Фильтр приоритета">
