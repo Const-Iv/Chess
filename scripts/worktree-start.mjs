@@ -1,13 +1,14 @@
 // @ts-check
 
+import { readdir, stat } from "node:fs/promises";
 import path from "node:path";
+import { setTimeout as sleep } from "node:timers/promises";
 
 import { ensureDependencies } from "./dependency-preflight.mjs";
 import {
   appendHistoryEvent,
   createTaskId,
   ensurePipelineDirs,
-  fileExists,
   findGitRoot,
   formatIso,
   getCodexHome,
@@ -46,6 +47,231 @@ function buildDirtyTreeGuardMessage(repoRoot, allowDirtyRequested) {
   }
   lines.push("Безопасные следующие шаги: `git diff`, затем commit текущей работы или `git stash -u`.");
   return lines.join("\n");
+}
+
+/** @typedef {{openAttempted: boolean, openStatus: "skipped"|"verified"|"unverified"|"failed", openedChat: boolean, openThreadId: string | null, openDiagnostics: string | null, openCommand: string | null}} CodexOpenResult */
+
+const CODEX_OPEN_READBACK_TIMEOUT_MS = 5000;
+const CODEX_OPEN_READBACK_POLL_MS = 500;
+
+/**
+ * @param {string} codexHome
+ * @returns {Promise<string | null>}
+ */
+async function findCodexStateDb(codexHome) {
+  let entries;
+  try {
+    entries = await readdir(codexHome);
+  } catch {
+    return null;
+  }
+  const candidates = [];
+  for (const entry of entries) {
+    if (!/^state_\d+\.sqlite$/.test(entry)) {
+      continue;
+    }
+    const candidate = path.join(codexHome, entry);
+    try {
+      candidates.push({ path: candidate, mtimeMs: (await stat(candidate)).mtimeMs });
+    } catch {
+      // Ignore files that disappear during read-back.
+    }
+  }
+  candidates.sort((a, b) => b.mtimeMs - a.mtimeMs || b.path.localeCompare(a.path));
+  return candidates[0]?.path ?? null;
+}
+
+/**
+ * @param {string} value
+ * @returns {string}
+ */
+function sqliteQuote(value) {
+  return `'${value.replace(/'/g, "''")}'`;
+}
+
+/**
+ * @param {string} cwd
+ * @param {string} codexHome
+ * @param {string} worktreePath
+ * @param {number} notBeforeMs
+ * @returns {Promise<{threadId: string | null, diagnostic: string | null}>}
+ */
+async function findCodexThreadForWorktree(cwd, codexHome, worktreePath, notBeforeMs) {
+  const dbPath = await findCodexStateDb(codexHome);
+  if (!dbPath) {
+    return {
+      threadId: null,
+      diagnostic: `No Codex thread was observed for cwd ${worktreePath}: Codex state db was not found.`
+    };
+  }
+  const query = [
+    "select id from threads",
+    `where archived = 0 and cwd = ${sqliteQuote(worktreePath)} and coalesce(created_at_ms, created_at * 1000) >= ${Math.floor(
+      notBeforeMs
+    )}`,
+    "order by coalesce(created_at_ms, created_at * 1000) desc limit 1;"
+  ].join(" ");
+  const result = runCommand(cwd, "sqlite3", [dbPath, query], { allowFailure: true });
+  if (result.status !== 0) {
+    return {
+      threadId: null,
+      diagnostic: `No Codex thread was observed for cwd ${worktreePath}: sqlite read-back failed (${result.status}).`
+    };
+  }
+  return { threadId: result.stdout.trim().split("\n").find(Boolean) ?? null, diagnostic: null };
+}
+
+/**
+ * @param {string} cwd
+ * @param {string} codexHome
+ * @param {string} worktreePath
+ * @param {number} notBeforeMs
+ * @returns {Promise<{threadId: string | null, diagnostic: string | null}>}
+ */
+async function waitForCodexThread(cwd, codexHome, worktreePath, notBeforeMs) {
+  const deadline = Date.now() + CODEX_OPEN_READBACK_TIMEOUT_MS;
+  let lastDiagnostic = null;
+  do {
+    const result = await findCodexThreadForWorktree(cwd, codexHome, worktreePath, notBeforeMs);
+    if (result.threadId) {
+      return result;
+    }
+    lastDiagnostic = result.diagnostic;
+    if (lastDiagnostic?.includes("state db was not found")) {
+      break;
+    }
+    await sleep(CODEX_OPEN_READBACK_POLL_MS);
+  } while (Date.now() < deadline);
+  return {
+    threadId: null,
+    diagnostic:
+      lastDiagnostic ??
+      `No Codex thread was observed for cwd ${worktreePath} within ${CODEX_OPEN_READBACK_TIMEOUT_MS}ms.`
+  };
+}
+
+/**
+ * @param {string} worktreePath
+ * @param {string} seedMessage
+ * @returns {string}
+ */
+function buildCodexNewThreadUrl(worktreePath, seedMessage) {
+  const params = new URLSearchParams();
+  params.set("path", worktreePath);
+  if (seedMessage.trim()) {
+    params.set("prompt", seedMessage);
+  }
+  return `codex://new?${params.toString()}`;
+}
+
+/**
+ * @param {string} repoRoot
+ * @param {string} worktreePath
+ * @param {string} seedMessage
+ * @returns {{attempted: boolean, ok: boolean, command: string, diagnostic: string}}
+ */
+function openCodexNewThreadComposer(repoRoot, worktreePath, seedMessage) {
+  const url = buildCodexNewThreadUrl(worktreePath, seedMessage);
+  const command = `open ${JSON.stringify(url)}`;
+  if (process.platform !== "darwin") {
+    return {
+      attempted: false,
+      ok: false,
+      command,
+      diagnostic: "Codex new-thread deep link is only supported on macOS."
+    };
+  }
+  const result = runCommand(repoRoot, "open", [url], { allowFailure: true });
+  if (result.status !== 0) {
+    return {
+      attempted: true,
+      ok: false,
+      command,
+      diagnostic: `Codex new-thread deep link failed (${result.status}): ${(result.stderr || result.stdout).trim()}`
+    };
+  }
+  return {
+    attempted: true,
+    ok: true,
+    command,
+    diagnostic: "Codex new-thread deep link opened the target worktree composer."
+  };
+}
+
+/**
+ * @param {string} repoRoot
+ * @param {string} worktreePath
+ * @param {boolean} noOpen
+ * @param {string} seedMessage
+ * @returns {Promise<CodexOpenResult>}
+ */
+async function openCodexTaskChat(repoRoot, worktreePath, noOpen, seedMessage) {
+  const openCommand = `codex app ${JSON.stringify(worktreePath)}`;
+  if (noOpen) {
+    return {
+      openAttempted: false,
+      openStatus: "skipped",
+      openedChat: false,
+      openThreadId: null,
+      openDiagnostics: "Codex auto-open skipped by --no-open or STARTER_NO_OPEN=1.",
+      openCommand
+    };
+  }
+
+  const codexPath = runCommand(repoRoot, "sh", ["-lc", "command -v codex"], { allowFailure: true });
+  if (codexPath.status !== 0) {
+    return {
+      openAttempted: true,
+      openStatus: "failed",
+      openedChat: false,
+      openThreadId: null,
+      openDiagnostics: "Codex CLI was not found in PATH; task worktree was created but no chat was opened.",
+      openCommand
+    };
+  }
+
+  const notBeforeMs = Date.now() - 1000;
+  const opened = runCommand(repoRoot, "codex", ["app", worktreePath], { allowFailure: true });
+  if (opened.status !== 0) {
+    return {
+      openAttempted: true,
+      openStatus: "failed",
+      openedChat: false,
+      openThreadId: null,
+      openDiagnostics: `codex app failed (${opened.status}): ${(opened.stderr || opened.stdout).trim()}`,
+      openCommand
+    };
+  }
+
+  const deepLink = openCodexNewThreadComposer(repoRoot, worktreePath, seedMessage);
+  const effectiveOpenCommand = deepLink.attempted ? `${openCommand}; ${deepLink.command}` : openCommand;
+  if (deepLink.ok) {
+    await sleep(CODEX_OPEN_READBACK_POLL_MS);
+  }
+
+  const readBack = await waitForCodexThread(repoRoot, getCodexHome(), worktreePath, notBeforeMs);
+  if (readBack.threadId) {
+    return {
+      openAttempted: true,
+      openStatus: "verified",
+      openedChat: true,
+      openThreadId: readBack.threadId,
+      openDiagnostics: "Codex thread read-back matched the created worktree cwd.",
+      openCommand: effectiveOpenCommand
+    };
+  }
+  const diagnostics = [readBack.diagnostic, deepLink.diagnostic].filter(Boolean).join(" ");
+  return {
+    openAttempted: true,
+    openStatus: "unverified",
+    openedChat: false,
+    openThreadId: null,
+    openDiagnostics:
+      diagnostics ||
+      readBack.diagnostic ||
+      `No Codex thread was observed for cwd ${worktreePath} after a successful codex app launch attempt.`,
+    openCommand: effectiveOpenCommand
+  };
 }
 
 /**
@@ -107,6 +333,9 @@ async function main() {
     mainWorktreePath
   };
 
+  const openResult = await openCodexTaskChat(repoRoot, worktreePath, noOpen, seedMessage);
+  Object.assign(taskState, openResult);
+
   await saveTaskState(repoRoot, taskState);
   await appendHistoryEvent(repoRoot, {
     at: formatIso(),
@@ -117,15 +346,10 @@ async function main() {
       title,
       seedMessage,
       worktreePath,
-      allowDirtyRequested
+      allowDirtyRequested,
+      ...openResult
     }
   });
-
-  if (!noOpen && (await fileExists(worktreePath))) {
-    runCommand(repoRoot, "sh", ["-lc", `command -v codex >/dev/null 2>&1 && codex app "${worktreePath}" >/dev/null 2>&1 &`], {
-      allowFailure: true
-    });
-  }
 
   const artifactsDir = getTaskArtifactsDir(repoRoot, taskId);
   await ensurePipelineDirs(repoRoot);
@@ -137,7 +361,7 @@ async function main() {
         taskId,
         branch,
         worktreePath,
-        openedChat: !noOpen
+        ...openResult
       },
       null,
       2
