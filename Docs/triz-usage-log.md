@@ -2,12 +2,6 @@
 
 Журнал срабатываний TRIZ-триггеров и применённых решений.
 
-## 2026-04-29T10:14:24.619Z 20260429-083348-74bc
-
-- Branch: `codex/20260429-083348-74bc-agent-const`
-- Reasons: historical_recurrence
-- Status: trigger recorded
-
 ## 2026-04-29T16:26:17.873Z 20260429-162316-4a71
 
 - Branch: `codex/20260429-162316-4a71-teach-starter-rule-share-downstream-import-evidence`
@@ -202,4 +196,10 @@
 
 - Branch: `codex/20260717-094330-625f-share-starter-rules-with-chess`
 - Reasons: cross_module_conflict, historical_recurrence
+- Status: trigger recorded
+
+## 2026-07-17T10:27:03.340Z 20260717-094330-625f
+
+- Branch: `codex/20260717-094330-625f-share-starter-rules-with-chess`
+- Reasons: historical_recurrence
 - Status: trigger recorded
