@@ -2,24 +2,6 @@
 
 Журнал срабатываний TRIZ-триггеров и применённых решений.
 
-## 2026-04-29T08:42:00.000Z 20260429-083348-74bc — TRIZ_APPLIED
-
-- Principle: separation in space / mediator
-- Changes: Agent_Const product-charter approach is moved into starter as a reusable charter pattern and gate, while starter keeps its own baseline mission and explicitly requires downstream projects to replace or extend the charter with product-specific content through adapters/profiles instead of hardcoding it into core governance.
-- Guard: `rg` parity checks verify that old `Summary -> JTBD` rules are gone from canonical docs and that `product-charter` / `Миссия -> Видение -> Цель -> JTBD` are present across `AGENTS.md`, `.memory-bank/*`, `CODEX_MEMORY.md`, mirrors, plan template, blueprint, and README; `npm run qa:agent` and `npm run task:qa:agent` passed.
-
-## 2026-04-29T09:21:19.197Z 20260429-083348-74bc
-
-- Branch: `codex/20260429-083348-74bc-agent-const`
-- Reasons: cross_module_conflict, historical_recurrence
-- Status: trigger recorded
-
-## 2026-04-29T09:22:00.000Z 20260429-083348-74bc — TRIZ_APPLIED
-
-- Principle: preliminary action / mediator
-- Changes: cross-project rule discovery is separated from rule application through `rule-sync:scan`, `rule-sync:report`, and `rule-sync:apply-plan --dry-run`; scan/report can run on a schedule, while actual source edits still require owner approval, managed worktree, plan file, and QA.
-- Guard: `tests/unit/rule-sync.test.mjs` covers discovery, reusable/product-specific classification, report rendering, and safe apply-plan seed generation; `tests/coverage-critical.manifest.json` tracks `scripts/rule-sync.mjs` as critical coverage.
-
 ## 2026-04-29T10:14:24.619Z 20260429-083348-74bc
 
 - Branch: `codex/20260429-083348-74bc-agent-const`
@@ -199,3 +181,25 @@
 - Подходы: separation by stage; preliminary action; standard interface. Preview отделен от production, `qa:security` встроен в canonical `task:merge:main`, generated `Docs/archive/*.md.gz` попадает в publish-stage auto-commit.
 - Что устранено: риск governance-only правила без исполнения в скрипте, риск обхода `qa:security` перед Vercel production update, риск считать preview заменой task QA and риск оставить `main` грязным generated archive после publish-stage sync.
 - Guard: targeted `merge-main-from-main` integration test passed; repeated `npm run task:qa:agent` passed before final finish/merge retry.
+
+## 2026-07-17T10:25:59.753Z 20260717-094330-625f
+
+- Branch: `codex/20260717-094330-625f-share-starter-rules-with-chess`
+- Reasons: cross_module_conflict, historical_recurrence
+- Status: trigger recorded
+
+## 2026-07-17T10:26:06.909Z 20260717-094330-625f — TRIZ_APPLIED
+
+- **Триггеры:** `cross_module_conflict`, `historical_recurrence`.
+- **Противоречие:** reusable baseline должен одинаково действовать во всех canonical/mirror surfaces, но downstream product identity, adapters, profiles и local/private state должны остаться уникальными и неизменными.
+- **Принципы:** разделение по объекту, посредник, копирование и предварительное ограничение.
+- **Решение:** exact missing-list отделён от present/partial rules; stable registry id служит посредником; переносимые формулировки копируются только в заявленные существующие surfaces; product charter получает только отдельный identity guard, когда он есть в target contract.
+- **Что устранено:** исключены bulk-copy чужой product identity, повторный импорт present rules и скрытое смешивание operational/local state с governance.
+- **Guard/evidence:** registry/required-fragment check, downstream full QA, canonical task finish и повторный outbound scan.
+- **Fallback/долг:** отсутствующие downstream skill/template surfaces не создаются автоматически; code seam обновлён только там, где exact missing rule не был реализован поведением.
+
+## 2026-07-17T10:26:30.436Z 20260717-094330-625f
+
+- Branch: `codex/20260717-094330-625f-share-starter-rules-with-chess`
+- Reasons: cross_module_conflict, historical_recurrence
+- Status: trigger recorded
