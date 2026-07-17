@@ -75,3 +75,8 @@ Evidence path: `Docs/echo-tests/chess-opening-root-capability.md`.
 - После появления UI нужен browser smoke: выбор дебюта, ввод линии, показ подсказки, названия варианта, принципа, цели позиции и следующих ходов.
 - Для imported research-карточек source label обязан различать `Lichess exact`, `Lichess prefix` и `SAN legal`; нельзя писать, что prefix-only продолжение является engine-best.
 - Repo-managed skills подключаются через `npm run skills:link`; `--adopt` требует отдельного owner approval.
+
+## Shared Starter Baseline Rules — synced 2026-07-17
+
+- `starter.skills.source-link-flow`: Reusable shared skills хранятся в repo `skills/` и подключаются в `$CODEX_HOME/skills` только через безопасный link flow. Downstream-проекты могут подключать starter как versioned source и линковать skills через `skills-manage.mjs --source <skills-root>`. `.system`, plugin-managed, product-specific skills и generated skill trees (`.agents/skills`, `.claude/skills`, `.cursor/skills`) не импортируются в starter core через bulk-copy.
+- `starter.product-charter.project-identity-unique`: Product charter каждого проекта уникален: mission, vision, goal, target audience, `JTBD`, product constraints and success criteria нельзя импортировать, шарить или подменять из другого проекта. `starter-rule-import` и `starter-rule-share` могут переносить только отдельные approved reusable governance blocks; если такой блок должен жить в product charter, он добавляется как отдельный project-local block/guard и формулируется для конкретного проекта без замены charter identity.
