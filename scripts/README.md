@@ -219,3 +219,7 @@ lint -> lint:fix:changed -> lint -> typecheck -> test -> build
 - `task:qa:agent` всё равно пишет `previewPreparedSha`; это checkpoint contract, а не обещание live preview.
 - Default preview payload: `status = not_supported`.
 - `task:finish:core` не использует legacy `--preview ok|skip`.
+
+## Shared Starter Baseline Rules — synced 2026-07-17
+
+- `starter.product-charter.project-identity-unique`: Product charter каждого проекта уникален: mission, vision, goal, target audience, `JTBD`, product constraints and success criteria нельзя импортировать, шарить или подменять из другого проекта. `starter-rule-import` и `starter-rule-share` могут переносить только отдельные approved reusable governance blocks; если такой блок должен жить в product charter, он добавляется как отдельный project-local block/guard и формулируется для конкретного проекта без замены charter identity.
