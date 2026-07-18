@@ -1417,6 +1417,7 @@ export default function OpeningTrainer() {
   );
   const boardMoves = trainerMode === "free" ? freeMoves : catalogSeedMoves;
   const boardChess = useMemo(() => replayFreeChess(boardMoves), [boardMoves]);
+  const boardFen = boardChess.fen();
   const boardLastMove = boardMoves[boardMoves.length - 1] ?? null;
   const interactiveContinuationCards = getInteractiveContinuationCards(lesson);
   const selectedLearningCard = interactiveContinuationCards.find(
@@ -1534,18 +1535,14 @@ export default function OpeningTrainer() {
   }, []);
 
   useEffect(() => {
-    if (trainerMode !== "free") {
-      return;
-    }
-
     let isCurrentPosition = true;
-    setEngineEvaluation((previous) => markEngineEvaluationRefreshing(previous, freeFen));
+    setEngineEvaluation((previous) => markEngineEvaluationRefreshing(previous, boardFen));
 
     const evaluator = stockfishEvaluator.current ?? new BrowserStockfishEvaluator();
     stockfishEvaluator.current = evaluator;
 
     evaluator
-      .evaluateFen(freeFen)
+      .evaluateFen(boardFen)
       .then((view) => {
         if (isCurrentPosition) {
           setEngineEvaluation(view);
@@ -1565,7 +1562,7 @@ export default function OpeningTrainer() {
     return () => {
       isCurrentPosition = false;
     };
-  }, [freeFen, trainerMode]);
+  }, [boardFen]);
 
   function enterFreeTraining() {
     const nextSide = trainerMode === "free" ? freeSide : studySideFilter;
@@ -1854,19 +1851,17 @@ export default function OpeningTrainer() {
             </div>
           </section>
 
-          <div className={["board-stage", trainerMode === "free" ? "board-stage-free" : ""].filter(Boolean).join(" ")}>
-            {trainerMode === "free" ? (
-              <aside
-                aria-label={`Оценка Stockfish: ${engineEvaluation.scoreText}, ${engineEvaluation.summary}`}
-                className={`engine-eval-bar engine-advantage-${engineEvaluation.advantage}`}
-                style={engineBarStyle}
-              >
-                <span className="engine-eval-score">{engineEvaluation.scoreText}</span>
-                <span className="engine-eval-side engine-eval-black">черн.</span>
-                <span className="engine-eval-side engine-eval-white">бел.</span>
-                <span aria-hidden="true" className="engine-eval-fill" />
-              </aside>
-            ) : null}
+          <div className="board-stage">
+            <aside
+              aria-label={`Оценка Stockfish: ${engineEvaluation.scoreText}, ${engineEvaluation.summary}`}
+              className={`engine-eval-bar engine-advantage-${engineEvaluation.advantage}`}
+              style={engineBarStyle}
+            >
+              <span className="engine-eval-score">{engineEvaluation.scoreText}</span>
+              <span className="engine-eval-side engine-eval-black">черн.</span>
+              <span className="engine-eval-side engine-eval-white">бел.</span>
+              <span aria-hidden="true" className="engine-eval-fill" />
+            </aside>
             <div
               className={[
                 "board",

@@ -54,6 +54,7 @@ button {
   background: var(--panel);
   border: 1px solid var(--line);
   border-radius: 8px;
+  min-width: 0;
   box-shadow: var(--shadow);
 }
 
@@ -280,11 +281,9 @@ button {
   align-items: stretch;
   display: grid;
   gap: 8px;
-  grid-template-columns: 1fr;
-}
-
-.board-stage-free {
   grid-template-columns: 34px minmax(0, 1fr);
+  max-width: 100%;
+  min-width: 0;
 }
 
 .engine-eval-bar {
@@ -348,6 +347,7 @@ button {
 .board {
   aspect-ratio: 1;
   border: 2px solid #5c442d;
+  min-width: 0;
   overflow: hidden;
   position: relative;
   width: 100%;
@@ -1215,6 +1215,25 @@ button.continuation-theory {
 
   .board-explorer {
     gap: 8px;
+  }
+
+  .board-step-card div {
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .board-step-card strong {
+    margin-left: auto;
+  }
+
+  .board-step-card .move-quality-badge {
+    max-width: 100%;
+    white-space: normal;
+  }
+
+  .board-step-card .move-quality-label {
+    line-height: 1.15;
   }
 
   .step-arrow {
